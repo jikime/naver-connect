@@ -3,7 +3,6 @@ import { Geist_Mono, Hind, Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { GlobalNav } from "@/components/shell/GlobalNav";
 import { MotionProvider } from "@/components/shell/MotionProvider";
-import { PhaseBanner } from "@/components/shell/PhaseBanner";
 import {
   type PersonaRosterEntry,
   RoleSwitcher,
@@ -77,7 +76,6 @@ export default async function RootLayout({
             </div>
             <GlobalNav />
           </header>
-          <PhaseBanner />
           <main className="flex flex-1 flex-col">{children}</main>
         </MotionProvider>
       </body>
