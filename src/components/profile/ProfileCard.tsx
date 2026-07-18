@@ -9,6 +9,13 @@
 
 import { useEffect, useId, useState } from "react";
 import { VisibilityGate } from "@/components/shared/VisibilityGate";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import fieldsSeed from "@/data/fields.json";
 import { getMember, getMembers } from "@/lib/dal";
 import { useViewerContext } from "@/stores/viewer-context";
@@ -91,19 +98,19 @@ export function ProfileCard() {
         >
           보고 있는 프로필
         </label>
-        <select
-          id={selectId}
-          value={selectedId}
-          onChange={(e) => setSelectedId(e.target.value)}
-          className="h-9 border border-input bg-background px-2 text-sm text-foreground"
-        >
-          {roster.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-              {r.id === vc.personaId ? " (나)" : ""}
-            </option>
-          ))}
-        </select>
+        <Select value={selectedId} onValueChange={setSelectedId}>
+          <SelectTrigger id={selectId} className="w-auto">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {roster.map((r) => (
+              <SelectItem key={r.id} value={r.id}>
+                {r.name}
+                {r.id === vc.personaId ? " (나)" : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <p className="text-xs text-guud-text-muted-2">

@@ -31,8 +31,10 @@ export function CoverageSummary({ region }: { region: Region }) {
         </div>
       </div>
 
-      <div className="border border-destructive/40 bg-destructive/5 p-4">
-        <p className="text-xs font-semibold text-destructive">완전 공백 축</p>
+      <div className="border border-destructive/40 bg-muted p-4">
+        {/* 모드 B 회송: text-destructive on bg-destructive/5는 3.28:1로 AA 미달 —
+            배경 틴트를 제거하고 텍스트는 text-foreground(21:1)로, 강조는 테두리(destructive)만 담당 */}
+        <p className="text-xs font-semibold text-foreground">완전 공백 축</p>
         <p className="mt-1 font-heading text-xl font-bold text-foreground">
           {region.highlighted_gap_axis}
         </p>

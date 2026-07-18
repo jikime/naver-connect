@@ -49,7 +49,7 @@ export function SupplierView({ services }: { services: ExpertService[] }) {
           </p>
         </div>
       ) : (
-        <p className="text-xs text-guud-text-faint">
+        <p className="text-xs text-muted-foreground">
           등록된 공급 카탈로그가 아직 없습니다(향후 확장).
         </p>
       )}

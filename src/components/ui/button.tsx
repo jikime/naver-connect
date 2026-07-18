@@ -21,8 +21,10 @@ const buttonVariants = cva(
         link: "text-primary underline underline-offset-4 hover:underline",
       },
       size: {
+        // 모드 B 회송: 기본 버튼 40px는 모바일 터치 타깃 44px 미만 — h-11로 상향(온보딩 단계이동 등
+        // size 미지정 CTA 전반에 일괄 적용). sm/xs/icon-*는 의도된 압축 컨텍스트라 그대로 유지.
         default:
-          "h-10 gap-1.5 px-6 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+          "h-11 gap-1.5 px-6 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
         xs: "h-7 gap-1 px-3 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-9 gap-1 px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
         lg: "h-11 gap-1.5 px-8 has-data-[icon=inline-end]:pr-5 has-data-[icon=inline-start]:pl-5",

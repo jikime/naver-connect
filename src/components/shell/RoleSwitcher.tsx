@@ -6,7 +6,13 @@
 // Server Component(layout.tsx)가 DAL(getMembers)로 읽어 공개 필드만 props로 내려준다
 // (민감 시드를 Client Component가 직접 import하지 않는다, ADR-03/04).
 
-import { useId } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   OPERATOR_PERSONA_ID,
   useViewerContextStore,
@@ -29,7 +35,6 @@ export function RoleSwitcher({ personas }: { personas: PersonaRosterEntry[] }) {
   const role = useViewerContextStore((state) => state.role);
   const personaId = useViewerContextStore((state) => state.personaId);
   const setViewer = useViewerContextStore((state) => state.setViewer);
-  const personaSelectId = useId();
 
   const personasForRole = personas.filter(
     (p) => roleForMemberType(p.member_type) === role,
@@ -77,23 +82,22 @@ export function RoleSwitcher({ personas }: { personas: PersonaRosterEntry[] }) {
       </fieldset>
 
       {role !== "운영자" && (
-        <>
-          <label htmlFor={personaSelectId} className="sr-only">
-            페르소나 선택
-          </label>
-          <select
-            id={personaSelectId}
-            value={personaId}
-            onChange={(e) => handlePersonaChange(e.target.value)}
-            className="border border-input bg-background px-2 py-1.5 text-xs text-foreground"
+        <Select value={personaId} onValueChange={handlePersonaChange}>
+          <SelectTrigger
+            size="sm"
+            aria-label="페르소나 선택"
+            className="w-auto text-xs"
           >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
             {personasForRole.map((p) => (
-              <option key={p.id} value={p.id}>
+              <SelectItem key={p.id} value={p.id}>
                 {p.name}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-        </>
+          </SelectContent>
+        </Select>
       )}
     </div>
   );

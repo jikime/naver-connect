@@ -6,6 +6,7 @@ export * from "./deal";
 export * from "./ecosystem";
 export * from "./errors";
 export * from "./gap-report";
+export * from "./knowledge-graph";
 export * from "./kpi";
 export * from "./members";
 export * from "./onboarding";

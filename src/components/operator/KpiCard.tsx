@@ -1,7 +1,11 @@
 // KpiCard — 목표선/현재선 구분 미터 + 가정치 뱃지("달성" 오인 방지, FR-KP-03/BR-09).
 // 근거: ARCHITECTURE.md §3(L2 KpiDash), TASKS.md T-016, FR-KP-01/02/03
+// Task #21: 게이지 바가 목표 폭까지 채워지고 현재 수치가 카운트업된다(가정치 뱃지는 정적 유지 —
+// "달성"으로 착시되지 않도록 애니메이션을 주지 않는다, BR-09).
 
+import { motion } from "motion/react";
 import { AssumptionBadge } from "@/components/shared/AssumptionBadge";
+import { CountUp } from "@/components/shared/CountUp";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Kpi } from "@/types";
 
@@ -23,9 +27,11 @@ export function KpiCard({ kpi }: { kpi: Kpi }) {
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="relative h-2 w-full rounded-full bg-muted">
-          <div
+          <motion.div
             className="h-full rounded-full bg-primary"
-            style={{ width: `${currentPct}%` }}
+            initial={{ width: 0 }}
+            animate={{ width: `${currentPct}%` }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           />
           <div
             className="absolute inset-y-0 w-0.5 bg-foreground"
@@ -37,7 +43,7 @@ export function KpiCard({ kpi }: { kpi: Kpi }) {
           <span>
             현재{" "}
             <strong className="font-semibold text-foreground">
-              {kpi.current}
+              <CountUp value={kpi.current} />
               {kpi.unit}
             </strong>
           </span>

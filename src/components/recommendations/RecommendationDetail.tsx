@@ -3,6 +3,7 @@
 // RecommendationDetail — 추천 상세 카드. 5문장 구조 + 매칭유형 배지 + [만나볼래요]/[이번엔 패스] CTA.
 // 근거: ARCHITECTURE.md §3(L2 RecDetail), TASKS.md T-013/T-014, FR-RC-03/04/05/06/07, FR-FB-01~04
 
+import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import { AssumptionBadge } from "@/components/shared/AssumptionBadge";
 import { HotLeadBadge } from "@/components/shared/HotLeadBadge";
@@ -99,7 +100,12 @@ export function RecommendationDetail({ id }: { id: string }) {
           <RecommendationMessage rec={rec} />
 
           {rec.status === "declined" && (
-            <div className="border border-guud-hairline bg-muted p-4 text-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="border border-guud-hairline bg-muted p-4 text-sm"
+            >
               <p className="font-semibold text-foreground">이번엔 패스했어요</p>
               {declinedReason && (
                 <p className="mt-1 text-guud-text-muted-2">
@@ -112,11 +118,16 @@ export function RecommendationDetail({ id }: { id: string }) {
                   메모: {rec.decline_note}
                 </p>
               )}
-            </div>
+            </motion.div>
           )}
 
           {rec.meeting_outcome && (
-            <div className="border border-guud-hairline bg-muted p-4 text-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="border border-guud-hairline bg-muted p-4 text-sm"
+            >
               <p className="font-semibold text-foreground">
                 만남 후기가 등록됐어요
               </p>
@@ -130,13 +141,20 @@ export function RecommendationDetail({ id }: { id: string }) {
                   {rec.meeting_outcome.note}
                 </p>
               )}
-            </div>
+            </motion.div>
           )}
 
           {rec.status !== "declined" && !rec.meeting_outcome && (
-            <>
+            <AnimatePresence mode="wait">
               {mode === "idle" && (
-                <div className="flex flex-wrap gap-2">
+                <motion.div
+                  key="idle"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex flex-wrap gap-2"
+                >
                   <Button onClick={() => setMode("meeting")}>만나볼래요</Button>
                   <Button
                     variant="outline"
@@ -144,32 +162,48 @@ export function RecommendationDetail({ id }: { id: string }) {
                   >
                     이번엔 패스할게요
                   </Button>
-                </div>
+                </motion.div>
               )}
               {mode === "declining" && (
-                <DeclineReasonPanel
-                  vc={vc}
-                  recId={rec.id}
-                  reasons={reasons}
-                  onCancel={() => setMode("idle")}
-                  onSubmitted={() => {
-                    setMode("idle");
-                    void reload();
-                  }}
-                />
+                <motion.div
+                  key="declining"
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -12 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  <DeclineReasonPanel
+                    vc={vc}
+                    recId={rec.id}
+                    reasons={reasons}
+                    onCancel={() => setMode("idle")}
+                    onSubmitted={() => {
+                      setMode("idle");
+                      void reload();
+                    }}
+                  />
+                </motion.div>
               )}
               {mode === "meeting" && (
-                <MeetingOutcomeForm
-                  vc={vc}
-                  recId={rec.id}
-                  onCancel={() => setMode("idle")}
-                  onSubmitted={() => {
-                    setMode("idle");
-                    void reload();
-                  }}
-                />
+                <motion.div
+                  key="meeting"
+                  initial={{ opacity: 0, x: 12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 12 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  <MeetingOutcomeForm
+                    vc={vc}
+                    recId={rec.id}
+                    onCancel={() => setMode("idle")}
+                    onSubmitted={() => {
+                      setMode("idle");
+                      void reload();
+                    }}
+                  />
+                </motion.div>
               )}
-            </>
+            </AnimatePresence>
           )}
         </CardContent>
       </Card>

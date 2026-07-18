@@ -18,7 +18,7 @@ export function NodeDetailPanel({
   if (!node) {
     return (
       <div className="flex h-full min-h-40 items-center justify-center border border-dashed border-guud-hairline p-4 text-center text-sm text-guud-text-muted-2">
-        연결맵에서 노드를 선택하면 주체 상세가 여기 표시됩니다.
+        연결맵·지역 맵에서 노드를 선택하면 주체 상세가 여기 표시됩니다.
       </div>
     );
   }

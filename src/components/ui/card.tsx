@@ -12,7 +12,10 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden bg-card py-(--card-spacing) text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 [--card-spacing:--spacing(8)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(5)] *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
+        // 모드 B 회송(7): shadow-sm + ring-1은 DESIGN.md elevation 토큰(none/1-soft/inset)에
+        // 없는 off-system 그림자 — guud는 "거의 플랫"이 원칙이라 elevation.none으로 내리고,
+        // 깊이는 앱 전반의 다른 패널과 동일하게 hairline 테두리로만 표현한다.
+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden border border-guud-hairline bg-card py-(--card-spacing) text-sm text-card-foreground [--card-spacing:--spacing(8)] has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(5)] *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
         className,
       )}
       {...props}

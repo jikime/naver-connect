@@ -78,7 +78,7 @@ export function DealRoomCard({ room }: { room: DealRoom }) {
             님의 핫리드에서 시작된 씨앗입니다.
           </p>
         )}
-        <p className="text-xs text-guud-text-faint">{room.source_ref}</p>
+        <p className="text-xs text-muted-foreground">{room.source_ref}</p>
         <div className="flex flex-wrap gap-1.5">
           {(["G1", "G2", "G3", "G4"] as const).map((gate) => (
             <GateStatusBadge

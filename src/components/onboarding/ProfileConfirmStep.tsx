@@ -9,6 +9,13 @@ import { useId } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import fieldsSeed from "@/data/fields.json";
 import { cn } from "@/lib/utils";
@@ -169,7 +176,8 @@ export function ProfileConfirmStep({
                 aria-pressed={active}
                 onClick={() => toggleField(field.id)}
                 className={cn(
-                  "rounded-full border px-3 py-1 text-xs font-semibold",
+                  // 모드 B 회송: 터치 타깃 44px 미만(26px) — min-h-11 + inline-flex로 확보
+                  "inline-flex min-h-11 items-center rounded-full border px-3 py-1 text-xs font-semibold",
                   active
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-background text-guud-text-muted-2 hover:text-foreground",
@@ -211,21 +219,25 @@ export function ProfileConfirmStep({
         {draft.trustConnections.map((tc, index) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: 순서 변경 없는 편집 목록이라 인덱스 키로 충분
           <div key={index} className="flex flex-wrap items-center gap-2">
-            <select
+            <Select
               value={tc.type}
-              onChange={(e) =>
+              onValueChange={(value) =>
                 updateTrustConnection(index, {
-                  type: e.target.value as TrustConnectionDraft["type"],
+                  type: value as TrustConnectionDraft["type"],
                 })
               }
-              className="h-9 border border-input bg-background px-2 text-xs text-foreground"
             >
-              {TRUST_CONNECTION_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger size="sm" className="w-auto text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TRUST_CONNECTION_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Input
               value={tc.ref}
               onChange={(e) =>

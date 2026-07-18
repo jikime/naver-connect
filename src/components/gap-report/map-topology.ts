@@ -126,3 +126,111 @@ export function resolveHighlightedAxisNodes(axis: string): Set<string> {
   }
   return nodeIds;
 }
+
+/**
+ * "회원 기관은 링 강조"(팀리드 T-020 지시) — organizations.json에서 member_id가
+ * 채워진 조직(ORG-001~008, 8인 페르소나 본인 조직 1:1)이 걸린 노드를 찾는다.
+ * 색이 아니라 노드 마커의 이중 테두리(링) 모양으로 표시해 NFR-05 색맹 대응을 지킨다.
+ */
+export function computeMemberNodeIds(
+  orgs: { value_chain_stage_id: number; member_id: string | null }[],
+): Set<string> {
+  const nodeIds = new Set<string>();
+  for (const org of orgs) {
+    if (!org.member_id) continue;
+    const nodeId = stageToNode.get(org.value_chain_stage_id);
+    if (nodeId) nodeIds.add(nodeId);
+  }
+  return nodeIds;
+}
+
+// ---------------------------------------------------------------------------
+// 지역 맵 뷰(T-020) — 같은 6노드·엣지를 "구역 지도" 프레이밍으로 재배치한다.
+// 한빛구는 가상 지역이라 실제 TopoJSON 경계가 없다(팀리드 지시) — 외곽선·구역
+// 블록 전부 손수 그린 정적 도형(둥근 사각형)으로 "추상화된 지도"임을 의도적으로
+// 드러낸다. 좌표는 ADR-02와 동일하게 사전계산된 상수(런타임 레이아웃 계산 없음).
+
+export interface MapZone {
+  id: string;
+  label: string;
+  /** 이 구역에 속한 노드 id들 */
+  nodeIds: string[];
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** guud 토큰만 사용하는 채움 클래스 — 색상보다 라벨·테두리 패턴으로 구분(NFR-05) */
+  fillClassName: string;
+}
+
+export const DISTRICT_VIEWBOX = { width: 640, height: 460 };
+
+export const DISTRICT_BOUNDARY = { x: 20, y: 20, width: 600, height: 420 };
+
+// 팀리드 지시: "canvas 바탕, hairline 경계" — 구역은 채움색 다변화 대신 캔버스
+// 배경 + hairline 테두리로 통일하고, 구역 구분은 라벨 텍스트가 맡는다(NFR-05
+// "색보다 라벨" 원칙과도 일치). header-band 베이지는 아래 DISTRICT_GREENS의
+// 소규모 "공원" 장식에만 절제해서 쓴다.
+export const DISTRICT_ZONES: MapZone[] = [
+  {
+    id: "care-zone",
+    label: "돌봄권역",
+    nodeIds: ["care-home", "daycare"],
+    x: 40,
+    y: 40,
+    width: 280,
+    height: 200,
+    fillClassName: "fill-background",
+  },
+  {
+    id: "medical-zone",
+    label: "의료권역",
+    nodeIds: ["hospital", "medical-coop"],
+    x: 340,
+    y: 40,
+    width: 240,
+    height: 200,
+    fillClassName: "fill-background",
+  },
+  {
+    id: "housing-zone",
+    label: "주거권역",
+    nodeIds: ["social-housing"],
+    x: 40,
+    y: 260,
+    width: 240,
+    height: 160,
+    fillClassName: "fill-background",
+  },
+  {
+    id: "transport-zone",
+    label: "교통권역",
+    nodeIds: ["transport"],
+    x: 300,
+    y: 260,
+    width: 280,
+    height: 160,
+    fillClassName: "fill-background",
+  },
+];
+
+/**
+ * "동네" 느낌을 위한 장식용 녹지·공원 패치 — 데이터 아님(순수 장식), 구역 사이
+ * 여백에 header-band 베이지를 절제해서 얹는다("녹지/공원 암시", 팀리드 지시).
+ * 경계 없이 부드러운 원형(rx=height/2)만 써서 각진 구역 블록과 형태로도 구분된다.
+ */
+export const DISTRICT_GREEN_PATCHES = [
+  { id: "park-center", cx: 320, cy: 230, r: 26 },
+  { id: "park-south", cx: 300, cy: 400, r: 16 },
+] as const;
+
+/** 지역 맵 뷰에서 각 노드가 자리할 좌표(구역 내부). 그래프 뷰(MAP_NODES.x/y)와는 별개. */
+export const DISTRICT_NODE_POSITIONS: Record<string, { x: number; y: number }> =
+  {
+    "care-home": { x: 180, y: 100 },
+    daycare: { x: 180, y: 190 },
+    hospital: { x: 460, y: 100 },
+    "medical-coop": { x: 460, y: 190 },
+    "social-housing": { x: 160, y: 340 },
+    transport: { x: 440, y: 340 },
+  };

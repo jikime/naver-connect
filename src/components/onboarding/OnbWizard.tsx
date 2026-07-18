@@ -6,6 +6,7 @@
 // 협업준비도='구체적 프로젝트 있음'→hot_lead(스텝6 후속질문 +3 분기 트리거, FR-ON-05).
 
 import { AlertTriangle } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MatchTypeBadge } from "@/components/shared/MatchTypeBadge";
@@ -47,6 +48,13 @@ interface FinalizeResult {
   member: MaskedMember;
   firstRecommendations: Recommendation[];
 }
+
+// Task #21: 스텝 전환 슬라이드(direction: 다음=1 → 오른쪽에서 진입/왼쪽으로 퇴장, 이전=-1 → 반대)
+const stepVariants = {
+  enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 24 : -24 }),
+  center: { opacity: 1, x: 0 },
+  exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -24 : 24 }),
+};
 
 function canProceedFromStep(step: number, draft: OnboardingDraft): boolean {
   switch (step) {
@@ -92,6 +100,8 @@ export function OnbWizard() {
   );
 
   const [step, setStep] = useState(1);
+  // Task #21: 스텝 전환 슬라이드 방향(다음=1, 이전=-1) — AnimatePresence의 initial/exit에 사용
+  const [direction, setDirection] = useState(1);
   const [draft, setDraft] = useState<OnboardingDraft>(createEmptyDraft());
   const [followupQueue, setFollowupQueue] = useState<FollowupQueueItem[]>([]);
 
@@ -151,6 +161,11 @@ export function OnbWizard() {
     setDraft((prev) => ({ ...prev, ...patch }));
   }
 
+  function goToStep(next: number) {
+    setDirection(next > step ? 1 : -1);
+    setStep(next);
+  }
+
   async function handleAcknowledgeNotice() {
     const priority = draft.demandSelections.find((s) => s.priority);
     const otherDemand = draft.demandSelections.find((s) => !s.priority);
@@ -200,7 +215,7 @@ export function OnbWizard() {
     }
 
     setFollowupQueue(items);
-    setStep(6);
+    goToStep(6);
   }
 
   function handleFollowupAnswer(item: FollowupQueueItem, answer: string) {
@@ -341,85 +356,111 @@ export function OnbWizard() {
         </div>
       </div>
 
-      {step === 1 && (
-        <ProfileConfirmStep draft={draft} onChange={updateDraft} mode="edit" />
-      )}
-      {step === 2 && (
-        <DemandSelectStep tags={tags} draft={draft} onChange={updateDraft} />
-      )}
-      {step === 3 && (
-        <SupplySelectStep tags={tags} draft={draft} onChange={updateDraft} />
-      )}
-      {step === 4 && (
-        <CollaborationTraitsStep draft={draft} onChange={updateDraft} />
-      )}
-      {step === 5 && scriptMeta && (
-        <SensitiveInfoNotice
-          notice={scriptMeta.sensitive_notice}
-          onAcknowledge={handleAcknowledgeNotice}
-        />
-      )}
-      {step === 6 && (
-        <FollowupQuestionStep
-          queue={followupQueue}
-          onAnswer={handleFollowupAnswer}
-          onComplete={() => updateDraft({ followupDone: true })}
-          done={draft.followupDone}
-        />
-      )}
-      {step === 7 && (
-        <div className="space-y-4">
-          <ProfileConfirmStep
-            draft={draft}
-            onChange={updateDraft}
-            mode="review"
-          />
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="border border-guud-hairline p-3">
-              <p className="mb-2 text-xs font-semibold text-guud-text-muted-2">
-                공개 프로필에 표시
-              </p>
-              <ul className="space-y-1 text-sm text-foreground">
-                {draft.supplySelections.map((s) => {
-                  const tag = tags.find((t) => t.id === s.tagId);
-                  return (
-                    <li key={s.tagId}>
-                      {tag?.name}: {s.detail}
-                    </li>
-                  );
-                })}
-                <li>활동: {draft.activities.join(", ")}</li>
-                <li>선호 방식: {draft.preferredMode}</li>
-              </ul>
-            </div>
-            <div className="border border-dashed border-guud-text-faint p-3">
-              <p className="mb-2 text-xs font-semibold text-guud-text-muted-2">
-                비공개(본인·운영자만)
-              </p>
-              <ul className="space-y-1 text-sm text-foreground">
-                {draft.demandSelections.map((s) => {
-                  const tag = tags.find((t) => t.id === s.tagId);
-                  return (
-                    <li key={s.tagId}>
-                      {s.priority ? "★ " : ""}
-                      {tag?.name}
-                    </li>
-                  );
-                })}
-                <li>가용시간: {draft.availability}</li>
-                {isHotLead(draft.readiness) && <li>핫리드 대상</li>}
-              </ul>
-            </div>
-          </div>
-          <VisibilityConsent
-            checked={draft.visibilityConsent}
-            onChange={(checked) => updateDraft({ visibilityConsent: checked })}
-          />
-          {finalizeError && (
-            <p className="text-sm text-destructive">{finalizeError}</p>
+      <AnimatePresence mode="wait" custom={direction}>
+        <motion.div
+          key={step}
+          custom={direction}
+          variants={stepVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.18 }}
+        >
+          {step === 1 && (
+            <ProfileConfirmStep
+              draft={draft}
+              onChange={updateDraft}
+              mode="edit"
+            />
           )}
-        </div>
-      )}
+          {step === 2 && (
+            <DemandSelectStep
+              tags={tags}
+              draft={draft}
+              onChange={updateDraft}
+            />
+          )}
+          {step === 3 && (
+            <SupplySelectStep
+              tags={tags}
+              draft={draft}
+              onChange={updateDraft}
+            />
+          )}
+          {step === 4 && (
+            <CollaborationTraitsStep draft={draft} onChange={updateDraft} />
+          )}
+          {step === 5 && scriptMeta && (
+            <SensitiveInfoNotice
+              notice={scriptMeta.sensitive_notice}
+              onAcknowledge={handleAcknowledgeNotice}
+            />
+          )}
+          {step === 6 && (
+            <FollowupQuestionStep
+              queue={followupQueue}
+              onAnswer={handleFollowupAnswer}
+              onComplete={() => updateDraft({ followupDone: true })}
+              done={draft.followupDone}
+            />
+          )}
+          {step === 7 && (
+            <div className="space-y-4">
+              <ProfileConfirmStep
+                draft={draft}
+                onChange={updateDraft}
+                mode="review"
+              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="border border-guud-hairline p-3">
+                  <p className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+                    공개 프로필에 표시
+                  </p>
+                  <ul className="space-y-1 text-sm text-foreground">
+                    {draft.supplySelections.map((s) => {
+                      const tag = tags.find((t) => t.id === s.tagId);
+                      return (
+                        <li key={s.tagId}>
+                          {tag?.name}: {s.detail}
+                        </li>
+                      );
+                    })}
+                    <li>활동: {draft.activities.join(", ")}</li>
+                    <li>선호 방식: {draft.preferredMode}</li>
+                  </ul>
+                </div>
+                <div className="border border-dashed border-guud-text-faint p-3">
+                  <p className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+                    비공개(본인·운영자만)
+                  </p>
+                  <ul className="space-y-1 text-sm text-foreground">
+                    {draft.demandSelections.map((s) => {
+                      const tag = tags.find((t) => t.id === s.tagId);
+                      return (
+                        <li key={s.tagId}>
+                          {s.priority ? "★ " : ""}
+                          {tag?.name}
+                        </li>
+                      );
+                    })}
+                    <li>가용시간: {draft.availability}</li>
+                    {isHotLead(draft.readiness) && <li>핫리드 대상</li>}
+                  </ul>
+                </div>
+              </div>
+              <VisibilityConsent
+                checked={draft.visibilityConsent}
+                onChange={(checked) =>
+                  updateDraft({ visibilityConsent: checked })
+                }
+              />
+              {finalizeError && (
+                <p className="text-sm text-destructive">{finalizeError}</p>
+              )}
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {step !== 5 && (
         <div className="flex items-center justify-between border-t border-guud-hairline pt-4">
@@ -427,7 +468,7 @@ export function OnbWizard() {
             type="button"
             variant="outline"
             disabled={step === 1}
-            onClick={() => setStep((s) => Math.max(1, s - 1))}
+            onClick={() => goToStep(Math.max(1, step - 1))}
           >
             이전
           </Button>
@@ -443,7 +484,7 @@ export function OnbWizard() {
             <Button
               type="button"
               disabled={!canProceed}
-              onClick={() => setStep((s) => Math.min(TOTAL_STEPS, s + 1))}
+              onClick={() => goToStep(Math.min(TOTAL_STEPS, step + 1))}
             >
               다음
             </Button>
@@ -455,7 +496,7 @@ export function OnbWizard() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => setStep((s) => Math.max(1, s - 1))}
+            onClick={() => goToStep(Math.max(1, step - 1))}
           >
             이전
           </Button>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Hind, Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { GlobalNav } from "@/components/shell/GlobalNav";
+import { MotionProvider } from "@/components/shell/MotionProvider";
 import { PhaseBanner } from "@/components/shell/PhaseBanner";
 import {
   type PersonaRosterEntry,
@@ -66,17 +67,19 @@ export default async function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        <header className="bg-guud-header-band">
-          <div className="flex items-center justify-between px-[30px] py-3">
-            <span className="font-heading text-lg font-bold text-foreground">
-              AX 플랫폼
-            </span>
-            <RoleSwitcher personas={personas} />
-          </div>
-          <GlobalNav />
-        </header>
-        <PhaseBanner />
-        <main className="flex flex-1 flex-col">{children}</main>
+        <MotionProvider>
+          <header className="bg-guud-header-band">
+            <div className="flex items-center justify-between px-[30px] py-3">
+              <span className="font-heading text-lg font-bold text-foreground">
+                AX 플랫폼
+              </span>
+              <RoleSwitcher personas={personas} />
+            </div>
+            <GlobalNav />
+          </header>
+          <PhaseBanner />
+          <main className="flex flex-1 flex-col">{children}</main>
+        </MotionProvider>
       </body>
     </html>
   );

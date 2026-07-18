@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { submitDecline } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import type { DeclineReason, DeclineReasonCode, ViewerContext } from "@/types";
@@ -83,12 +84,12 @@ export function DeclineReasonPanel({
           <label htmlFor="decline-note" className="sr-only">
             기타 사유 한 줄
           </label>
-          <input
+          <Input
             id="decline-note"
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="한 줄로 남겨주세요"
-            className="flex-1 border border-input bg-background px-3 py-2 text-sm"
+            className="flex-1"
           />
           <Button
             size="sm"

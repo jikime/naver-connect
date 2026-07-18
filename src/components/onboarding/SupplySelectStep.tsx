@@ -4,6 +4,7 @@
 // 근거: ARCHITECTURE.md §3(L2 OnbWizard), TASKS.md T-009a
 // 태그 선택 카드(pill 토글). 선택된 태그만 상세 설명 입력란이 열린다(공개 프로필 supply_tags.detail).
 
+import { motion } from "motion/react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { Tag } from "@/types";
@@ -71,11 +72,13 @@ export function SupplySelectStep({
                   disabled && "opacity-50",
                 )}
               >
-                <button
+                <motion.button
                   type="button"
                   aria-pressed={active}
                   disabled={disabled}
                   onClick={() => toggleTag(tag.id)}
+                  whileTap={disabled ? undefined : { scale: 0.97 }}
+                  transition={{ duration: 0.1 }}
                   className="block w-full text-left disabled:cursor-not-allowed"
                 >
                   <span className="block text-sm font-semibold text-foreground">
@@ -84,7 +87,7 @@ export function SupplySelectStep({
                   <span className="block text-xs text-guud-text-muted-2">
                     {tag.supply_desc}
                   </span>
-                </button>
+                </motion.button>
                 {active && (
                   <Textarea
                     aria-label={`${tag.name} 공급 상세`}

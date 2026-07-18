@@ -5,6 +5,7 @@
 // 태그 선택 카드(pill 토글) + 별표 최우선 표시. 정확히 3개 미만/초과, 최우선 미지정 시 다음 버튼 비활성(셸이 검증).
 
 import { Star } from "lucide-react";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { Tag } from "@/types";
 import type { DemandSelection, OnboardingDraft } from "./onboarding-draft";
@@ -89,11 +90,13 @@ export function DemandSelectStep({
                   disabled && "opacity-50",
                 )}
               >
-                <button
+                <motion.button
                   type="button"
                   aria-pressed={active}
                   disabled={disabled}
                   onClick={() => toggleTag(tag.id)}
+                  whileTap={disabled ? undefined : { scale: 0.97 }}
+                  transition={{ duration: 0.1 }}
                   className="flex-1 text-left disabled:cursor-not-allowed"
                 >
                   <span className="block text-sm font-semibold text-foreground">
@@ -102,13 +105,15 @@ export function DemandSelectStep({
                   <span className="block text-xs text-guud-text-muted-2">
                     {tag.demand_desc}
                   </span>
-                </button>
+                </motion.button>
                 {active && (
-                  <button
+                  <motion.button
                     type="button"
                     aria-pressed={selection?.priority ?? false}
                     aria-label={`${tag.name} 최우선으로 지정`}
                     onClick={() => setPriority(tag.id)}
+                    whileTap={{ scale: 0.85 }}
+                    transition={{ duration: 0.1 }}
                     className="shrink-0 p-1"
                   >
                     <Star
@@ -119,7 +124,7 @@ export function DemandSelectStep({
                           : "text-guud-text-faint",
                       )}
                     />
-                  </button>
+                  </motion.button>
                 )}
               </div>
             </li>

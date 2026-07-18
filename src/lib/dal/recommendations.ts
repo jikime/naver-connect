@@ -6,7 +6,12 @@
 import recommendationsSeed from "@/data/private/recommendations.json";
 import { getExpertSubtype } from "@/lib/dal/members";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
-import type { Recommendation, ViewerContext } from "@/types";
+import type {
+  MatchType,
+  Recommendation,
+  RecStatus,
+  ViewerContext,
+} from "@/types";
 
 const seed = recommendationsSeed as Recommendation[];
 
@@ -72,6 +77,56 @@ export async function getRecommendations(
       ? weekFiltered.filter((rec) => rec.rec_kind === "모듬")
       : weekFiltered;
   return branchFiltered.map((rec) => withSessionAndMask(rec, vc));
+}
+
+/** 지식 그래프(A-v2)용 구조 엣지. 관계 존재·매칭유형·상태만 담고 원문은 일절 담지 않는다. */
+export interface RecommendationGraphEdge {
+  id: string;
+  from: string;
+  to: string;
+  match_type: MatchType;
+  rec_kind: "1:1" | "모듬";
+  status: RecStatus;
+}
+
+/**
+ * 지식 그래프의 사람↔사람 추천 엣지(구조만). BR-01: message·contact_point·
+ * min_exposure_note·matching_rationale·is_hot_lead 등 비공개/민감 필드는 절대 투영하지 않고
+ * from/to/match_type/rec_kind/status만 남긴다. recommendations.json을 읽는 유일한 지점이
+ * 이 파일이어야 하므로(ADR-03) 그래프 조립 DAL도 시드를 직접 import하지 않고 이 함수를 경유한다.
+ * 뷰어별 필터(FR-RC-08 공공중간지원 분기 등)는 "추천 생성" 단계의 규칙이며, 여기서는
+ * 네트워크 전경(overview)의 구조 엣지를 반환한다.
+ */
+export async function getRecommendationGraphEdges(
+  _vc: ViewerContext,
+): Promise<RecommendationGraphEdge[]> {
+  const edges: RecommendationGraphEdge[] = [];
+  for (const rec of seed) {
+    if (rec.rec_kind === "모듬") {
+      const organizer = rec.from_member_id;
+      for (const memberId of rec.meetup?.member_ids ?? []) {
+        if (memberId === organizer) continue;
+        edges.push({
+          id: `${rec.id}:${memberId}`,
+          from: organizer,
+          to: memberId,
+          match_type: rec.match_type,
+          rec_kind: "모듬",
+          status: rec.status,
+        });
+      }
+    } else if (rec.to_member_id) {
+      edges.push({
+        id: rec.id,
+        from: rec.from_member_id,
+        to: rec.to_member_id,
+        match_type: rec.match_type,
+        rec_kind: "1:1",
+        status: rec.status,
+      });
+    }
+  }
+  return edges;
 }
 
 /** 추천 상세(FR-RC-03~07). 없으면 reject. */

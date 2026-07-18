@@ -5,6 +5,8 @@
 // 근거: ARCHITECTURE.md §3(L2 ReviewQueueDashboard), TASKS.md T-015, FR-OP-02
 
 import { useId, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const CHECKLIST_ITEMS = [
   "접점이 원문 인용인가(BR-02)",
@@ -40,20 +42,20 @@ export function ReviewChecklist({
       {CHECKLIST_ITEMS.map((item, index) => {
         const inputId = `${groupId}-${index}`;
         return (
-          <label
-            key={item}
-            htmlFor={inputId}
-            className="flex items-start gap-2 text-sm text-foreground"
-          >
-            <input
+          <div key={item} className="flex items-start gap-2">
+            <Checkbox
               id={inputId}
-              type="checkbox"
               checked={checked[index]}
-              onChange={() => toggle(index)}
+              onCheckedChange={() => toggle(index)}
               className="mt-0.5"
             />
-            {item}
-          </label>
+            <Label
+              htmlFor={inputId}
+              className="text-sm leading-snug font-normal text-foreground"
+            >
+              {item}
+            </Label>
+          </div>
         );
       })}
     </fieldset>

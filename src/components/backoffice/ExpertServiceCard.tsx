@@ -26,7 +26,8 @@ export function ExpertServiceCard({ service }: { service: ExpertService }) {
           {service.experience_tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-guud-hairline bg-guud-surface-alt-2 px-2 py-0.5 text-xs text-guud-text-muted-2"
+              // 모드 B 회송: text-muted-2 on surface-alt-2는 3.50:1로 AA 미달 — text-strong(10.03:1)로 교체
+              className="rounded-full border border-guud-hairline bg-guud-surface-alt-2 px-2 py-0.5 text-xs text-guud-text-strong"
             >
               {tag}
             </span>
@@ -49,7 +50,7 @@ export function ExpertServiceCard({ service }: { service: ExpertService }) {
         <p className="text-xs text-guud-text-muted-2">
           재계약률 {Math.round(service.recontract_rate * 100)}%
         </p>
-        <p className="border-t border-guud-hairline pt-2 text-xs text-guud-text-faint">
+        <p className="border-t border-guud-hairline pt-2 text-xs text-muted-foreground">
           {service.coi_disclosure}
         </p>
       </CardContent>

@@ -5,6 +5,7 @@
 //       FR-RC-01/02/08. 1:1 차단·유형 필터는 getRecommendations(T-003)가 이미 처리하므로
 //       이 컴포넌트는 정렬(핫리드+퍼즐형 우선)과 렌더만 담당한다(T-012 Self-check).
 
+import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { HotLeadBadge } from "@/components/shared/HotLeadBadge";
@@ -23,6 +24,16 @@ import { useSessionInteractionStore } from "@/stores/session-interaction";
 import { useViewerContext } from "@/stores/viewer-context";
 import type { Recommendation } from "@/types";
 import { MeetupCard } from "./MeetupCard";
+
+// Task #21: 카드 리스트 스태거 진입(항목당 60ms 지연, 개별 트랜지션 120ms 이내)
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 6 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.12 } },
+};
 
 /** 핫리드·퍼즐형을 앞으로 정렬한다(FR-RC-02). DAL 필터링 결과의 표시 순서만 바꾼다. */
 function sortByHotLeadPuzzleFirst(recs: Recommendation[]): Recommendation[] {
@@ -102,14 +113,21 @@ export function WeeklyRecommendationList() {
   }
 
   return (
-    <div className="grid gap-4 px-[30px] py-6 sm:grid-cols-2 lg:grid-cols-3">
-      {recs.map((rec) =>
-        rec.rec_kind === "모듬" ? (
-          <MeetupCard key={rec.id} rec={rec} />
-        ) : (
-          <RecommendationSummaryCard key={rec.id} rec={rec} />
-        ),
-      )}
-    </div>
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="grid gap-4 px-[30px] py-6 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      {recs.map((rec) => (
+        <motion.div key={rec.id} variants={item}>
+          {rec.rec_kind === "모듬" ? (
+            <MeetupCard rec={rec} />
+          ) : (
+            <RecommendationSummaryCard rec={rec} />
+          )}
+        </motion.div>
+      ))}
+    </motion.div>
   );
 }
