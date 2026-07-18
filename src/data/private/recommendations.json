@@ -1,0 +1,250 @@
+[
+  {
+    "id": "REC-01",
+    "rec_kind": "1:1",
+    "from_member_id": "M-003",
+    "to_member_id": "M-004",
+    "match_type": "거울형",
+    "value_class": "동료성장가치",
+    "matching_rationale": "분야는 다르지만(에너지·교통) 정책의존형 수익구조라는 동일한 고민을 공유. 거울형은 학습공동체 발전경로의 표준 입구.",
+    "message": {
+      "intro": "에너지 분야에서 시민 출자로 옥상 태양광 20개소를 일궈온 이하나 사무국장님이에요.",
+      "contact_point": "이하나 님도 '공공부지 공모일정에 사업이 휘둘려요'라고 하셨는데, 최연우 님이 '지자체 위탁계약이 사실상 매출전부라 갱신때마다 조마조마해요'라고 하신 고민과 뿌리가 같아요.",
+      "your_benefit": "분야는 달라도 정책·제도에 매출이 휘둘리는 구조를 먼저 겪은 동료에게서 대응 노하우를 얻을 수 있어요.",
+      "their_benefit": "최연우 님의 현장 감각은 이하나 님에게도 같은 고민을 나눌 든든한 짝이 돼요.",
+      "first_action": "'정책의존형 수익구조, 어떻게 버티나' 주제로 같은 고민을 가진 회원 네 분과 함께 여는 학습모임에 초대해요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "정책·제도에 매출이 휘둘리는 고민을 가진 이하나 님",
+    "authored_direction": "A→B",
+    "sent_week": "2026-W27",
+    "status": "accepted",
+    "meeting_outcome": {
+      "met": true,
+      "will_meet_again": true,
+      "note": "학습모임에서 만나 월 1회 정책대응 스터디를 잇기로 함"
+    }
+  },
+  {
+    "id": "REC-02",
+    "rec_kind": "1:1",
+    "from_member_id": "M-004",
+    "to_member_id": "M-003",
+    "match_type": "거울형",
+    "value_class": "동료성장가치",
+    "matching_rationale": "이하나에게 최연우를 소개하는 역방향 카드. 같은 정책의존형 고민을 다른 분야 사례로 비춰봄. A→B와 개별 작성(복붙 대칭 금지).",
+    "message": {
+      "intro": "완주에서 고령자 특화 배차 알고리즘으로 수요응답형 교통을 운영하는 최연우 대표님이에요.",
+      "contact_point": "최연우 님이 '지자체 위탁계약이 사실상 매출전부라 갱신때마다 조마조마해요'라고 하셨는데, 이하나 님의 '공공부지 공모일정에 사업이 휘둘려요'와 같은 결의 고민이에요.",
+      "your_benefit": "제도 리스크를 다르게 분산해 온 다른 분야 사례를 참고할 수 있어요.",
+      "their_benefit": "이하나 님의 시민출자 경험은 최연우 님에게 매출 다변화 힌트가 돼요.",
+      "first_action": "'정책의존형 수익구조' 학습모임에서 편하게 인사 나눠보세요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "위탁계약 의존 구조를 고민하는 최연우 님",
+    "authored_direction": "B→A",
+    "sent_week": "2026-W27",
+    "status": "sent"
+  },
+  {
+    "id": "REC-03",
+    "rec_kind": "1:1",
+    "from_member_id": "M-002",
+    "to_member_id": "M-001",
+    "match_type": "퍼즐형",
+    "value_class": "사업가치",
+    "matching_rationale": "한쪽 수요가 다른쪽 수요와 맞물리는 '서로가 서로의 답' 구조. 박준호 핫리드 → 운영자 48시간 내 확인 대상.",
+    "message": {
+      "intro": "부천에서 사회주택 협동조합을 이끄는 박준호 이사장님이에요.",
+      "contact_point": "박준호 님이 '매입임대 30호로 케어안심주택 준비중, 재가돌봄 파트너 필요'라고 하셨는데, 김서연 님의 '이용자가 흩어져있어 이동시간이 수익을 갉아먹어요' 문제와 정확히 맞물려요.",
+      "your_benefit": "한 건물에 모인 입주자를 돌보면 흩어진 이용자 방문에 쓰던 이동시간을 줄여 수익성을 회복할 수 있어요.",
+      "their_benefit": "김서연 님의 재가돌봄 운영력은 박준호 님의 케어안심주택에 꼭 필요한 파트너예요.",
+      "first_action": "'케어안심주택에 재가돌봄을 어떻게 결합할지' 30분 통화로 먼저 그림을 맞춰보세요."
+    },
+    "is_hot_lead": true,
+    "min_exposure_note": "케어안심주택에 재가돌봄 파트너를 찾는 박준호 님",
+    "authored_direction": "A→B",
+    "sent_week": "2026-W28",
+    "status": "pending_review"
+  },
+  {
+    "id": "REC-04",
+    "rec_kind": "1:1",
+    "from_member_id": "M-001",
+    "to_member_id": "M-002",
+    "match_type": "퍼즐형",
+    "value_class": "사업가치",
+    "matching_rationale": "박준호에게 김서연을 소개하는 역방향 카드. 핫리드 퍼즐의 양방향. 개별 작성.",
+    "message": {
+      "intro": "은평에서 재가돌봄 사회적협동조합을 7년째 운영하는 김서연 대표님이에요.",
+      "contact_point": "김서연 님이 '이용자가 흩어져있어 이동시간이 수익을 갉아먹어요'라고 하셨는데, 박준호 님의 '매입임대 30호로 케어안심주택 준비중, 재가돌봄 파트너 필요'와 서로가 서로의 답이 돼요.",
+      "your_benefit": "케어안심주택에 바로 투입 가능한 검증된 재가돌봄 운영 파트너를 얻어요.",
+      "their_benefit": "박준호 님의 30호 입주자는 김서연 님에게 밀집된 안정 고객군이 돼요.",
+      "first_action": "'입주 예정 세대의 돌봄 수요' 자료를 들고 한 번 만나 사업 구조를 맞춰보세요."
+    },
+    "is_hot_lead": true,
+    "min_exposure_note": "재가돌봄 운영 파트너를 찾는 김서연 님",
+    "authored_direction": "B→A",
+    "sent_week": "2026-W28",
+    "status": "pending_review"
+  },
+  {
+    "id": "REC-05",
+    "rec_kind": "모듬",
+    "from_member_id": "M-006",
+    "to_member_id": null,
+    "match_type": "퍼즐형",
+    "value_class": "관계가치",
+    "matching_rationale": "퍼즐형②(전문가 수요를 기업가 공급이 채우는 11번 태그 역방향 매칭). 대상 오유진의 expert_subtype='공공중간지원'이므로 1:1 추천을 생성하지 않고 모듬 초대 변형으로 수용(FR-RC-08·BR-04·ADR-06). '전문가는 주기만 하는 사람' 함정을 깨는 유형.",
+    "message": {
+      "intro": "세종 정책연구소의 오유진 부연구위원이 여는 '현장×연구' 공동연구 모듬이에요.",
+      "contact_point": "오유진 님이 '돌봄통합지원법 시행초기 현장사례가 연구에 꼭필요해요'라고 하셨고, 김서연 님은 '통합지원회의 참여기관 사례 개방 가능'이라 서로의 필요가 맞물려요.",
+      "your_benefit": "현장 회원은 자기 사례가 정책 근거로 쌓이는 걸 보고, 연구가 정리한 제도 동향을 먼저 받아볼 수 있어요.",
+      "their_benefit": "오유진 님은 살아있는 현장 데이터를, 참여 회원은 공동연구 파트너를 얻어요.",
+      "first_action": "공공·중간지원 회원은 1:1 대신 이 모듬에 참여해 첫 사례 공유 회의에 함께해요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "현장사례 공동연구를 제안한 오유진 님",
+    "authored_direction": "A→B",
+    "meetup": {
+      "meetup_id": "MU-001",
+      "type": "공공모듬",
+      "purpose": "돌봄통합지원법 시행 초기 현장사례를 함께 기록하는 '현장×연구' 공동연구 모듬",
+      "member_ids": ["M-006", "M-001", "M-002"]
+    },
+    "sent_week": "2026-W28",
+    "status": "sent"
+  },
+  {
+    "id": "REC-06",
+    "rec_kind": "1:1",
+    "from_member_id": "M-001",
+    "to_member_id": "M-004",
+    "match_type": "다리형",
+    "value_class": "사업가치",
+    "matching_rationale": "이종분야(돌봄·교통) 같은 고객(고령자). 분야간 연계매트릭스(도메인 룰) 근거. 실패율 최고 유형 → '예상 밖의 분야에서 왔어요' 기대치 조정 + 가장 가벼운 첫 행동.",
+    "message": {
+      "intro": "은평에서 재가돌봄을 운영하는 김서연 대표님이에요.",
+      "contact_point": "분야는 다르지만, 김서연 님의 '이용자가 흩어져있어 이동시간이 수익을 갉아먹어요'와 최연우 님의 고령자 이동 서비스는 같은 고객을 바라봐요.",
+      "your_benefit": "흩어진 돌봄 이용자의 병원·나들이 이동 수요가 새로운 운행 노선이 될 수 있어요.",
+      "their_benefit": "최연우 님의 배차는 김서연 님의 이동시간 손실 문제를 덜어줘요.",
+      "first_action": "예상 밖의 분야에서 왔어요 — 부담 없이 '고령자 이동, 어디가 제일 불편한가' 15분 통화부터 해봐요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "고령자 이동 문제를 겪는 김서연 님",
+    "authored_direction": "A→B",
+    "sent_week": "2026-W28",
+    "status": "declined",
+    "decline_reason": "접점약함"
+  },
+  {
+    "id": "REC-07",
+    "rec_kind": "1:1",
+    "from_member_id": "M-004",
+    "to_member_id": "M-001",
+    "match_type": "다리형",
+    "value_class": "사업가치",
+    "matching_rationale": "김서연에게 최연우를 소개하는 역방향 다리형. 같은 고객(고령자)을 향한 분야 연계. 개별 작성.",
+    "message": {
+      "intro": "완주에서 고령자 특화 DRT를 운영하는 최연우 대표님이에요.",
+      "contact_point": "최연우 님은 농촌 이동수요 현장 데이터를 가지고 있고, 김서연 님의 '이용자가 흩어져있어 이동시간이 수익을 갉아먹어요' 고민과 같은 고객을 바라봐요.",
+      "your_benefit": "이동은 최연우 님에게 맡기고 돌봄 본연에 집중해 이동시간 손실을 줄일 수 있어요.",
+      "their_benefit": "김서연 님의 이용자 분포는 최연우 님에게 새 운행 데이터가 돼요.",
+      "first_action": "'같은 고객, 다른 분야' 주제로 가볍게 커피 한 잔 어때요 — 이동 동선부터 맞춰봐요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "고령자 이동수요 데이터를 가진 최연우 님",
+    "authored_direction": "B→A",
+    "sent_week": "2026-W28",
+    "status": "sent"
+  },
+  {
+    "id": "REC-08",
+    "rec_kind": "1:1",
+    "from_member_id": "M-005",
+    "to_member_id": "M-007",
+    "match_type": "취미형",
+    "value_class": "관계가치",
+    "matching_rationale": "일 밖의 공통점(둘 다 주말 등산, 서울)을 접점으로. 업무 접점은 괄호 속 보조 신호만. 1:1이 아닌 소모임(산행) 초대 형태. '선행신뢰효과' 가설(파일럿 검증 대상).",
+    "message": {
+      "intro": "서울에서 사회적경제 전문 회계사로 일하는 정민철 님이에요.",
+      "contact_point": "두 분 다 협력성향에서 '주말 등산'을 꼽으셨고, 활동 지역도 서울로 겹쳐요. (덧붙여 정민철 님의 비영리회계와 한동수 님의 투자심사는 언젠가 만날 접점이기도 하고요.)",
+      "your_benefit": "주말 산행을 함께할 편한 동료가 생기고, 자연스레 사회적경제 회계 감각도 곁들일 수 있어요.",
+      "their_benefit": "한동수 님의 투자심사 관점은 정민철 님에게도 신선한 자극이 돼요.",
+      "first_action": "이번 달 회원 산행 소모임에 두 분을 함께 초대해요 — 북한산에서 인사 나눠요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "주말 등산을 즐기는 정민철 님",
+    "authored_direction": "A→B",
+    "sent_week": "2026-W28",
+    "status": "accepted",
+    "meeting_outcome": {
+      "met": true,
+      "will_meet_again": true,
+      "note": "회원 산행에서 만나 다음 산행도 함께하기로 함"
+    }
+  },
+  {
+    "id": "REC-09",
+    "rec_kind": "1:1",
+    "from_member_id": "M-007",
+    "to_member_id": "M-005",
+    "match_type": "취미형",
+    "value_class": "관계가치",
+    "matching_rationale": "정민철에게 한동수를 소개하는 역방향 취미형. 취미(등산·러닝)와 지역(서울) 겹침. 개별 작성.",
+    "message": {
+      "intro": "서울의 임팩트투자사에서 초기 사회적기업을 심사하는 한동수 님이에요.",
+      "contact_point": "한동수 님도 주말이면 등산·러닝을 즐기고 서울에서 활동해, 정민철 님과 취미와 지역이 겹쳐요.",
+      "your_benefit": "주말 운동 메이트가 생기고, 투자자 시선에서 본 사회적경제 이야기를 덤으로 들을 수 있어요.",
+      "their_benefit": "정민철 님의 회계 현장 감각은 한동수 님의 심사에도 도움이 돼요.",
+      "first_action": "회원 산행 소모임에서 편하게 만나보세요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "주말 등산·러닝을 즐기는 한동수 님",
+    "authored_direction": "B→A",
+    "sent_week": "2026-W28",
+    "status": "sent"
+  },
+  {
+    "id": "REC-10",
+    "rec_kind": "1:1",
+    "from_member_id": "M-008",
+    "to_member_id": "M-003",
+    "match_type": "선배형",
+    "value_class": "동료성장가치",
+    "matching_rationale": "지나온 길 — 같은 조직 형태(협동조합) 선후배 매칭. 역방향 보조 접점(강미래 디지털전환 수요 ↔ 이하나 IT운영 경험 공급)으로 호혜 설계.",
+    "message": {
+      "intro": "정읍에서 로컬푸드 직매장 협동조합을 12년째 이끄는 강미래 상임이사님이에요.",
+      "contact_point": "강미래 님은 '직매장 운영 12년, 지자체 협약 산전수전'을 겪었고, 이하나 님이 '조합원 출자확대가 벽에 부딪혔어요'라고 한 고민을 먼저 지나온 선배예요.",
+      "your_benefit": "조합원 출자 확대와 지자체 협약에서 겪을 벽을 미리 겪은 선배의 실전 조언을 얻어요.",
+      "their_benefit": "이하나 님의 IT·에너지 운영 경험은 강미래 님의 '직매장 디지털전환' 숙제에 힌트가 돼요.",
+      "first_action": "'협동조합 출자·지자체 협약, 뭐부터 풀까' 주제로 선배와 30분 통화해봐요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "조합원 출자확대 고민을 가진 이하나 님",
+    "authored_direction": "A→B",
+    "sent_week": "2026-W28",
+    "status": "sent"
+  },
+  {
+    "id": "REC-11",
+    "rec_kind": "1:1",
+    "from_member_id": "M-003",
+    "to_member_id": "M-008",
+    "match_type": "선배형",
+    "value_class": "동료성장가치",
+    "matching_rationale": "강미래에게 이하나를 소개하는 역방향 보조접점 카드. 선배(강미래)와 후배(이하나)가 디지털전환 주제에서는 역할이 바뀌는 상호 멘토링 설계.",
+    "message": {
+      "intro": "대전에서 시민햇빛발전 협동조합을 운영하며 옥상 태양광 20개소를 다뤄온 이하나 사무국장님이에요.",
+      "contact_point": "강미래 님이 '직매장 디지털전환이 숙제예요'라고 하셨는데, 이하나 님은 협동조합에서 IT·설비 운영을 직접 해온 분이에요.",
+      "your_benefit": "디지털 전환을 협동조합 맥락에서 겪어본 동료에게 현실적인 첫 스텝을 물어볼 수 있어요.",
+      "their_benefit": "강미래 님의 12년 운영 노하우는 이하나 님에게도 값진 배움이에요.",
+      "first_action": "선배·후배로 서로 배우는 '협동조합 상호 멘토링' 한 번 잡아봐요."
+    },
+    "is_hot_lead": false,
+    "min_exposure_note": "직매장 디지털전환을 고민하는 강미래 님",
+    "authored_direction": "B→A",
+    "sent_week": "2026-W28",
+    "status": "draft"
+  }
+]

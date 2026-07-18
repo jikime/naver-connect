@@ -1,0 +1,83 @@
+[
+  {
+    "id": 1,
+    "from_stage": 302,
+    "to_stage": 201,
+    "resource_flow": "고객",
+    "rationale": "사회주택[운영]→돌봄[발굴·접수]: 입주자를 밀집 고객군으로 확보",
+    "status": "잠재",
+    "evidence_source": "STAGE_LINK 사전 v0 (한빛구 돌봄↔주거 축 공백)"
+  },
+  {
+    "id": 2,
+    "from_stage": 202,
+    "to_stage": 302,
+    "resource_flow": "서비스",
+    "rationale": "돌봄[서비스제공]→사회주택[운영]: 돌봄 결합으로 공실 리스크 최소화",
+    "status": "잠재",
+    "evidence_source": "STAGE_LINK 사전 v0 (한빛구 돌봄↔주거 축 공백)"
+  },
+  {
+    "id": 3,
+    "from_stage": 101,
+    "to_stage": 201,
+    "resource_flow": "고객",
+    "rationale": "의료[진료·퇴원]→돌봄[발굴·접수]: 퇴원환자 연계, 통합지원 신청 핵심 경로",
+    "status": "실제",
+    "evidence_source": "회원 신고 관계 (한빛구 퇴원환자 연계 3건)"
+  },
+  {
+    "id": 4,
+    "from_stage": 102,
+    "to_stage": 202,
+    "resource_flow": "서비스",
+    "rationale": "의료사협[방문진료]→돌봄[서비스제공]: 재택의료+돌봄 결합",
+    "status": "실제",
+    "evidence_source": "협약 확인 (한빛구 방문진료 협약 1건)"
+  },
+  {
+    "id": 5,
+    "from_stage": 203,
+    "to_stage": 601,
+    "resource_flow": "서비스위탁",
+    "rationale": "돌봄[제공:이동지원]→교통[운영:DRT·동행]: 병원동행 비급여 핵심 수요",
+    "status": "잠재",
+    "evidence_source": "STAGE_LINK 사전 v0 (한빛구 병원동행 제공기관 5/23, DRT 0)"
+  },
+  {
+    "id": 6,
+    "from_stage": 601,
+    "to_stage": 101,
+    "resource_flow": "고객접근",
+    "rationale": "교통[운영]→의료·돌봄[접근성]: 접근성 기반 인프라",
+    "status": "잠재",
+    "evidence_source": "STAGE_LINK 사전 v0"
+  },
+  {
+    "id": 7,
+    "from_stage": 303,
+    "to_stage": 401,
+    "resource_flow": "공간",
+    "rationale": "사회주택[옥상·공간]→에너지[입지]: 클러스터 외 확장 예시",
+    "status": "잠재",
+    "evidence_source": "STAGE_LINK 사전 v0 (세 분야 시너지맵)"
+  },
+  {
+    "id": 8,
+    "from_stage": 102,
+    "to_stage": 201,
+    "resource_flow": "사람·신뢰",
+    "rationale": "의료사협[조합원 조직화]→돌봄[수요조직]: 이용자·가족 출자 기반 수요 조직화",
+    "status": "실제",
+    "evidence_source": "회원 검증 데이터 (한빛구 의료사협 조합원 1,800명)"
+  },
+  {
+    "id": 9,
+    "from_stage": 402,
+    "to_stage": 302,
+    "resource_flow": "에너지·비용절감",
+    "rationale": "에너지[발전운영]→사회주택[운영]: 발전 수익으로 임대운영 비용 절감",
+    "status": "잠재",
+    "evidence_source": "STAGE_LINK 사전 v0 (세 분야 시너지맵)"
+  }
+]

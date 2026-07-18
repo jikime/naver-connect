@@ -1,0 +1,71 @@
+[
+  {
+    "id": "G1",
+    "region_id": "R-HANBIT",
+    "title": "돌봄↔사회주택 연결 0건",
+    "connection_count": 0,
+    "phenomenon": "사회주택 4곳(112호)이 있지만 고령자 특화 0호이고, 재가돌봄 23곳과의 연결이 0건이다. 돌봄↔주거 축은 잠재연결 3개가 모두 공백인 가장 큰 기회지대.",
+    "stage_link_basis": [1, 2],
+    "related_members": [
+      { "member_id": "M-002", "role": "사회주택 운영(주거 회원)" },
+      { "member_id": "M-001", "role": "재가돌봄 운영(돌봄 회원)" }
+    ],
+    "candidate_resources": ["RES-02", "RES-03"],
+    "actions": [
+      {
+        "type": "추천발송",
+        "desc": "주거 회원 2곳 × 돌봄 회원 3곳 퍼즐형 추천 발송"
+      },
+      {
+        "type": "모듬개설",
+        "desc": "'케어안심주택 스터디' 모듬 개설(도시계획 연구자 1인 포함)"
+      },
+      {
+        "type": "3단계협업지원",
+        "desc": "성사 시 3단계 협업기획 지원 후보 1호로 승격"
+      }
+    ]
+  },
+  {
+    "id": "G2",
+    "region_id": "R-HANBIT",
+    "title": "의료→돌봄 퇴원환자 연계 커버리지 3/23",
+    "connection_count": 3,
+    "phenomenon": "종합병원·의원 69곳이 있으나 퇴원환자를 돌봄으로 잇는 연계는 23곳 중 3곳(3/23)뿐. 미연계 돌봄기관 20곳이 통합지원 신청 경로에서 빠져 있다.",
+    "stage_link_basis": [3],
+    "related_members": [
+      { "member_id": "M-001", "role": "연계 경험 돌봄 회원" }
+    ],
+    "candidate_resources": ["RES-02", "OPP-01"],
+    "actions": [
+      {
+        "type": "모듬개설",
+        "desc": "지역 앰배서더 모듬으로 퇴원연계 표준 경로 공유"
+      },
+      {
+        "type": "추천발송",
+        "desc": "선배형 추천(연계 경험 회원 ↔ 미연계 회원)"
+      }
+    ]
+  },
+  {
+    "id": "G3",
+    "region_id": "R-HANBIT",
+    "title": "돌봄↔교통 병원동행·이동 파트너 부재",
+    "connection_count": 5,
+    "phenomenon": "병원동행 서비스 제공기관 5/23, DRT 사업자 0. 돌봄이 필요로 하는 이동지원을 받아줄 교통 파트너가 지역에 없다.",
+    "stage_link_basis": [5],
+    "related_members": [
+      { "member_id": "M-004", "role": "인접지역 DRT 회원" },
+      { "member_id": "M-001", "role": "돌봄 회원" }
+    ],
+    "candidate_resources": ["RES-01", "OPP-02"],
+    "actions": [
+      { "type": "추천발송", "desc": "다리형 추천('같은 고객, 다른 분야')" },
+      {
+        "type": "모듬개설",
+        "desc": "공동 수요조사 모듬(전문가 회원 연구자 참여)"
+      }
+    ]
+  }
+]

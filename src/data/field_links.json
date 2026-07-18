@@ -1,0 +1,80 @@
+[
+  {
+    "from_field": 1,
+    "to_field": 2,
+    "strength": "●",
+    "_comment": "의료·보건–돌봄: 사람중심 클러스터 핵심 강결합"
+  },
+  { "from_field": 1, "to_field": 3, "strength": "◐" },
+  { "from_field": 1, "to_field": 4, "strength": "○" },
+  { "from_field": 1, "to_field": 5, "strength": "○" },
+  { "from_field": 1, "to_field": 6, "strength": "◐" },
+  { "from_field": 1, "to_field": 7, "strength": "○" },
+  { "from_field": 1, "to_field": 8, "strength": "○" },
+  {
+    "from_field": 2,
+    "to_field": 3,
+    "strength": "●",
+    "_comment": "돌봄–주택: 사람중심 클러스터 강결합(케어안심주택)"
+  },
+  { "from_field": 2, "to_field": 4, "strength": "○" },
+  { "from_field": 2, "to_field": 5, "strength": "◐" },
+  {
+    "from_field": 2,
+    "to_field": 6,
+    "strength": "●",
+    "_comment": "돌봄–교통: 병원동행. 교통이 사람중심 클러스터의 연결고리"
+  },
+  { "from_field": 2, "to_field": 7, "strength": "◐" },
+  { "from_field": 2, "to_field": 8, "strength": "○" },
+  {
+    "from_field": 3,
+    "to_field": 4,
+    "strength": "●",
+    "_comment": "주택–에너지: 옥상 태양광. 전환중심 클러스터 강결합"
+  },
+  { "from_field": 3, "to_field": 5, "strength": "○" },
+  { "from_field": 3, "to_field": 6, "strength": "◐" },
+  { "from_field": 3, "to_field": 7, "strength": "◐" },
+  { "from_field": 3, "to_field": 8, "strength": "○" },
+  { "from_field": 4, "to_field": 5, "strength": "○" },
+  {
+    "from_field": 4,
+    "to_field": 6,
+    "strength": "◐",
+    "_comment": "에너지–교통: 전환중심 클러스터(탄소중립 매개)"
+  },
+  { "from_field": 4, "to_field": 7, "strength": "◐" },
+  {
+    "from_field": 4,
+    "to_field": 8,
+    "strength": "○",
+    "_comment": "약한 조합 = 신규 기회지대로 명시됨"
+  },
+  { "from_field": 5, "to_field": 6, "strength": "◐" },
+  {
+    "from_field": 5,
+    "to_field": 7,
+    "strength": "●",
+    "_comment": "먹거리–농어촌: 지역중심 클러스터 강결합"
+  },
+  { "from_field": 5, "to_field": 8, "strength": "◐" },
+  {
+    "from_field": 6,
+    "to_field": 7,
+    "strength": "●",
+    "_comment": "교통–농어촌: 지역 접근성 강결합"
+  },
+  {
+    "from_field": 6,
+    "to_field": 8,
+    "strength": "○",
+    "_comment": "약한 조합 = 신규 기회지대로 명시됨"
+  },
+  {
+    "from_field": 7,
+    "to_field": 8,
+    "strength": "◐",
+    "_comment": "농어촌–문화: 지역중심 클러스터(로컬 콘텐츠)"
+  }
+]

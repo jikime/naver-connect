@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1,
+    "name": "의료·보건",
+    "definition": "지역 주민의 진료·건강관리·재택의료를 담당하는 분야. 의료사협·병의원 등이 퇴원환자 연계와 방문진료로 돌봄과 접점을 만든다.",
+    "is_extension": false
+  },
+  {
+    "id": 2,
+    "name": "돌봄",
+    "definition": "재가·주야간 돌봄으로 살던 곳에서의 노후를 지원하는 통합돌봄 분야. 4개 분야와 강결합하는 허브 분야.",
+    "is_extension": false
+  },
+  {
+    "id": 3,
+    "name": "주택·주거",
+    "definition": "매입임대·토지임차 등으로 부담가능한 사회주택을 공급·운영하는 분야. 돌봄 결합 시 케어안심주택으로 확장된다.",
+    "is_extension": false
+  },
+  {
+    "id": 4,
+    "name": "에너지",
+    "definition": "시민 출자 기반 태양광 등 재생에너지를 개발·운영하는 분야. 주택 옥상·유휴공간을 입지로 결합한다.",
+    "is_extension": false
+  },
+  {
+    "id": 5,
+    "name": "먹거리·농식품",
+    "definition": "로컬푸드 직매장 등 지역 생산-소비를 잇는 먹거리 순환 분야. 농어촌과 강결합한다.",
+    "is_extension": false
+  },
+  {
+    "id": 6,
+    "name": "교통·이동",
+    "definition": "수요응답형 교통(DRT)·병원동행 등 이동권을 보장하는 분야. 접근성 기반 인프라로 의료·돌봄을 연결한다.",
+    "is_extension": false
+  },
+  {
+    "id": 7,
+    "name": "농어촌·지역",
+    "definition": "지방소멸 대응·청년마을·로컬크리에이터 등 지역 정주와 일자리를 만드는 분야. 공간적 허브.",
+    "is_extension": false
+  },
+  {
+    "id": 8,
+    "name": "문화·예술",
+    "definition": "동네 매니지먼트·로컬 콘텐츠로 지역의 문화 자원을 활성화하는 분야.",
+    "is_extension": false
+  },
+  {
+    "id": 9,
+    "name": "교육",
+    "definition": "확장 분야 — 지역 교육·평생학습.",
+    "is_extension": true
+  },
+  {
+    "id": 10,
+    "name": "일자리",
+    "definition": "확장 분야 — 사회적경제 일자리·고용.",
+    "is_extension": true
+  },
+  {
+    "id": 11,
+    "name": "환경",
+    "definition": "확장 분야 — 자원순환·기후대응.",
+    "is_extension": true
+  },
+  {
+    "id": 12,
+    "name": "복지",
+    "definition": "확장 분야 — 사회서비스·복지 전달체계.",
+    "is_extension": true
+  },
+  {
+    "id": 13,
+    "name": "디지털",
+    "definition": "확장 분야 — 사회적경제 디지털 전환.",
+    "is_extension": true
+  }
+]

@@ -1,0 +1,229 @@
+[
+  {
+    "id": "M-001",
+    "name": "김서연",
+    "member_type": "기업가",
+    "expert_subtype": null,
+    "org": {
+      "name": "은평 재가돌봄 사회적협동조합",
+      "type": "사회적협동조합",
+      "role": "대표"
+    },
+    "region": { "sido": "서울", "sigungu": "은평구" },
+    "field_tags": [2],
+    "value_chain_stage": "돌봄 서비스제공",
+    "mission_statement": "지역에서 나이 들어도 살던 곳에서 돌봄받는 통합돌봄을 만든다.",
+    "trust_connections": [{ "type": "소속모임", "ref": "지역 통합지원회의" }],
+    "hot_lead": false,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 11, "detail": "통합지원회의 참여기관 사례 개방 가능" },
+          { "tagId": 10, "detail": "통합돌봄 7년 현장 운영경험" }
+        ],
+        "activities": ["학습모임", "공동사업협업"],
+        "preferred_mode": "오프라인 선호(서울·수도권)",
+        "region": { "sido": "서울", "sigungu": "은평구" }
+      }
+    }
+  },
+  {
+    "id": "M-002",
+    "name": "박준호",
+    "member_type": "기업가",
+    "expert_subtype": null,
+    "org": {
+      "name": "부천 사회주택 협동조합",
+      "type": "협동조합",
+      "role": "이사장"
+    },
+    "region": { "sido": "경기", "sigungu": "부천시" },
+    "field_tags": [3],
+    "value_chain_stage": "사회주택 운영",
+    "mission_statement": "주거와 돌봄이 결합된 케어안심주택으로 노후 주거 불안을 푼다.",
+    "trust_connections": [{ "type": "아는회원", "ref": "LH 매입임대 담당" }],
+    "hot_lead": true,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 5, "detail": "커뮤니티 공간 공유 가능" },
+          { "tagId": 11, "detail": "입주자 커뮤니티 현장 접점" }
+        ],
+        "activities": ["공동사업협업", "멘토링받기"],
+        "preferred_mode": "오프라인 선호(수도권)",
+        "region": { "sido": "경기", "sigungu": "부천시" }
+      }
+    }
+  },
+  {
+    "id": "M-003",
+    "name": "이하나",
+    "member_type": "기업가",
+    "expert_subtype": null,
+    "org": {
+      "name": "대전 시민햇빛발전 협동조합",
+      "type": "협동조합",
+      "role": "사무국장"
+    },
+    "region": { "sido": "대전", "sigungu": "유성구" },
+    "field_tags": [4],
+    "value_chain_stage": "에너지 발전운영",
+    "mission_statement": "시민이 출자해 만드는 옥상 태양광으로 에너지 전환을 앞당긴다.",
+    "trust_connections": [
+      { "type": "소속모임", "ref": "전국 시민햇빛발전 네트워크" }
+    ],
+    "hot_lead": false,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 10, "detail": "옥상 태양광 20개소 개발·운영" }
+        ],
+        "activities": ["학습모임", "취미모임(등산)"],
+        "preferred_mode": "무관(대전·충청)",
+        "region": { "sido": "대전", "sigungu": "유성구" }
+      }
+    }
+  },
+  {
+    "id": "M-004",
+    "name": "최연우",
+    "member_type": "기업가",
+    "expert_subtype": null,
+    "org": {
+      "name": "완주 DRT 스타트업",
+      "type": "주식회사(소셜벤처)",
+      "role": "대표"
+    },
+    "region": { "sido": "전북", "sigungu": "완주군" },
+    "field_tags": [6],
+    "value_chain_stage": "교통 운영(DRT)",
+    "mission_statement": "고령자가 병원과 마을을 오갈 수 있는 수요응답형 이동을 만든다.",
+    "trust_connections": [{ "type": "소개자", "ref": "농촌 이동지원 연구자" }],
+    "hot_lead": false,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 4, "detail": "고령자 특화 배차 알고리즘" },
+          { "tagId": 11, "detail": "농촌 이동수요 현장 데이터" }
+        ],
+        "activities": ["멘토링받기", "공동사업협업"],
+        "preferred_mode": "무관(전북)",
+        "region": { "sido": "전북", "sigungu": "완주군" }
+      }
+    }
+  },
+  {
+    "id": "M-005",
+    "name": "정민철",
+    "member_type": "전문가",
+    "expert_subtype": "전문서비스",
+    "org": {
+      "name": "사회적경제 전문 회계법인",
+      "type": "회계법인",
+      "role": "파트너 회계사"
+    },
+    "region": { "sido": "서울", "sigungu": "중구" },
+    "field_tags": [2, 3],
+    "value_chain_stage": "전문서비스 제공",
+    "mission_statement": "사회적경제 조직이 회계 때문에 좌초하지 않도록 돕는다.",
+    "trust_connections": [
+      { "type": "소속모임", "ref": "사회적경제 회계사 모임" }
+    ],
+    "hot_lead": false,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 7, "detail": "비영리회계·공모사업 정산 10년" }
+        ],
+        "activities": ["취미모임(등산)", "멘토링하기"],
+        "preferred_mode": "오프라인 선호(서울)",
+        "region": { "sido": "서울", "sigungu": "중구" }
+      }
+    }
+  },
+  {
+    "id": "M-006",
+    "name": "오유진",
+    "member_type": "전문가",
+    "expert_subtype": "공공중간지원",
+    "org": {
+      "name": "세종 정책연구소",
+      "type": "정책연구기관",
+      "role": "부연구위원"
+    },
+    "region": { "sido": "세종", "sigungu": "세종시" },
+    "field_tags": [2],
+    "value_chain_stage": "정책연구·중간지원",
+    "mission_statement": "돌봄통합지원 정책이 현장과 맞물리도록 근거를 잇는다.",
+    "trust_connections": [
+      { "type": "소속모임", "ref": "통합돌봄 정책 연구네트워크" }
+    ],
+    "hot_lead": false,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 8, "detail": "정책분석·제안서 방법론" },
+          { "tagId": 3, "detail": "제도·정책 동향 상시 파악" }
+        ],
+        "activities": ["공동연구", "학습모임"],
+        "preferred_mode": "온라인·오프라인 무관(세종·수도권)",
+        "region": { "sido": "세종", "sigungu": "세종시" }
+      }
+    }
+  },
+  {
+    "id": "M-007",
+    "name": "한동수",
+    "member_type": "전문가",
+    "expert_subtype": "투자금융",
+    "org": { "name": "임팩트투자사", "type": "임팩트투자사", "role": "심사역" },
+    "region": { "sido": "서울", "sigungu": "강남구" },
+    "field_tags": [2, 3, 4],
+    "value_chain_stage": "재원·투자심사",
+    "mission_statement": "돌봄·주거·기후 초기 팀에 인내자본과 IR 관점을 더한다.",
+    "trust_connections": [
+      { "type": "아는회원", "ref": "사회적경제 임팩트투자 라운드테이블" }
+    ],
+    "hot_lead": false,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 2, "detail": "IR 코칭, 투자심사 관점 피드백" }
+        ],
+        "activities": ["취미모임(등산·러닝)", "멘토링하기"],
+        "preferred_mode": "오프라인 선호(서울)",
+        "region": { "sido": "서울", "sigungu": "강남구" }
+      }
+    }
+  },
+  {
+    "id": "M-008",
+    "name": "강미래",
+    "member_type": "기업가",
+    "expert_subtype": null,
+    "org": {
+      "name": "정읍 로컬푸드 직매장 협동조합",
+      "type": "협동조합",
+      "role": "상임이사"
+    },
+    "region": { "sido": "전북", "sigungu": "정읍시" },
+    "field_tags": [5],
+    "value_chain_stage": "먹거리 유통(직매장)",
+    "mission_statement": "지역 농민의 판로가 되는 직매장으로 먹거리 순환을 만든다.",
+    "trust_connections": [
+      { "type": "소속모임", "ref": "전국 로컬푸드 직매장 협의회" }
+    ],
+    "hot_lead": false,
+    "visibility": {
+      "public": {
+        "supply_tags": [
+          { "tagId": 10, "detail": "직매장 운영 12년, 지자체 협약 산전수전" },
+          { "tagId": 1, "detail": "직매장 입점 판로 제공" }
+        ],
+        "activities": ["멘토링하기", "학습모임"],
+        "preferred_mode": "오프라인 선호(전북)",
+        "region": { "sido": "전북", "sigungu": "정읍시" }
+      }
+    }
+  }
+]

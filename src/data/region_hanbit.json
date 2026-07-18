@@ -1,0 +1,41 @@
+{
+  "id": "R-HANBIT",
+  "name": "한빛구",
+  "actor_counts": [
+    {
+      "label": "재가돌봄기관",
+      "count": 23,
+      "metric": "요양보호사 약 610명 (장기요양기관 공개DB 기준)"
+    },
+    {
+      "label": "주야간보호",
+      "count": 7,
+      "metric": "정원 대비 이용률 92% (공급 부족 신호)"
+    },
+    {
+      "label": "병원·의원",
+      "count": 69,
+      "metric": "종합병원 1, 방문진료 수가 청구 이력기관 4곳"
+    },
+    { "label": "의료사협", "count": 1, "metric": "조합원 1,800명" },
+    {
+      "label": "사회주택",
+      "count": 4,
+      "metric": "112호, 고령자 특화 0호(전원 일반형)"
+    },
+    { "label": "교통약자 이동지원센터", "count": 1, "metric": "DRT 0" },
+    {
+      "label": "네트워크 회원",
+      "count": 14,
+      "metric": "돌봄 5·의료 2·주거 3·전문가 4"
+    },
+    {
+      "label": "퇴원환자 연계",
+      "count": 3,
+      "metric": "커버리지 3/23 (미연계 돌봄기관 20곳)"
+    },
+    { "label": "병원동행 서비스 제공기관", "count": 5, "metric": "5/23" }
+  ],
+  "coverage": { "potential": 12, "actual": 4, "rate": 33 },
+  "highlighted_gap_axis": "돌봄↔주거"
+}

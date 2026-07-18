@@ -1,0 +1,195 @@
+{
+  "_comment": "12태그 × 수요/공급 질문 라이브러리 + 핫리드 심화질문 3 + 민감정보 고지·클로징. analysis-stage1 온보딩 스크립트에서 도출(창작 아님, A9). 재원·자금(tag_id 2)은 문서 원문 예시를 그대로 사용, 나머지는 각 태그의 수요/공급 의미에서 동일 패턴으로 전개.",
+  "meta": {
+    "hot_lead_deep_questions": [
+      "프로젝트를 한 줄로 소개해주세요.",
+      "지금 필요한 파트너나 역량은 무엇인가요?",
+      "현재 어느 단계이고 언제쯤 시작하고 싶으세요? (아이디어 / 기획 중 / 파트너만 있으면 착수)"
+    ],
+    "sensitive_notice": "지금부터 여쭙는 내용은 공개 프로필에 나가지 않고 추천에만 사용돼요.",
+    "closing_script": "고맙습니다 OO님. 말씀해주신 내용으로 프로필 카드를 만들었어요. 공개되는 정보와 추천에만 쓰이는 정보를 다시 한번 확인해 주세요. 확정됐어요. 며칠 안에 꼭 만나야 할 회원 세 분을 이유와 함께 추천해드릴게요.",
+    "llm_swap_note": "FR-ON-10: 이 정적 질문 라이브러리는 향후 LLM 후속질문 생성기로 교체되는 지점이다. 목업은 태그별 고정 분기(demand_questions/supply_questions)로 대화를 시뮬레이션하고, 회원 답변 원문을 요약·윤색 없이 detail_quote 로 저장한다. 후속질문 최대 3개(최우선수요1+나머지수요1+공급1), 한 번에 한 질문, 재질문 최대 1회, 수요 질문 전 sensitive_notice 고지."
+  },
+  "scripts": [
+    {
+      "tag_id": 1,
+      "demand_questions": [
+        {
+          "text": "어떤 고객이나 판로를 새로 열고 싶으세요? (B2C·B2B·공공조달 중)",
+          "example_answer": "공공조달 쪽 판로를 뚫고 싶은데 어디서 시작할지 모르겠어요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "다른 회원의 고객·기회 발굴을 어떻게 도울 수 있나요?",
+          "example_answer": "공공조달 입찰 경험이 있어 초기 진입 자문이 가능해요."
+        }
+      ]
+    },
+    {
+      "tag_id": 2,
+      "demand_questions": [
+        {
+          "text": "필요한 자금의 성격과 대략의 규모·시기를 알려주세요.",
+          "example_answer": "내년 상반기 임팩트투자 3억."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "자금 관련해 어떤 도움을 줄 수 있나요?",
+          "example_answer": "공모사업 정보력, 투자심사 경험, IR 코칭."
+        }
+      ]
+    },
+    {
+      "tag_id": 3,
+      "demand_questions": [
+        {
+          "text": "어떤 인허가나 규제 대응이 지금 발목을 잡고 있나요?",
+          "example_answer": "공공부지 공모 일정에 사업이 휘둘려요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "제도·정책 쪽으로 어떤 경로나 동향을 나눌 수 있나요?",
+          "example_answer": "입법·행정 동향을 상시 파악하고 정책제안 경로를 안내할 수 있어요."
+        }
+      ]
+    },
+    {
+      "tag_id": 4,
+      "demand_questions": [
+        {
+          "text": "어떤 기술·디지털 과제를 풀고 싶으세요?",
+          "example_answer": "직매장 디지털 전환이 숙제예요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "기술·디지털로 어떤 파트너십이나 데이터를 제공할 수 있나요?",
+          "example_answer": "고령자 특화 배차 알고리즘과 이동수요 데이터를 열 수 있어요."
+        }
+      ]
+    },
+    {
+      "tag_id": 5,
+      "demand_questions": [
+        {
+          "text": "어떤 사업 공간이나 부지가 필요하세요?",
+          "example_answer": "지역 거점으로 쓸 프로그램 공간이 필요해요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "공간·입지 쪽으로 무엇을 나눌 수 있나요?",
+          "example_answer": "커뮤니티 공간 공유가 가능해요."
+        }
+      ]
+    },
+    {
+      "tag_id": 6,
+      "demand_questions": [
+        {
+          "text": "인력·조직에서 가장 큰 어려움은 무엇인가요?",
+          "example_answer": "요양보호사 이직률이 30%를 넘어요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "조직진단·HR 쪽으로 어떤 자문이 가능한가요?",
+          "example_answer": "채용 프로세스와 거버넌스 진단을 도울 수 있어요."
+        }
+      ]
+    },
+    {
+      "tag_id": 7,
+      "demand_questions": [
+        {
+          "text": "회계·세무·법무·노무 중 어떤 전문서비스가 급하세요?",
+          "example_answer": "공모사업 정산 회계가 매번 막혀요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "어떤 전문서비스를 공급할 수 있나요?",
+          "example_answer": "비영리회계·공모사업 정산 10년 경력이에요."
+        }
+      ]
+    },
+    {
+      "tag_id": 8,
+      "demand_questions": [
+        {
+          "text": "사업개발에서 어떤 도움이 필요하세요? (BM·사업계획서·IR)",
+          "example_answer": "이용자가 흩어져 있어 이동시간이 수익을 갉아먹어요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "사업개발 방법론으로 무엇을 나눌 수 있나요?",
+          "example_answer": "정책분석·제안서 방법론을 제공할 수 있어요."
+        }
+      ]
+    },
+    {
+      "tag_id": 9,
+      "demand_questions": [
+        {
+          "text": "어떤 네트워크·연결이 지금 가장 필요하세요?",
+          "example_answer": "지자체 위탁계약이 사실상 매출 전부라 갱신 때마다 조마조마해요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "어떤 현장조직·기업 네트워크를 연결해줄 수 있나요?",
+          "example_answer": "LH·지역 돌봄 현장 네트워크를 연결할 수 있어요."
+        }
+      ]
+    },
+    {
+      "tag_id": 10,
+      "demand_questions": [
+        {
+          "text": "어떤 경험·노하우를 배우고 싶으세요?",
+          "example_answer": "협동조합 운영 초기의 시행착오를 미리 듣고 싶어요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "창업·운영 경험 중 무엇을 나눌 수 있나요?",
+          "example_answer": "직매장 운영 12년, 지자체 협약 산전수전을 다 겪었어요."
+        }
+      ]
+    },
+    {
+      "tag_id": 11,
+      "demand_questions": [
+        {
+          "text": "(전문가 수요) 어떤 연구 필드나 실증 테스트베드가 필요하세요?",
+          "example_answer": "돌봄통합지원법 시행 초기 현장사례가 연구에 꼭 필요해요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "(기업가 공급) 어떤 현장 데이터나 사례를 개방할 수 있나요?",
+          "example_answer": "통합지원회의 참여기관 사례 개방이 가능해요."
+        }
+      ]
+    },
+    {
+      "tag_id": 12,
+      "demand_questions": [
+        {
+          "text": "어떤 최신 동향이나 교육 기회를 찾고 계세요?",
+          "example_answer": "돌봄·주거 분야 최신 정책 동향을 따라잡고 싶어요."
+        }
+      ],
+      "supply_questions": [
+        {
+          "text": "지식·학습 쪽으로 무엇을 나눌 수 있나요?",
+          "example_answer": "강의·기고 기회와 공동연구 파트너십을 열 수 있어요."
+        }
+      ]
+    }
+  ]
+}

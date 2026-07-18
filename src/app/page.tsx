@@ -1,65 +1,33 @@
-import Image from "next/image";
+// 홈 랜딩 — 온보딩/프로필로 유도(T-007). 데이터 없이 정적 셸이라 Server Component로 둔다(ADR-04).
+// 근거: TASKS.md T-007, FR-GL-04(전역 네비 진입 순서: 온보딩→프로필→생태계맵→주간추천)
+
+import Link from "next/link";
+import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="flex flex-1 flex-col items-center justify-center gap-8 px-[30px] py-24 text-center">
+      <div className="max-w-xl space-y-4">
+        <h1 className="font-heading text-3xl font-bold text-foreground">
+          사회혁신기업가네트워크 AX 플랫폼
+        </h1>
+        <p className="text-base text-guud-text-muted-2">
+          기업가·전문가가 온보딩 한 번으로 이어지고, 관계(추천)·기회(격차
+          리포트)·사업(딜룸) 3층이 서로 연결되는 모습을 미리 봅니다. 상단 역할
+          스위처로 8인 페르소나를 전환해보세요.
+        </p>
+      </div>
+      <div className="flex flex-col items-center gap-3 sm:flex-row">
+        <Button asChild size="lg">
+          <Link href="/onboarding">
+            온보딩 시작하기 <AutomationLevelBadge frId="FR-ON-01" />
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="lg">
+          <Link href="/profile">내 프로필 보기</Link>
+        </Button>
+      </div>
     </div>
   );
 }

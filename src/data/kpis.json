@@ -1,0 +1,152 @@
+[
+  {
+    "id": "KPI-1S-01",
+    "stage": 1,
+    "label": "온보딩 완료율",
+    "target": 80,
+    "current": 76,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": true
+  },
+  {
+    "id": "KPI-1S-02",
+    "stage": 1,
+    "label": "후속질문 응답 충실도",
+    "target": 70,
+    "current": 68,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": true
+  },
+  {
+    "id": "KPI-1S-03",
+    "stage": 1,
+    "label": "추천 수락률",
+    "target": 40,
+    "current": 42,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": true
+  },
+  {
+    "id": "KPI-1S-04",
+    "stage": 1,
+    "label": "만남 성사율",
+    "target": 25,
+    "current": 21,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": true
+  },
+  {
+    "id": "KPI-1S-05",
+    "stage": 1,
+    "label": "재만남 의향",
+    "target": 50,
+    "current": 55,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": true
+  },
+  {
+    "id": "KPI-1S-06",
+    "stage": 1,
+    "label": "거절사유 수집률",
+    "target": 60,
+    "current": 64,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": true
+  },
+  {
+    "id": "KPI-2S-01",
+    "stage": 2,
+    "label": "주체 커버리지(공공DB 대비)",
+    "target": 90,
+    "current": 78,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-2S-02",
+    "stage": 2,
+    "label": "AI 분류 정확도(골든샘플 대비)",
+    "target": 85,
+    "current": 82,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-2S-03",
+    "stage": 2,
+    "label": "회원 검증 참여",
+    "target": 50,
+    "current": 33,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-2S-04",
+    "stage": 2,
+    "label": "격차→행동 전환(기회카드발 추천·모듬)",
+    "target": 5,
+    "current": 2,
+    "unit": "건",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-3S-01",
+    "stage": 3,
+    "label": "협업 논의→기획(G3) 전환",
+    "target": 1,
+    "current": 0,
+    "unit": "건",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-3S-02",
+    "stage": 3,
+    "label": "백오피스 매칭 만족도(양측, 5점)",
+    "target": 4,
+    "current": 4,
+    "unit": "점",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-3S-03",
+    "stage": 3,
+    "label": "전문가 마켓 참여의향",
+    "target": 10,
+    "current": 6,
+    "unit": "인",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-3S-04",
+    "stage": 3,
+    "label": "공동구매 참여의향(조직 수)",
+    "target": 10,
+    "current": 8,
+    "unit": "건",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  },
+  {
+    "id": "KPI-3S-05",
+    "stage": 3,
+    "label": "공고 큐레이션 반응률",
+    "target": 30,
+    "current": 27,
+    "unit": "%",
+    "is_assumption": true,
+    "shown_in_mvp": false
+  }
+]

@@ -1,0 +1,146 @@
+[
+  {
+    "member_id": "M-001",
+    "demand_tags": [
+      {
+        "tagId": 6,
+        "priority": true,
+        "detail_quote": "요양보호사 이직률이 30%를 넘어요"
+      },
+      {
+        "tagId": 8,
+        "priority": false,
+        "detail_quote": "이용자가 흩어져있어 이동시간이 수익을 갉아먹어요"
+      }
+    ],
+    "hot_lead": null,
+    "availability": "월 2~3회",
+    "recommendation_history": ["REC-03", "REC-04", "REC-05", "REC-06", "REC-07"]
+  },
+  {
+    "member_id": "M-002",
+    "demand_tags": [
+      {
+        "tagId": 8,
+        "priority": true,
+        "detail_quote": "매입임대 30호로 케어안심주택 준비중, 재가돌봄 파트너 필요"
+      },
+      {
+        "tagId": 9,
+        "priority": false,
+        "detail_quote": "LH 등 매입임대 연계 네트워크가 필요해요"
+      }
+    ],
+    "hot_lead": {
+      "flag": true,
+      "project_summary": "매입임대 30호로 케어안심주택 준비 중, 재가돌봄 파트너 필요",
+      "needed_partner": "재가돌봄 운영 파트너",
+      "stage": "기획중"
+    },
+    "availability": "주 1회 이상",
+    "recommendation_history": ["REC-03", "REC-04"]
+  },
+  {
+    "member_id": "M-003",
+    "demand_tags": [
+      {
+        "tagId": 3,
+        "priority": true,
+        "detail_quote": "공공부지 공모일정에 사업이 휘둘려요"
+      },
+      {
+        "tagId": 2,
+        "priority": false,
+        "detail_quote": "조합원 출자확대가 벽에 부딪혔어요"
+      }
+    ],
+    "hot_lead": null,
+    "availability": "월 2회(등산 모임 포함)",
+    "recommendation_history": ["REC-01", "REC-02", "REC-10", "REC-11"]
+  },
+  {
+    "member_id": "M-004",
+    "demand_tags": [
+      {
+        "tagId": 9,
+        "priority": true,
+        "detail_quote": "지자체 위탁계약이 사실상 매출전부라 갱신때마다 조마조마해요"
+      },
+      {
+        "tagId": 10,
+        "priority": false,
+        "detail_quote": "먼저 겪은 선배에게 멘토링을 받고 싶어요"
+      }
+    ],
+    "hot_lead": null,
+    "availability": "월 2~3회",
+    "recommendation_history": ["REC-01", "REC-02", "REC-06", "REC-07"]
+  },
+  {
+    "member_id": "M-005",
+    "demand_tags": [
+      {
+        "tagId": 1,
+        "priority": true,
+        "detail_quote": "사회적경제 조직 자문처를 넓히고 싶어요"
+      },
+      {
+        "tagId": 12,
+        "priority": false,
+        "detail_quote": "강의 기회를 늘리고 싶어요"
+      }
+    ],
+    "hot_lead": null,
+    "availability": "월 1회 이하 + 프로보노 월 4시간",
+    "recommendation_history": ["REC-08", "REC-09"]
+  },
+  {
+    "member_id": "M-006",
+    "demand_tags": [
+      {
+        "tagId": 11,
+        "priority": true,
+        "detail_quote": "돌봄통합지원법 시행초기 현장사례가 연구에 꼭필요해요"
+      },
+      {
+        "tagId": 12,
+        "priority": false,
+        "detail_quote": "공동연구 파트너를 찾고 있어요"
+      }
+    ],
+    "hot_lead": null,
+    "availability": "월 2~3회",
+    "recommendation_history": ["REC-05"]
+  },
+  {
+    "member_id": "M-007",
+    "demand_tags": [
+      {
+        "tagId": 2,
+        "priority": true,
+        "detail_quote": "돌봄·주거·기후 초기팀을 찾고있어요"
+      },
+      {
+        "tagId": 11,
+        "priority": false,
+        "detail_quote": "투자 판단을 위해 현장 이해를 넓히고 싶어요"
+      }
+    ],
+    "hot_lead": null,
+    "availability": "주말 위주",
+    "recommendation_history": ["REC-08", "REC-09"]
+  },
+  {
+    "member_id": "M-008",
+    "demand_tags": [
+      {
+        "tagId": 4,
+        "priority": true,
+        "detail_quote": "직매장 디지털전환이 숙제예요"
+      }
+    ],
+    "hot_lead": null,
+    "availability": "월 2~3회",
+    "recommendation_history": ["REC-10", "REC-11"]
+  }
+]

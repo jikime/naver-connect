@@ -1,0 +1,163 @@
+[
+  {
+    "id": 101,
+    "field_id": 1,
+    "name": "진료·퇴원",
+    "key_activity": "진료 및 퇴원환자 지역연계",
+    "revenue_source": "건강보험 수가",
+    "success_factor": "지역연계실·통합지원 신청 경로 확보",
+    "meta_stage": "운영·평가"
+  },
+  {
+    "id": 102,
+    "field_id": 1,
+    "name": "방문진료(의료사협)",
+    "key_activity": "방문진료·재택의료, 조합원 조직화",
+    "revenue_source": "방문진료 수가 + 조합원 출자",
+    "success_factor": "이용자·가족 출자 기반 신뢰",
+    "meta_stage": "생산·제공",
+    "unit_economics": "의료사협 설립요건 500명·1억원(2023 완화: 인구 10만 이하 5천만원·발기인 300인), 개인 출자한도 총출자좌수 10%"
+  },
+  {
+    "id": 201,
+    "field_id": 2,
+    "name": "발굴·접수",
+    "key_activity": "이용자 발굴·초기 상담·통합지원 접수",
+    "revenue_source": "장기요양 수가",
+    "success_factor": "밀집 고객군 확보",
+    "meta_stage": "발굴·기획"
+  },
+  {
+    "id": 202,
+    "field_id": 2,
+    "name": "서비스제공",
+    "key_activity": "방문요양·방문진료 연계 돌봄 제공",
+    "revenue_source": "3시간 방문요양 회당 5만원대",
+    "success_factor": "요양보호사 확보·이직률 관리",
+    "meta_stage": "생산·제공",
+    "unit_economics": "1등급 월 한도액 약 251만원, 2등급 약 233만원, 수가 86% 이상 인건비 의무지출, 센터 운영재원 수가의 13~14% 이내, 손익분기 이용자 약 30~50명"
+  },
+  {
+    "id": 203,
+    "field_id": 2,
+    "name": "이동지원",
+    "key_activity": "병원동행·이동지원 연계",
+    "revenue_source": "비급여 병원동행",
+    "success_factor": "교통 파트너 확보",
+    "meta_stage": "유통·연계"
+  },
+  {
+    "id": 301,
+    "field_id": 3,
+    "name": "공급·매입",
+    "key_activity": "매입임대·토지임차로 주택 확보",
+    "revenue_source": "정책융자 + 보조금 + 임대보증금",
+    "success_factor": "3트랙 선택·자금구조 설계",
+    "meta_stage": "발굴·기획",
+    "unit_economics": "3트랙(직접매입형/토지임대장기임차형/매입임대위탁운영형), 도시다세대 원룸 1호 임대료 월 48만원, 순현금흐름 월 +13~19만원, 자기자본 20%+정책융자 50~60%+임대보증금 15~20%+보조금 5~10%(직접매입형)"
+  },
+  {
+    "id": 302,
+    "field_id": 3,
+    "name": "운영",
+    "key_activity": "임대운영·입주자 커뮤니티",
+    "revenue_source": "임대료 + 위탁운영비",
+    "success_factor": "공실 리스크 최소화",
+    "meta_stage": "운영·평가",
+    "unit_economics": "돌봄 결합 시 호당 월 100만원 이상 추가 창출 가능"
+  },
+  {
+    "id": 303,
+    "field_id": 3,
+    "name": "옥상·공간",
+    "key_activity": "옥상·유휴공간 제공",
+    "revenue_source": "공간 임대·수익 배분",
+    "success_factor": "설비 결합 가능한 물건 확보",
+    "meta_stage": "유통·연계"
+  },
+  {
+    "id": 401,
+    "field_id": 4,
+    "name": "입지확보",
+    "key_activity": "옥상·부지 입지 확보",
+    "revenue_source": "공모·시민출자",
+    "success_factor": "안정적 입지 파이프라인",
+    "meta_stage": "발굴·기획"
+  },
+  {
+    "id": 402,
+    "field_id": 4,
+    "name": "발전운영",
+    "key_activity": "태양광 발전·판매·정산",
+    "revenue_source": "전력 판매 수익 (SMP+REC)",
+    "success_factor": "회수기간 단축·시민출자 유지",
+    "meta_stage": "생산·제공",
+    "unit_economics": "100kW 지붕형 초기투자비 1.0~1.3억원, 연간 매출 2,000~2,200만원, 회수기간 7~9년, 자기자본 통상 20~30%"
+  },
+  {
+    "id": 501,
+    "field_id": 5,
+    "name": "생산·수급",
+    "key_activity": "지역 농가 조직화·수급 관리",
+    "revenue_source": "출하 수수료",
+    "success_factor": "안정적 생산자 네트워크",
+    "meta_stage": "발굴·기획"
+  },
+  {
+    "id": 502,
+    "field_id": 5,
+    "name": "직매장 유통",
+    "key_activity": "로컬푸드 직매장 판매·정산",
+    "revenue_source": "직매장 수수료",
+    "success_factor": "회전율·지역 소비 기반",
+    "meta_stage": "유통·연계",
+    "unit_economics": "로컬푸드 직매장 수수료 8~12%(지자체 보전 사례 존재), 구미 로컬푸드 누적매출 150억원대"
+  },
+  {
+    "id": 601,
+    "field_id": 6,
+    "name": "운영(DRT·동행)",
+    "key_activity": "수요응답형 배차·병원동행 운영",
+    "revenue_source": "지자체 위탁 + 이용요금",
+    "success_factor": "차액 재정지원 구조 확보",
+    "meta_stage": "운영·평가",
+    "unit_economics": "DRT 차량 1대당 운송원가 월 30~70만원대, 요금 1,800원 수준, 세종시 대기시간 90% 단축 사례; 운송수입<운송비용 시 지자체 차액 재정지원(도 30%·시군 70% 등 분담)"
+  },
+  {
+    "id": 602,
+    "field_id": 6,
+    "name": "접근성연계",
+    "key_activity": "의료·돌봄 접근성 제공",
+    "revenue_source": "위탁·연계 수수료",
+    "success_factor": "의료·돌봄 파트너십",
+    "meta_stage": "유통·연계"
+  },
+  {
+    "id": 701,
+    "field_id": 7,
+    "name": "지역기획",
+    "key_activity": "지역 정주·일자리 사업 기획",
+    "revenue_source": "지방소멸대응기금·공모재원",
+    "success_factor": "정주·일자리형 설계",
+    "meta_stage": "발굴·기획",
+    "unit_economics": "지방소멸대응기금 2022~2031 연 1조원, 122개 지자체, 인구감소지역 연 최대 약 160억원(인구감소지역 95%·관심지역 5% 배분)"
+  },
+  {
+    "id": 702,
+    "field_id": 7,
+    "name": "정주·일자리",
+    "key_activity": "청년마을·로컬크리에이터 운영",
+    "revenue_source": "공모재원 + 자체 수익",
+    "success_factor": "지속 가능한 정주 모델",
+    "meta_stage": "운영·평가"
+  },
+  {
+    "id": 801,
+    "field_id": 8,
+    "name": "동네매니지먼트",
+    "key_activity": "지역 문화자원·콘텐츠 운영",
+    "revenue_source": "공간·프로그램·콘텐츠 수익",
+    "success_factor": "지역 자산 활성화",
+    "meta_stage": "유통·연계"
+  }
+]

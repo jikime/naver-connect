@@ -1,0 +1,65 @@
+[
+  {
+    "id": "RES-01",
+    "name": "장기요양보험 수가",
+    "nature": "정책의존형",
+    "field_tags": [2],
+    "freshness_cycle": "연 1회 고시"
+  },
+  {
+    "id": "RES-02",
+    "name": "통합돌봄 연계서비스 계약",
+    "nature": "정책의존형",
+    "field_tags": [1, 2],
+    "freshness_cycle": "돌봄통합지원법 시행 연동(2026.3~)"
+  },
+  {
+    "id": "RES-03",
+    "name": "매입임대 위탁운영",
+    "nature": "정책의존형",
+    "field_tags": [3],
+    "freshness_cycle": "LH/지자체 공고 주기"
+  },
+  {
+    "id": "RES-04",
+    "name": "사회주택 정책융자",
+    "nature": "중간형",
+    "field_tags": [3],
+    "freshness_cycle": "분기"
+  },
+  {
+    "id": "RES-05",
+    "name": "시민 출자(태양광)",
+    "nature": "자기조직형",
+    "field_tags": [4],
+    "freshness_cycle": "상시(공모 시 집중)"
+  },
+  {
+    "id": "RES-06",
+    "name": "의료사협 조합원 출자",
+    "nature": "자기조직형",
+    "field_tags": [1, 2],
+    "freshness_cycle": "상시"
+  },
+  {
+    "id": "RES-07",
+    "name": "로컬푸드 직매장 수수료",
+    "nature": "자기조직형",
+    "field_tags": [5],
+    "freshness_cycle": "상시"
+  },
+  {
+    "id": "RES-08",
+    "name": "지방소멸대응기금",
+    "nature": "정책의존형",
+    "field_tags": [7],
+    "freshness_cycle": "연 1회 배분(2022~2031)"
+  },
+  {
+    "id": "RES-09",
+    "name": "판로지원법 우선구매",
+    "nature": "정책의존형",
+    "field_tags": [1, 2],
+    "freshness_cycle": "상시"
+  }
+]

@@ -1,0 +1,70 @@
+[
+  {
+    "id": "DR-01",
+    "title": "케어안심주택 케어링크",
+    "stage": "씨앗",
+    "source_type": "핫리드",
+    "source_ref": "M-002 핫리드 / REC-03",
+    "gate_status": {
+      "G1": { "passed": true, "date": "2026-07-14" },
+      "G2": { "passed": false, "date": null },
+      "G3": { "passed": false, "date": null },
+      "G4": { "passed": false, "date": null }
+    },
+    "participating_orgs": ["ORG-002", "ORG-001"],
+    "agreement_doc": {
+      "note": "잘 헤어지는 규칙: 역할·기여, 비용·수익 배분, 의사결정 방식, IP 귀속, 중단·탈퇴 규정 — 씨앗 단계라 규약 템플릿만 첨부."
+    }
+  },
+  {
+    "id": "DR-02",
+    "title": "한빛구 돌봄-주거 연계 컨소시엄",
+    "stage": "탐색",
+    "source_type": "격차기회카드",
+    "source_ref": "GapCard G1",
+    "gate_status": {
+      "G1": { "passed": true, "date": "2026-07-02" },
+      "G2": { "passed": true, "date": "2026-07-12" },
+      "G3": { "passed": false, "date": null },
+      "G4": { "passed": false, "date": null }
+    },
+    "participating_orgs": ["ORG-002", "ORG-001", "ORG-009"],
+    "agreement_doc": {
+      "note": "2개 이상 조직 + 역할 분담 합의(G2) 완료. 기획 단계 규약 서명 준비 중."
+    }
+  },
+  {
+    "id": "DR-03",
+    "title": "한빛구 병원동행 위탁 컨소시엄",
+    "stage": "기획",
+    "source_type": "외부공고",
+    "source_ref": "Opportunity OPP-02(나라장터)",
+    "gate_status": {
+      "G1": { "passed": true, "date": "2026-06-20" },
+      "G2": { "passed": true, "date": "2026-06-28" },
+      "G3": { "passed": true, "date": "2026-07-10" },
+      "G4": { "passed": false, "date": null }
+    },
+    "participating_orgs": ["ORG-004", "ORG-001"],
+    "agreement_doc": {
+      "note": "사업계획 + 협업 규약 서명(G3) 완료. 재원 자동 매칭으로 위탁 예산 연결, 실행 단계 백오피스 연결 대기."
+    }
+  },
+  {
+    "id": "DR-04",
+    "title": "케어안심주택 실증 컨소시엄(공고 역구성)",
+    "stage": "탐색",
+    "source_type": "공고역방향",
+    "source_ref": "Opportunity OPP-04(사회적경제지원센터)",
+    "gate_status": {
+      "G1": { "passed": true, "date": "2026-07-08" },
+      "G2": { "passed": true, "date": "2026-07-15" },
+      "G3": { "passed": false, "date": null },
+      "G4": { "passed": false, "date": null }
+    },
+    "participating_orgs": ["ORG-002", "ORG-001", "ORG-021"],
+    "agreement_doc": {
+      "note": "공고→요건 분석→팀 역구성으로 탐색 직행(G2·G3 압축 심사). 마감 압박에도 규약 체결은 생략 불가."
+    }
+  }
+]

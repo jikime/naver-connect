@@ -1,0 +1,62 @@
+[
+  {
+    "id": "OPP-01",
+    "source": "사회적기업진흥원",
+    "field": "돌봄",
+    "region": "한빛구",
+    "target_requirement": "지역 통합돌봄 연계 실증, 돌봄·의료 컨소시엄",
+    "deadline": "2026-09-15",
+    "consortium_required": true,
+    "budget_scale": "2억원 내외"
+  },
+  {
+    "id": "OPP-02",
+    "source": "나라장터",
+    "field": "교통·이동",
+    "region": "한빛구",
+    "target_requirement": "고령자 병원동행·이동지원 위탁 운영",
+    "deadline": "2026-08-31",
+    "consortium_required": false,
+    "budget_scale": "연 1.5억원(위탁)"
+  },
+  {
+    "id": "OPP-03",
+    "source": "K-스타트업",
+    "field": "디지털",
+    "region": "전국",
+    "target_requirement": "사회적경제 디지털 전환(직매장·돌봄 DX)",
+    "deadline": "2026-08-20",
+    "consortium_required": false,
+    "budget_scale": "최대 1억원"
+  },
+  {
+    "id": "OPP-04",
+    "source": "사회적경제지원센터",
+    "field": "주택·주거",
+    "region": "수도권",
+    "target_requirement": "케어안심주택 모델 실증, 주거+돌봄 결합",
+    "deadline": "2026-10-10",
+    "consortium_required": true,
+    "budget_scale": "3억원 내외"
+  },
+  {
+    "id": "OPP-05",
+    "source": "금융",
+    "field": "재원·자금",
+    "region": "전국",
+    "target_requirement": "임팩트투자 딜소싱(G3 통과 프로젝트 대상)",
+    "deadline": "2026-11-30",
+    "consortium_required": false,
+    "budget_scale": "라운드당 3~10억원"
+  },
+  {
+    "id": "OPP-06",
+    "source": "기업CSR",
+    "field": "먹거리·농식품",
+    "region": "전북",
+    "target_requirement": "지역 로컬푸드 상생 CSR 파트너십",
+    "deadline": "2026-09-05",
+    "consortium_required": false,
+    "budget_scale": "5천만원"
+  }
+]
