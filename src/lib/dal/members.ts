@@ -65,3 +65,29 @@ export async function getMember(
 export function getExpertSubtype(memberId: string): ExpertSubtype | undefined {
   return publicSeed.find((m) => m.id === memberId)?.expert_subtype;
 }
+
+/**
+ * 회원 키워드 검색(v1.1 FR-SR-01/02). 이름·조직명·분야(field_tags)·공급 태그(공개층
+ * supply_tags.detail)로 필터링한다. 반환은 다른 read 함수와 동일하게 visibilityMask를
+ * 통과해 비공개층(수요·핫리드)이 걸러진다(BR-01, FR-GL-03).
+ */
+export async function searchMembers(
+  vc: ViewerContext,
+  query: string,
+  fieldId?: number,
+): Promise<MaskedMember[]> {
+  const q = query.trim().toLowerCase();
+  const matches = publicSeed.filter((pub) => {
+    if (fieldId !== undefined && !pub.field_tags.includes(fieldId)) {
+      return false;
+    }
+    if (q.length === 0) return true;
+    const supplyText = pub.visibility.public.supply_tags
+      .map((t) => t.detail)
+      .join(" ");
+    const haystack =
+      `${pub.name} ${pub.org.name} ${pub.keyword_set.join(" ")} ${supplyText}`.toLowerCase();
+    return haystack.includes(q);
+  });
+  return matches.map((pub) => visibilityMask(reassemble(pub), vc));
+}

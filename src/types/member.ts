@@ -59,6 +59,13 @@ export interface Member {
   }[];
   /** 요약 플래그(공개 판단용 아님) */
   hot_lead: boolean;
+  // ── v1.1 확장 (전부 공개층 · [창작 목업]) ──
+  /** 성장스토리·회사정보 추출 키워드 (FR-RL-01, 매칭 근거) */
+  keyword_set: string[];
+  /** "내 소속 단체" OrgId (FR-EM2-03) */
+  affiliation_org_id: string | null;
+  /** "내가 대상으로 하는 단체" OrgId[] (FR-EM2-03) */
+  target_org_ids: string[];
   visibility: {
     public: MemberPublicLayer;
     private: MemberPrivateLayer;

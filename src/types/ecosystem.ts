@@ -57,6 +57,28 @@ export interface Organization {
   verified_by: string[];
   last_checked_at: string;
   member_id: string | null;
+  // ── v1.1 확장 ([창작 목업]) ──
+  /** FR-GR-08 구매력 지표(0..100). region_hanbit·organizations 실측(조합원수·이용률·호수)에서 유도된 파생 정규화 값 */
+  buying_power: number;
+  /** FR-EM2-01/02 5-force 상 주된 역할 힌트 */
+  five_force_role:
+    | "기존경쟁자"
+    | "신규진입자"
+    | "공급자"
+    | "구매자"
+    | "대체재"
+    | null;
+}
+
+/** 밸류체인 단계별 5-force 이해관계자 세팅 (FR-EM2-01/02/04, 운영자 사전세팅 대체) [창작 목업] */
+export interface FiveForce {
+  /** 밸류체인 단계 VCStageId (FR-EM2-01) */
+  vc_stage_id: number;
+  role: "기존경쟁자" | "신규진입자" | "공급자" | "구매자" | "대체재";
+  /** 이 힘에 해당하는 주체 유형 설명 */
+  actor_type_hint: string;
+  /** 실존 단체 OrgId[] — 지역별 세분화는 org.region 으로(FR-EM2-02) */
+  org_ids: string[];
 }
 
 /** 상시 제도 재원 (BR-11) */

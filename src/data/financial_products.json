@@ -1,0 +1,86 @@
+[
+  {
+    "id": "FIN-01",
+    "institution": "가치금융신협",
+    "product_name": "사회적경제 프로젝트 연계 대출",
+    "type": "신협",
+    "field_tags": [2, 3],
+    "stage_hint": "기획~실행(G3 통과 후 검토)",
+    "region": "서울",
+    "conditions": "조합원 가입 연계, 프로젝트 계좌·정산 인프라 연동. 대출·투자 조건은 법률 검토 완료 전 확정 불가.",
+    "contact": "가치금융신협 사회적금융팀 (연락 CTA)",
+    "legal_review_status": "미착수"
+  },
+  {
+    "id": "FIN-02",
+    "institution": "임팩트투자사",
+    "product_name": "돌봄·주거·기후 초기팀 임팩트투자",
+    "type": "임팩트투자",
+    "field_tags": [2, 3, 4],
+    "stage_hint": "G3 통과 프로젝트 대상",
+    "region": "전국",
+    "conditions": "라운드당 3~10억원, IR 코칭 동반. 사회적 성과·재무 지속가능성 병행 심사.",
+    "contact": "임팩트투자사 심사역 (연락 CTA)",
+    "legal_review_status": "완료"
+  },
+  {
+    "id": "FIN-03",
+    "institution": "한국사회적기업진흥원",
+    "product_name": "사회적기업 정책융자",
+    "type": "정책융자",
+    "field_tags": [2, 10],
+    "stage_hint": "탐색~실행",
+    "region": "전국",
+    "conditions": "인증 사회적기업 대상 저리 융자. 사업계획·고용 계획 심사.",
+    "contact": "진흥원 금융지원팀 (연락 CTA)",
+    "legal_review_status": "완료"
+  },
+  {
+    "id": "FIN-04",
+    "institution": "지역신용보증재단",
+    "product_name": "협동조합 운영자금 보증",
+    "type": "보증",
+    "field_tags": [3, 5],
+    "stage_hint": "실행",
+    "region": "전북·경기",
+    "conditions": "협동조합·사회적경제 조직 운영자금 보증. 담보 부족분 보완.",
+    "contact": "지역신용보증재단 (연락 CTA)",
+    "legal_review_status": "완료"
+  },
+  {
+    "id": "FIN-05",
+    "institution": "행정안전부",
+    "product_name": "지방소멸대응기금 연계",
+    "type": "기금",
+    "field_tags": [7],
+    "stage_hint": "기획~실행",
+    "region": "인구감소지역",
+    "conditions": "정주·일자리형 설계가 평가 유리. 지자체 배분 계획 연동.",
+    "contact": "지자체 지역발전과 (연락 CTA)",
+    "legal_review_status": "검토중"
+  },
+  {
+    "id": "FIN-06",
+    "institution": "신용보증기금",
+    "product_name": "사회적경제 특례보증",
+    "type": "보증",
+    "field_tags": [2, 3, 5],
+    "stage_hint": "실행",
+    "region": "전국",
+    "conditions": "사회적경제 조직 대상 보증료 우대·한도 확대. 사회적 가치 평가 반영.",
+    "contact": "신용보증기금 사회적경제팀 (연락 CTA)",
+    "legal_review_status": "완료"
+  },
+  {
+    "id": "FIN-07",
+    "institution": "한국사회가치연대기금",
+    "product_name": "사회투자 매칭펀드",
+    "type": "기금",
+    "field_tags": [2, 3],
+    "stage_hint": "기획~실행",
+    "region": "전국",
+    "conditions": "민간 임팩트투자와 매칭 출자. 사회적 성과 측정 계획 필수.",
+    "contact": "사회가치연대기금 투자팀 (연락 CTA)",
+    "legal_review_status": "완료"
+  }
+]

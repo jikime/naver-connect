@@ -1,0 +1,79 @@
+[
+  {
+    "id": "MU-001",
+    "type": "공공모듬",
+    "title": "현장×연구 공동연구 모듬",
+    "purpose": "돌봄통합지원법 시행 초기 현장사례를 함께 기록하는 '현장×연구' 공동연구 모듬 — 공공중간지원(오유진)의 1:1 대체 모듬 초대(REC-05 참조).",
+    "field_tags": [2],
+    "region": { "sido": "세종", "sigungu": "세종시" },
+    "member_ids": ["M-006", "M-001", "M-002"],
+    "host_member_id": "M-006",
+    "created_source": "공공중간지원추천"
+  },
+  {
+    "id": "MU-002",
+    "type": "학습모임",
+    "title": "정책의존형 수익구조 학습모임",
+    "purpose": "정책·제도에 매출이 휘둘리는 구조를 함께 공부하고 대응 노하우를 나누는 거울형 학습공동체(REC-01 발전 경로).",
+    "field_tags": [4, 6],
+    "region": { "sido": "대전", "sigungu": "유성구" },
+    "member_ids": ["M-003", "M-004"],
+    "host_member_id": "M-003",
+    "created_source": "자발개설"
+  },
+  {
+    "id": "MU-003",
+    "type": "취미모임",
+    "title": "회원 산행 소모임",
+    "purpose": "주말 등산·러닝을 함께하며 자연스러운 신뢰를 쌓는 취미 소모임(취미형 REC-08/09 초대 경로).",
+    "field_tags": [],
+    "region": { "sido": "서울", "sigungu": "종로구" },
+    "member_ids": ["M-005", "M-007"],
+    "host_member_id": "M-007",
+    "created_source": "자발개설"
+  },
+  {
+    "id": "MU-004",
+    "type": "지역앰배서더",
+    "title": "한빛구 생태계맵 검증 앰배서더 모듬",
+    "purpose": "한빛구 격차 리포트(G2)에서 파생된 지역 앰배서더 모듬 — 퇴원연계 표준 경로를 공유하고 맵 검증에 기여.",
+    "field_tags": [2],
+    "region": { "sido": "한빛구", "sigungu": "한빛구" },
+    "member_ids": ["M-001", "M-002"],
+    "host_member_id": "M-001",
+    "created_source": "격차카드모듬개설"
+  },
+  {
+    "id": "MU-005",
+    "type": "공공모듬",
+    "title": "케어안심주택 스터디",
+    "purpose": "한빛구 격차 리포트 G1(돌봄↔주택 0건)에서 개설된 스터디 — 주거·돌봄 회원과 도시계획 연구자가 케어안심주택 모델을 함께 설계.",
+    "field_tags": [2, 3],
+    "region": { "sido": "경기", "sigungu": "부천시" },
+    "member_ids": ["M-002", "M-001", "M-006"],
+    "host_member_id": "M-002",
+    "created_source": "격차카드모듬개설"
+  },
+  {
+    "id": "MU-006",
+    "type": "학습모임",
+    "title": "사회적경제 회계 실무 스터디",
+    "purpose": "공모사업 정산·비영리회계 실무를 회계 전문가와 기업가 회원이 함께 익히는 학습모임.",
+    "field_tags": [],
+    "region": { "sido": "서울", "sigungu": "중구" },
+    "member_ids": ["M-005", "M-001", "M-008"],
+    "host_member_id": "M-005",
+    "created_source": "자발개설"
+  },
+  {
+    "id": "MU-007",
+    "type": "지역앰배서더",
+    "title": "완주·정읍 로컬 순환 앰배서더",
+    "purpose": "전북 지역 먹거리·이동 순환 생태계를 함께 검증하고 지역 조직을 맵에 채워 넣는 앰배서더 모듬.",
+    "field_tags": [5, 6],
+    "region": { "sido": "전북", "sigungu": "정읍시" },
+    "member_ids": ["M-004", "M-008"],
+    "host_member_id": "M-008",
+    "created_source": "자발개설"
+  }
+]

@@ -114,6 +114,56 @@ export const AUTOMATION_REGISTRY: AutomationMeta[] = [
   { fr_id: "FR-EM-01", level: "자동" },
   { fr_id: "FR-EM-02", level: "수동" },
   { fr_id: "FR-EM-03", level: "자동" },
+  { fr_id: "FR-SR-01", level: "수동" },
+  { fr_id: "FR-SR-02", level: "자동" },
+  {
+    fr_id: "FR-RL-01",
+    level: "보조",
+    swap_point: "match_scores.json 시드 키워드 → 성장스토리 실추출 파이프라인",
+  },
+  { fr_id: "FR-RL-02", level: "수동" },
+  {
+    fr_id: "FR-RL-03",
+    level: "자동",
+    swap_point: "시드 점수 재계산 시뮬레이션 → 매칭엔진 실추론",
+  },
+  { fr_id: "FR-MG-01", level: "수동" },
+  {
+    fr_id: "FR-DR-05",
+    level: "자동",
+    swap_point:
+      "owner/participating 우선 정렬(세션 반영) → 백엔드 딜 소유권 쿼리",
+  },
+  {
+    fr_id: "FR-BO-06",
+    level: "보조",
+    swap_point: "카테고리 휴리스틱 매칭 → 실 매칭엔진(수요·이력 기반)",
+  },
+  { fr_id: "FR-BO-07", level: "수동" },
+  { fr_id: "FR-RS-01", level: "수동" },
+  {
+    fr_id: "FR-RS-02",
+    level: "자동",
+    swap_point: "분야명 겹침 시드 매칭 → 적합성 심사 엔진",
+  },
+  { fr_id: "FR-DS-01", level: "수동" },
+  {
+    fr_id: "FR-DS-02",
+    level: "자동",
+    swap_point: "정적 CTA 3종 → 등록 즉시 실제 매칭 파이프라인 트리거",
+  },
+  {
+    fr_id: "FR-FN-01",
+    level: "보조",
+    swap_point: "financial_products.json 정적 제안 → 금융기관 API 연동",
+  },
+  { fr_id: "FR-FN-02", level: "수동" },
+  {
+    fr_id: "FR-FN-03",
+    level: "자동",
+    swap_point:
+      "법률검토 상태 뱃지 → 신협 법률 검토 완료 후 확정/계약 기능 해제(OQ-02)",
+  },
 ];
 
 /** FR 단건 조회. */

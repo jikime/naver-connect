@@ -1,0 +1,466 @@
+{
+  "_comment": "[창작 목업 · A10 창작 예외 · 실데이터 전환 시 재검증] 회원 8인 전원 쌍(56 directed) 매칭 점수·키워드 근거. members.keyword_set 에서 유도. score(0..100)는 rule_weights 가중치로 재산출 시뮬레이션(FR-RL-03). axis 공통점=거울/선배/취미, 차이점=퍼즐/다리(FR-RC-01 5+5 그룹핑). 각 회원이 뷰어일 때 공통점·차이점 두 그룹이 모두 채워지도록 전 쌍 커버(더보기 15까지 시연 가능). 회원 쌍 근거라 민감(src/data/private/) 격리.",
+  "scores": [
+    {
+      "from_member_id": "M-001",
+      "to_member_id": "M-002",
+      "score": 88,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": ["케어안심주택", "재가돌봄", "매입임대"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-002",
+      "to_member_id": "M-001",
+      "score": 88,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": ["재가돌봄", "케어안심주택", "매입임대"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-001",
+      "to_member_id": "M-003",
+      "score": 70,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-003",
+      "to_member_id": "M-001",
+      "score": 70,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-001",
+      "to_member_id": "M-004",
+      "score": 74,
+      "shared_keywords": [],
+      "complementary_keywords": ["재가돌봄", "고령자이동"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-004",
+      "to_member_id": "M-001",
+      "score": 74,
+      "shared_keywords": [],
+      "complementary_keywords": ["고령자이동", "재가돌봄"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-001",
+      "to_member_id": "M-005",
+      "score": 68,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-005",
+      "to_member_id": "M-001",
+      "score": 68,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-001",
+      "to_member_id": "M-006",
+      "score": 80,
+      "shared_keywords": ["현장운영"],
+      "complementary_keywords": ["현장실증", "공동연구", "돌봄정책"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-006",
+      "to_member_id": "M-001",
+      "score": 80,
+      "shared_keywords": ["현장운영"],
+      "complementary_keywords": ["현장실증", "공동연구", "돌봄정책"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-001",
+      "to_member_id": "M-007",
+      "score": 66,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭", "돌봄주거기후"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-007",
+      "to_member_id": "M-001",
+      "score": 66,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭", "돌봄주거기후"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-001",
+      "to_member_id": "M-008",
+      "score": 71,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-008",
+      "to_member_id": "M-001",
+      "score": 71,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-002",
+      "to_member_id": "M-003",
+      "score": 70,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": ["태양광"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-003",
+      "to_member_id": "M-002",
+      "score": 70,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": ["태양광"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-002",
+      "to_member_id": "M-004",
+      "score": 64,
+      "shared_keywords": [],
+      "complementary_keywords": ["고령자이동", "DRT"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-004",
+      "to_member_id": "M-002",
+      "score": 64,
+      "shared_keywords": [],
+      "complementary_keywords": ["고령자이동", "DRT"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-002",
+      "to_member_id": "M-005",
+      "score": 66,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-005",
+      "to_member_id": "M-002",
+      "score": 66,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-002",
+      "to_member_id": "M-006",
+      "score": 63,
+      "shared_keywords": [],
+      "complementary_keywords": ["돌봄정책", "공동연구"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-006",
+      "to_member_id": "M-002",
+      "score": 63,
+      "shared_keywords": [],
+      "complementary_keywords": ["돌봄정책", "공동연구"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-002",
+      "to_member_id": "M-007",
+      "score": 79,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭", "돌봄주거기후"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-007",
+      "to_member_id": "M-002",
+      "score": 79,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭", "돌봄주거기후"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-002",
+      "to_member_id": "M-008",
+      "score": 60,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-008",
+      "to_member_id": "M-002",
+      "score": 60,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-003",
+      "to_member_id": "M-004",
+      "score": 73,
+      "shared_keywords": ["정책의존형수익구조"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-004",
+      "to_member_id": "M-003",
+      "score": 73,
+      "shared_keywords": ["정책의존형수익구조"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-003",
+      "to_member_id": "M-005",
+      "score": 62,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-005",
+      "to_member_id": "M-003",
+      "score": 62,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-003",
+      "to_member_id": "M-006",
+      "score": 58,
+      "shared_keywords": [],
+      "complementary_keywords": ["정책연구", "제도동향"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-006",
+      "to_member_id": "M-003",
+      "score": 58,
+      "shared_keywords": [],
+      "complementary_keywords": ["정책연구", "제도동향"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-003",
+      "to_member_id": "M-007",
+      "score": 72,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-007",
+      "to_member_id": "M-003",
+      "score": 72,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-003",
+      "to_member_id": "M-008",
+      "score": 70,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": ["디지털전환"],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-008",
+      "to_member_id": "M-003",
+      "score": 70,
+      "shared_keywords": ["협동조합"],
+      "complementary_keywords": ["디지털전환"],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-004",
+      "to_member_id": "M-005",
+      "score": 60,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-005",
+      "to_member_id": "M-004",
+      "score": 60,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-004",
+      "to_member_id": "M-006",
+      "score": 68,
+      "shared_keywords": [],
+      "complementary_keywords": ["현장실증", "돌봄정책"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-006",
+      "to_member_id": "M-004",
+      "score": 68,
+      "shared_keywords": [],
+      "complementary_keywords": ["현장실증", "돌봄정책"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-004",
+      "to_member_id": "M-007",
+      "score": 65,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-007",
+      "to_member_id": "M-004",
+      "score": 65,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "IR코칭"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-004",
+      "to_member_id": "M-008",
+      "score": 62,
+      "shared_keywords": ["지자체협약"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-008",
+      "to_member_id": "M-004",
+      "score": 62,
+      "shared_keywords": ["지자체협약"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-005",
+      "to_member_id": "M-006",
+      "score": 60,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-006",
+      "to_member_id": "M-005",
+      "score": 60,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-005",
+      "to_member_id": "M-007",
+      "score": 76,
+      "shared_keywords": ["등산"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-007",
+      "to_member_id": "M-005",
+      "score": 76,
+      "shared_keywords": ["등산"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-005",
+      "to_member_id": "M-008",
+      "score": 61,
+      "shared_keywords": [],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-008",
+      "to_member_id": "M-005",
+      "score": 61,
+      "shared_keywords": [],
+      "complementary_keywords": ["비영리회계", "공모정산"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-006",
+      "to_member_id": "M-007",
+      "score": 60,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-007",
+      "to_member_id": "M-006",
+      "score": 60,
+      "shared_keywords": ["사회적경제"],
+      "complementary_keywords": [],
+      "axis": "공통점"
+    },
+    {
+      "from_member_id": "M-006",
+      "to_member_id": "M-008",
+      "score": 57,
+      "shared_keywords": [],
+      "complementary_keywords": ["현장실증", "돌봄정책"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-008",
+      "to_member_id": "M-006",
+      "score": 57,
+      "shared_keywords": [],
+      "complementary_keywords": ["현장실증", "돌봄정책"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-007",
+      "to_member_id": "M-008",
+      "score": 63,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "딜소싱"],
+      "axis": "차이점"
+    },
+    {
+      "from_member_id": "M-008",
+      "to_member_id": "M-007",
+      "score": 63,
+      "shared_keywords": [],
+      "complementary_keywords": ["임팩트투자", "딜소싱"],
+      "axis": "차이점"
+    }
+  ],
+  "rule_weights": [
+    { "keyword": "협동조합", "weight": 1.0 },
+    { "keyword": "통합돌봄", "weight": 1.2 },
+    { "keyword": "재가돌봄", "weight": 1.2 },
+    { "keyword": "사회주택", "weight": 1.1 },
+    { "keyword": "케어안심주택", "weight": 1.3 },
+    { "keyword": "현장실증", "weight": 1.3 },
+    { "keyword": "임팩트투자", "weight": 1.0 },
+    { "keyword": "태양광", "weight": 0.9 },
+    { "keyword": "로컬푸드", "weight": 0.9 },
+    { "keyword": "등산", "weight": 0.6 },
+    { "keyword": "정책의존형수익구조", "weight": 1.1 }
+  ]
+}

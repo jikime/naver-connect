@@ -1,0 +1,82 @@
+[
+  {
+    "id": "CC-01",
+    "title": "살림의료사협 × 은평 재가돌봄 방문진료-돌봄 결합",
+    "status": "완료",
+    "participant_org_ids": ["ORG-009", "ORG-001"],
+    "period": "2024-03 ~ 2025-02",
+    "outcome_summary": "방문진료 협약으로 퇴원환자 재택 돌봄 연계 체계를 만들어 재입원율을 낮춤. STAGE_LINK #4(의료사협 방문진료→돌봄)의 실제 사례.",
+    "field_tags": [1, 2],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-02",
+    "title": "부천 사회주택 × 은평 재가돌봄 케어안심주택 시범",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-002", "ORG-001"],
+    "period": "2026-05 ~ (진행중)",
+    "outcome_summary": "매입임대 주택에 재가돌봄을 결합한 케어안심주택 시범 운영. 박준호 핫리드(REC-03)·딜룸 DR-01의 실증 배경.",
+    "field_tags": [2, 3],
+    "input_by": "회원"
+  },
+  {
+    "id": "CC-03",
+    "title": "안산시민햇빛발전 × 사회주택 옥상 태양광",
+    "status": "완료",
+    "participant_org_ids": ["ORG-023", "ORG-017"],
+    "period": "2023-06 ~ 2024-05",
+    "outcome_summary": "사회주택 옥상을 태양광 입지로 제공해 발전 수익을 임대운영 비용 절감으로 환류. STAGE_LINK #7·#9(주택↔에너지)의 실제 사례.",
+    "field_tags": [3, 4],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-04",
+    "title": "정읍 로컬푸드 × 구미 로컬푸드 상생 디지털전환",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-008", "ORG-025"],
+    "period": "2026-06 ~ (진행중)",
+    "outcome_summary": "직매장 디지털 전환을 다른 지역 로컬푸드와 공동 추진. 강미래 디지털전환 수요(REC-10/11)와 딜소싱 DR-05의 배경.",
+    "field_tags": [5, 13],
+    "input_by": "회원"
+  },
+  {
+    "id": "CC-05",
+    "title": "서울시민햇빛발전 × 사회주택협회 옥상 태양광 표준화",
+    "status": "완료",
+    "participant_org_ids": ["ORG-024", "ORG-037"],
+    "period": "2022-04 ~ 2023-03",
+    "outcome_summary": "사회주택 옥상 태양광 표준 계약·수익배분 모델을 정립해 후속 조합들이 재사용. 전환중심 클러스터(에너지-주택) 확산 사례.",
+    "field_tags": [3, 4],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-06",
+    "title": "완주 DRT × 은평 재가돌봄 병원동행 시범",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-004", "ORG-001"],
+    "period": "2026-05 ~ (진행중)",
+    "outcome_summary": "고령자 병원동행을 DRT와 재가돌봄이 공동 운영하는 시범. STAGE_LINK #5(돌봄→교통) 잠재 연결을 실제로 전환하는 G3·딜룸 DR-03 배경.",
+    "field_tags": [2, 6],
+    "input_by": "회원"
+  },
+  {
+    "id": "CC-07",
+    "title": "안성의료사협 × 지역 돌봄 통합지원 연계",
+    "status": "완료",
+    "participant_org_ids": ["ORG-010", "ORG-042"],
+    "period": "2024-01 ~ 2024-12",
+    "outcome_summary": "의료사협 방문진료와 구청 통합지원전담팀이 퇴원환자 연계 표준 경로를 만든 사례. G2(퇴원연계 커버리지) 개선 근거.",
+    "field_tags": [1, 2],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-08",
+    "title": "가치금융신협 × 부천 사회주택 프로젝트 금융 연계",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-041", "ORG-002"],
+    "period": "2026-06 ~ (진행중, 법률검토 병행)",
+    "outcome_summary": "사회주택 프로젝트에 신협 조합원 가입·정산 인프라를 연계하는 시범. 금융상품 FIN-01(법률검토 미착수)과 연동, 상품 확정은 검토 완료 전 보류.",
+    "field_tags": [2, 3],
+    "input_by": "운영자"
+  }
+]

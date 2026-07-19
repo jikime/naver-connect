@@ -8,11 +8,11 @@ import { getKnowledgeGraph } from "./knowledge-graph";
 const VIEWER = { role: "기업가", personaId: "M-001" } as const;
 
 describe("getKnowledgeGraph", () => {
-  it("5유형 노드를 모두 포함하고 딜룸 4개가 프로젝트로 들어간다", async () => {
+  it("5유형 노드를 모두 포함하고 딜룸 5개가 프로젝트로 들어간다", async () => {
     const { nodes } = await getKnowledgeGraph(VIEWER);
     const byType = (t: string) => nodes.filter((n) => n.type === t);
     expect(byType("member")).toHaveLength(8);
-    expect(byType("project")).toHaveLength(4);
+    expect(byType("project")).toHaveLength(5);
     expect(byType("doc").length).toBeGreaterThanOrEqual(5); // 리포트 + 기회카드 3 + 규약
     expect(byType("system")).toHaveLength(6);
     expect(byType("agg").length).toBeGreaterThan(0);

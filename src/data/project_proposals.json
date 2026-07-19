@@ -1,0 +1,62 @@
+[
+  {
+    "id": "PP-01",
+    "title": "한빛구 돌봄-주거 연계 컨소시엄 제안",
+    "basis": { "type": "생태계맵", "ref": "GapCard G1" },
+    "participant_member_ids": ["M-002", "M-001"],
+    "expected_effect": "사회주택 4곳과 재가돌봄 23곳의 연결 0건을 해소해 케어안심주택 1호 실증. 돌봄↔주거 커버리지 개선.",
+    "track_status": "검토",
+    "has_policy_program": true,
+    "linked_deal_id": "DR-02"
+  },
+  {
+    "id": "PP-02",
+    "title": "로컬푸드 디지털전환 협업 프로젝트",
+    "basis": { "type": "협업사례", "ref": "CC-04" },
+    "participant_member_ids": ["M-008", "M-003"],
+    "expected_effect": "직매장 디지털 전환 공동 추진으로 회전율·판로 확대. 협동조합 IT 운영 경험 이전.",
+    "track_status": "제안됨",
+    "has_policy_program": true,
+    "linked_deal_id": "DR-05"
+  },
+  {
+    "id": "PP-03",
+    "title": "한빛구 병원동행·이동 컨소시엄",
+    "basis": { "type": "생태계맵", "ref": "GapCard G3" },
+    "participant_member_ids": ["M-004", "M-001"],
+    "expected_effect": "병원동행 제공기관 5/23·DRT 0 공백을 인접지역 DRT 회원과 연계해 이동 파트너십 구축.",
+    "track_status": "성사",
+    "has_policy_program": true,
+    "linked_deal_id": "DR-03"
+  },
+  {
+    "id": "PP-04",
+    "title": "현장×연구 돌봄정책 공동연구",
+    "basis": { "type": "협업사례", "ref": "CC-01" },
+    "participant_member_ids": ["M-006", "M-001"],
+    "expected_effect": "돌봄통합지원법 시행 초기 현장사례를 정책 근거로 축적. 공동연구 모듬(MU-001)과 연계.",
+    "track_status": "제안됨",
+    "has_policy_program": false,
+    "linked_deal_id": null
+  },
+  {
+    "id": "PP-05",
+    "title": "농어촌 로컬 문화재생 프로젝트",
+    "basis": { "type": "생태계맵", "ref": "FieldLink 농어촌-문화" },
+    "participant_member_ids": ["M-008"],
+    "expected_effect": "먹거리·문화를 잇는 로컬 콘텐츠로 정주 기반 강화 목표였으나, 참여 조직 확보 실패로 중단.",
+    "track_status": "중단",
+    "has_policy_program": true,
+    "linked_deal_id": null
+  },
+  {
+    "id": "PP-06",
+    "title": "에너지-주택 옥상태양광 결합 제안",
+    "basis": { "type": "협업사례", "ref": "CC-03" },
+    "participant_member_ids": ["M-003", "M-002"],
+    "expected_effect": "사회주택 옥상을 태양광 입지로 결합해 발전 수익을 임대운영 비용 절감으로 환류. STAGE_LINK #7·#9 실증 확대.",
+    "track_status": "검토",
+    "has_policy_program": false,
+    "linked_deal_id": null
+  }
+]

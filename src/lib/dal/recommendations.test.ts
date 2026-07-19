@@ -11,20 +11,45 @@ beforeEach(() => {
 
 describe("getRecommendations — 공공중간지원 분기(FR-RC-08)", () => {
   it("대상이 공공중간지원(M-006)이면 1:1 카드는 0건, 모듬만 반환한다", async () => {
-    const recs = await getRecommendations({
+    const { common, different } = await getRecommendations({
       role: "전문가",
       personaId: "M-006",
     });
-    expect(recs.length).toBeGreaterThan(0);
-    expect(recs.every((r) => r.rec_kind === "모듬")).toBe(true);
+    const all = [...common, ...different];
+    expect(all.length).toBeGreaterThan(0);
+    expect(all.every((r) => r.rec_kind === "모듬")).toBe(true);
   });
 
   it("일반 회원(M-004)은 1:1 추천을 정상적으로 받는다(FR-RC-01)", async () => {
-    const recs = await getRecommendations({
+    const { common, different } = await getRecommendations({
       role: "기업가",
       personaId: "M-004",
     });
-    expect(recs.some((r) => r.rec_kind === "1:1")).toBe(true);
+    expect([...common, ...different].some((r) => r.rec_kind === "1:1")).toBe(
+      true,
+    );
+  });
+});
+
+describe("getRecommendations — v1.1 공통점/차이점 그룹핑(FR-RC-01/02)", () => {
+  it("rec_axis에 따라 common/different로 나뉘어 반환된다", async () => {
+    const { common, different } = await getRecommendations({
+      role: "기업가",
+      personaId: "M-001",
+    });
+    expect(common.every((r) => r.rec_axis === "공통점")).toBe(true);
+    expect(different.every((r) => r.rec_axis === "차이점")).toBe(true);
+  });
+
+  it("핫리드(M-001)는 차이점 그룹에서 퍼즐형이 1순위로 정렬된다", async () => {
+    const { different } = await getRecommendations({
+      role: "기업가",
+      personaId: "M-001",
+    });
+    expect(different.length).toBeGreaterThan(0);
+    expect(
+      different[0].is_hot_lead && different[0].match_type === "퍼즐형",
+    ).toBe(true);
   });
 });
 

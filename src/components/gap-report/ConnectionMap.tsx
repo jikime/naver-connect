@@ -24,12 +24,14 @@ export function ConnectionMap({
   region,
   stageLinks,
   memberNodeIds,
+  buyingPowerByNode,
   selectedId,
   onSelectNode,
 }: {
   region: Region;
   stageLinks: StageLink[];
   memberNodeIds: Set<string>;
+  buyingPowerByNode: Record<string, number>;
   selectedId: string | null;
   onSelectNode: (id: string) => void;
 }) {
@@ -74,6 +76,7 @@ export function ConnectionMap({
               count={actorCount?.count}
               x={node.x}
               y={node.y}
+              buyingPower={buyingPowerByNode[node.id]}
               isSelected={node.id === selectedId}
               isAxisHighlight={highlightedAxisNodes.has(node.id)}
               hasMemberOrg={memberNodeIds.has(node.id)}

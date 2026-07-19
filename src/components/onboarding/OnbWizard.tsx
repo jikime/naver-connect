@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import {
   finalizeOnboarding,
   getInterviewScript,
+  getMeetups,
   getMember,
   getOnboardingMeta,
   getTags,
@@ -22,6 +23,7 @@ import {
 import { useViewerContext } from "@/stores/viewer-context";
 import type {
   MaskedMember,
+  Meetup,
   OnboardingScriptMeta,
   Recommendation,
   Tag,
@@ -108,6 +110,10 @@ export function OnbWizard() {
   const [finalizing, setFinalizing] = useState(false);
   const [finalizeError, setFinalizeError] = useState<string | null>(null);
   const [result, setResult] = useState<FinalizeResult | null>(null);
+  // v1.1 ADR-06: 모듬 변형은 meetup_id로 meetups.json을 참조한다(인라인 meetup 객체 폐지).
+  const [meetupsById, setMeetupsById] = useState<Map<string, Meetup>>(
+    new Map(),
+  );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: vc 객체는 selector가 매 렌더 새로 만들어 원시값(personaId/role)만 추적한다
   useEffect(() => {
@@ -275,6 +281,12 @@ export function OnbWizard() {
         visibility_consent: draft.visibilityConsent,
       });
       setResult(finalized);
+      if (
+        finalized.firstRecommendations.some((rec) => rec.rec_kind === "모듬")
+      ) {
+        const meetups = await getMeetups(vc);
+        setMeetupsById(new Map(meetups.map((m) => [m.id, m])));
+      }
     } catch (e) {
       setFinalizeError(
         e instanceof Error ? e.message : "확정 중 문제가 발생했어요.",
@@ -315,7 +327,9 @@ export function OnbWizard() {
               <MatchTypeBadge type={rec.match_type} />
               <span className="text-sm text-foreground">
                 {rec.rec_kind === "모듬"
-                  ? (rec.meetup?.purpose ?? "모듬 추천")
+                  ? ((rec.meetup_id
+                      ? meetupsById.get(rec.meetup_id)?.purpose
+                      : undefined) ?? "모듬 추천")
                   : rec.matching_rationale}
               </span>
             </li>

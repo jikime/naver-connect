@@ -9,13 +9,24 @@ export interface DealRoom {
   id: string;
   title: string;
   stage: "씨앗" | "탐색" | "기획" | "실행" | "자립";
-  /** FR-DR-02 */
-  source_type: "핫리드" | "격차기회카드" | "모임" | "외부공고" | "공고역방향";
+  /** FR-DR-02, v1.1: "딜소싱" 유입 추가 */
+  source_type:
+    | "핫리드"
+    | "격차기회카드"
+    | "모임"
+    | "외부공고"
+    | "공고역방향"
+    | "딜소싱";
   source_ref: string;
   gate_status: { G1: GateState; G2: GateState; G3: GateState; G4: GateState };
   participating_orgs: string[];
   /** "잘 헤어지는 규칙" (정적 표기만) */
   agreement_doc: { note: string };
+  // ── v1.1 확장 (FR-DR-05 "내 딜 현황" 관점) ──
+  /** 제안·진행 주체 — "내가 제안한 딜" 판별 */
+  owner_member_id: string;
+  /** 관여 회원 — "내가 진행하는 딜" 판별 */
+  participating_member_ids: string[];
 }
 
 /** FR-BO-01/02/04 */

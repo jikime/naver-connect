@@ -1,0 +1,62 @@
+[
+  {
+    "vc_stage_id": 202,
+    "role": "기존경쟁자",
+    "actor_type_hint": "지역 재가돌봄 운영 주체(사회적경제 조합·의료사협 방문돌봄) 간 이용자 확보 경쟁",
+    "org_ids": ["ORG-001", "ORG-009"]
+  },
+  {
+    "vc_stage_id": 202,
+    "role": "신규진입자",
+    "actor_type_hint": "요양 매칭·방문요양 영리 플랫폼의 지역 진입",
+    "org_ids": ["ORG-013", "ORG-014", "ORG-015", "ORG-016"]
+  },
+  {
+    "vc_stage_id": 202,
+    "role": "공급자",
+    "actor_type_hint": "수가·인력 기준을 정하는 제도 재정 공급자(장기요양보험)",
+    "org_ids": ["ORG-038"]
+  },
+  {
+    "vc_stage_id": 202,
+    "role": "구매자",
+    "actor_type_hint": "통합지원 신청·서비스 연계를 발주하는 지자체 전담조직(이용자·가족 대변)",
+    "org_ids": ["ORG-042"]
+  },
+  {
+    "vc_stage_id": 202,
+    "role": "대체재",
+    "actor_type_hint": "재택의료+돌봄 결합 모델 등 재가돌봄을 대체·보완하는 경로(타 의료사협)",
+    "org_ids": ["ORG-010", "ORG-011", "ORG-012"]
+  },
+  {
+    "vc_stage_id": 302,
+    "role": "기존경쟁자",
+    "actor_type_hint": "사회주택 운영 조합 간 입주자·위탁물량 확보 경쟁",
+    "org_ids": ["ORG-002", "ORG-017", "ORG-020"]
+  },
+  {
+    "vc_stage_id": 302,
+    "role": "신규진입자",
+    "actor_type_hint": "신생 주택협동조합·소셜디벨로퍼의 진입",
+    "org_ids": ["ORG-018", "ORG-019"]
+  },
+  {
+    "vc_stage_id": 302,
+    "role": "공급자",
+    "actor_type_hint": "매입임대 물량·정책융자를 공급하는 공공(LH/SH)",
+    "org_ids": ["ORG-021", "ORG-022"]
+  },
+  {
+    "vc_stage_id": 302,
+    "role": "구매자",
+    "actor_type_hint": "위탁운영을 발주하는 지자체(입주 대상·수요 대변)",
+    "org_ids": ["ORG-042"]
+  },
+  {
+    "vc_stage_id": 302,
+    "role": "대체재",
+    "actor_type_hint": "일반 민간임대·공공임대(고령자 특화 없는 대체 주거) — 시드 미보유(실데이터 전환 시 보강)",
+    "org_ids": []
+  }
+]

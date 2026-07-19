@@ -14,7 +14,9 @@
     "participating_orgs": ["ORG-002", "ORG-001"],
     "agreement_doc": {
       "note": "잘 헤어지는 규칙: 역할·기여, 비용·수익 배분, 의사결정 방식, IP 귀속, 중단·탈퇴 규정 — 씨앗 단계라 규약 템플릿만 첨부."
-    }
+    },
+    "owner_member_id": "M-002",
+    "participating_member_ids": ["M-002", "M-001"]
   },
   {
     "id": "DR-02",
@@ -31,7 +33,9 @@
     "participating_orgs": ["ORG-002", "ORG-001", "ORG-009"],
     "agreement_doc": {
       "note": "2개 이상 조직 + 역할 분담 합의(G2) 완료. 기획 단계 규약 서명 준비 중."
-    }
+    },
+    "owner_member_id": "M-001",
+    "participating_member_ids": ["M-001", "M-002"]
   },
   {
     "id": "DR-03",
@@ -48,7 +52,9 @@
     "participating_orgs": ["ORG-004", "ORG-001"],
     "agreement_doc": {
       "note": "사업계획 + 협업 규약 서명(G3) 완료. 재원 자동 매칭으로 위탁 예산 연결, 실행 단계 백오피스 연결 대기."
-    }
+    },
+    "owner_member_id": "M-004",
+    "participating_member_ids": ["M-004", "M-001"]
   },
   {
     "id": "DR-04",
@@ -65,6 +71,27 @@
     "participating_orgs": ["ORG-002", "ORG-001", "ORG-021"],
     "agreement_doc": {
       "note": "공고→요건 분석→팀 역구성으로 탐색 직행(G2·G3 압축 심사). 마감 압박에도 규약 체결은 생략 불가."
-    }
+    },
+    "owner_member_id": "M-002",
+    "participating_member_ids": ["M-002", "M-001"]
+  },
+  {
+    "id": "DR-05",
+    "title": "로컬푸드 디지털전환 협업 딜",
+    "stage": "씨앗",
+    "source_type": "딜소싱",
+    "source_ref": "ProjectProposal PP-02(딜소싱 등록)",
+    "gate_status": {
+      "G1": { "passed": true, "date": "2026-07-17" },
+      "G2": { "passed": false, "date": null },
+      "G3": { "passed": false, "date": null },
+      "G4": { "passed": false, "date": null }
+    },
+    "participating_orgs": ["ORG-008", "ORG-003"],
+    "agreement_doc": {
+      "note": "딜소싱 폼(정책사업 유무·참여자·사업내용·기대효과)에서 등록된 씨앗. K-스타트업 디지털 전환 공모(OPP-03) 연계 검토 중."
+    },
+    "owner_member_id": "M-008",
+    "participating_member_ids": ["M-008", "M-003"]
   }
 ]

@@ -1,6 +1,11 @@
 // 지식 그래프 공유 메타 — 노드 유형색·라벨·레이아웃(d3-force). 순수 데이터/계산 모듈.
-// 근거: team-lead A-v2("d3-force 드래그"), guud DESIGN.md(dataviz는 Known Gaps라 그래프 전용 팔레트를
-// 로컬 정의하되 red #FF3E2F는 전환 기회 강조에만 한정 — 넓은 면 금지 Don't 준수).
+// 근거: team-lead A-v2("d3-force 드래그"). dataviz는 guud·hana 모두 Known Gaps라
+// 그래프 전용 팔레트를 로컬 정의한다(하나 크로스워크, 2026-07-19).
+// - member(사람) 색은 새 브랜드 primary(#009178, 틸그린)와 색상각이 너무 가까워(5˚) 혼동될
+//   위험이 있어 195˚로 이격(#2F6B7F)해 브랜드색과 명확히 구별되게 조정.
+// - KG_EMPHASIS_COLOR는 globals.css --destructive와 동일한 "접근성 있는 기능색 예외" 빨강
+//   (#CC0F00, 명도만 낮춰 AA 통과 — 원래 guud accent-primary #FF3E2F는 흰 텍스트 대비 3.51:1 미달).
+//   브랜드색이 아닌 강조 전용이며 나머지 5개 유형색과 색상각이 충분히 떨어져 구별된다.
 
 import {
   forceCenter,
@@ -14,7 +19,7 @@ import {
 import type { KGEdge, KGNode, KGNodeType } from "@/types";
 
 export const KG_TYPE_META: Record<KGNodeType, { ko: string; color: string }> = {
-  member: { ko: "사람", color: "#2F7E77" }, // teal
+  member: { ko: "사람", color: "#2F6B7F" }, // slate-teal — 새 브랜드 primary(#009178)와 25˚ 이격
   org: { ko: "조직", color: "#C67B2C" }, // ochre
   project: { ko: "프로젝트", color: "#3355A0" }, // indigo — 중심 앵커
   doc: { ko: "문서", color: "#8B4E86" }, // plum
@@ -31,8 +36,8 @@ export const KG_TYPE_ORDER: KGNodeType[] = [
   "agg",
 ];
 
-/** 전환 기회(잠재→실제) 강조색 — guud accent-primary. 좁은 강조에만 사용. */
-export const KG_EMPHASIS_COLOR = "#FF3E2F";
+/** 전환 기회(잠재→실제) 강조색. 좁은 강조에만 사용. */
+export const KG_EMPHASIS_COLOR = "#CC0F00"; // globals.css --destructive와 동일한 접근성 기능색(브랜드 teal 재사용 시 member/브랜드 chrome과 혼동되어 회피)
 
 /** 차수 기반 노드 반경(중심성 = 크기). 레이아웃 충돌·3D val에 공통 사용. */
 export function nodeRadius(node: KGNode): number {

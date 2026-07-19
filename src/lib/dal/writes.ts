@@ -3,6 +3,7 @@
 
 import declineReasonsSeed from "@/data/decline_reasons.json";
 import recommendationsSeed from "@/data/private/recommendations.json";
+import { meetupsById } from "@/lib/dal/meetups";
 import { getMember } from "@/lib/dal/members";
 import { getRecommendations } from "@/lib/dal/recommendations";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
@@ -32,7 +33,9 @@ function assertIsRecipient(recId: string, vc: ViewerContext): void {
     vc.role === "운영자" ||
     rec.to_member_id === vc.personaId ||
     (rec.rec_kind === "모듬" &&
-      (rec.meetup?.member_ids.includes(vc.personaId) ?? false));
+      rec.meetup_id !== undefined &&
+      (meetupsById.get(rec.meetup_id)?.member_ids.includes(vc.personaId) ??
+        false));
   if (!isRecipient) {
     throw new Error("본인에게 온 추천만 반응할 수 있습니다");
   }
@@ -99,8 +102,8 @@ export async function finalizeOnboarding(
 ): Promise<{ member: MaskedMember; firstRecommendations: Recommendation[] }> {
   useSessionInteractionStore.getState().finalizeOnboardingFor(vc.personaId);
   const member = await getMember(vc, vc.personaId);
-  const recommendations = await getRecommendations(vc);
-  const firstRecommendations = recommendations.filter(
+  const { common, different } = await getRecommendations(vc);
+  const firstRecommendations = [...common, ...different].filter(
     (rec) => rec.status === "pending_review",
   );
   return { member, firstRecommendations };

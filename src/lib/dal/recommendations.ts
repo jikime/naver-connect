@@ -4,9 +4,12 @@
 // 시드: src/data/private/recommendations.json (민감 — contact_point가 비공개 수요 원문 인용)
 
 import recommendationsSeed from "@/data/private/recommendations.json";
+import { getMatchScores } from "@/lib/dal/matching";
+import { meetupsById } from "@/lib/dal/meetups";
 import { getExpertSubtype } from "@/lib/dal/members";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
+  MatchScore,
   MatchType,
   Recommendation,
   RecStatus,
@@ -14,6 +17,16 @@ import type {
 } from "@/types";
 
 const seed = recommendationsSeed as Recommendation[];
+
+function scoreKey(fromId: string, toId: string | null): string {
+  return `${fromId}→${toId ?? ""}`;
+}
+
+/** rec_kind==='모듬'인 레코드의 참여자 목록을 meetup_id로 meetups.json에서 조회한다(ADR-06 v1.1). */
+function meetupMemberIds(rec: Recommendation): string[] {
+  if (rec.rec_kind !== "모듬" || !rec.meetup_id) return [];
+  return meetupsById.get(rec.meetup_id)?.member_ids ?? [];
+}
 
 /** 이 추천이 뷰어 본인/운영자와 무관해 원문 대신 min_exposure_note만 볼 수 있는지 판정. */
 function isRecommendationParty(
@@ -48,23 +61,61 @@ function withSessionAndMask(
   };
 }
 
-/** 뷰어(vc.personaId)에게 "온" 추천인지: 1:1은 to_member_id, 모듬은 참여자 목록. */
+/** 뷰어(vc.personaId)에게 "온" 추천인지: 1:1은 to_member_id, 모듬은 meetups.json 참여자 목록. */
 function isAddressedTo(rec: Recommendation, personaId: string): boolean {
   if (rec.rec_kind === "모듬") {
-    return rec.meetup?.member_ids.includes(personaId) ?? false;
+    return meetupMemberIds(rec).includes(personaId);
   }
   return rec.to_member_id === personaId;
 }
 
+/** match_scores.json 기준 점수(높을수록 우선). 모듬처럼 대응 점수가 없으면 0(최하위) 취급. */
+function scoreOf(
+  rec: Recommendation,
+  scoresByPair: Map<string, MatchScore>,
+): number {
+  return (
+    scoresByPair.get(scoreKey(rec.from_member_id, rec.to_member_id))?.score ?? 0
+  );
+}
+
+/** 공통점 그룹: match_scores 점수순 정렬(내림차순, FR-RC-01). */
+function sortCommonGroup(
+  recs: Recommendation[],
+  scoresByPair: Map<string, MatchScore>,
+): Recommendation[] {
+  return [...recs].sort(
+    (a, b) => scoreOf(b, scoresByPair) - scoreOf(a, scoresByPair),
+  );
+}
+
 /**
- * 주간 추천 리스트(FR-RC-01/02). 대상(vc.personaId)의 expert_subtype이 '공공중간지원'이면
+ * 차이점(상보축) 그룹: 핫리드+퍼즐형을 1순위로 배치하고(FR-RC-02), 그 외는 match_scores
+ * 점수순으로 정렬한다(FR-RC-01).
+ */
+function sortDifferentGroup(
+  recs: Recommendation[],
+  scoresByPair: Map<string, MatchScore>,
+): Recommendation[] {
+  return [...recs].sort((a, b) => {
+    const aPriority = a.is_hot_lead && a.match_type === "퍼즐형" ? 0 : 1;
+    const bPriority = b.is_hot_lead && b.match_type === "퍼즐형" ? 0 : 1;
+    if (aPriority !== bPriority) return aPriority - bPriority;
+    return scoreOf(b, scoresByPair) - scoreOf(a, scoresByPair);
+  });
+}
+
+/**
+ * 주간 추천 리스트(v1.1 개편 FR-RC-01/02). 대상(vc.personaId)의 expert_subtype이 '공공중간지원'이면
  * 1:1 추천은 애초에 포함하지 않고 rec_kind='모듬'만 남긴다 — 사후 필터가 아니라
  * getRecommendations 자체가 "생성 단계"를 흉내내는 지점이므로 이 함수 안에서 강제한다(FR-RC-08·N-5).
+ * v1.1: 결과를 rec_axis 기준 "공통점"/"차이점" 두 그룹으로 나눠 반환한다(각 최대 15, 화면에서
+ * 초기 5+더보기로 노출 — 그룹 캡·정렬만 DAL이 하고 페이지네이션은 화면 책임).
  */
 export async function getRecommendations(
   vc: ViewerContext,
   week?: string,
-): Promise<Recommendation[]> {
+): Promise<{ common: Recommendation[]; different: Recommendation[] }> {
   const targetSubtype = getExpertSubtype(vc.personaId);
   const addressedToViewer = seed.filter((rec) =>
     isAddressedTo(rec, vc.personaId),
@@ -76,7 +127,20 @@ export async function getRecommendations(
     targetSubtype === "공공중간지원"
       ? weekFiltered.filter((rec) => rec.rec_kind === "모듬")
       : weekFiltered;
-  return branchFiltered.map((rec) => withSessionAndMask(rec, vc));
+  const masked = branchFiltered.map((rec) => withSessionAndMask(rec, vc));
+  const { scores } = await getMatchScores(vc);
+  const scoresByPair = new Map(
+    scores.map((s) => [scoreKey(s.from_member_id, s.to_member_id), s]),
+  );
+  const common = sortCommonGroup(
+    masked.filter((rec) => rec.rec_axis === "공통점"),
+    scoresByPair,
+  ).slice(0, 15);
+  const different = sortDifferentGroup(
+    masked.filter((rec) => rec.rec_axis === "차이점"),
+    scoresByPair,
+  ).slice(0, 15);
+  return { common, different };
 }
 
 /** 지식 그래프(A-v2)용 구조 엣지. 관계 존재·매칭유형·상태만 담고 원문은 일절 담지 않는다. */
@@ -104,7 +168,7 @@ export async function getRecommendationGraphEdges(
   for (const rec of seed) {
     if (rec.rec_kind === "모듬") {
       const organizer = rec.from_member_id;
-      for (const memberId of rec.meetup?.member_ids ?? []) {
+      for (const memberId of meetupMemberIds(rec)) {
         if (memberId === organizer) continue;
         edges.push({
           id: `${rec.id}:${memberId}`,

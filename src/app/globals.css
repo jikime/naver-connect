@@ -5,10 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * guud(까사미아 "굳닷컴") 디자인 토큰 크로스워크
- * source: artifacts/sites/guud/DESIGN.md
+ * 디자인 토큰 크로스워크 — 색상은 hanabank-biz, 형태·타이포·레이아웃은 guud 유지.
+ * color source: frontend2/artifacts/sites/hanabank-biz/DESIGN.md (하나 틸그린 #009178 리브랜드, 2026-07-19)
+ * shape/typography source: artifacts/sites/guud/DESIGN.md (각진 radius 0, 이중 폰트 체계는 layout.tsx 그대로)
  *
- * 형태 이중성 규칙: --radius는 0(각짐, 버튼·카드 기본)으로 고정한다.
+ * 변수 이름은 --guud- 접두를 그대로 유지한다(이미 다수 페이지가
+ * bg-guud-, text-guud-, border-guud- 유틸로 참조 중 — 이번 작업은 값만
+ * 하나 팔레트로 교체하는 색상 한정 리스킨이며, 변수 리네이밍/컴포넌트
+ * 리팩터는 범위 밖).
+ *
+ * 형태 이중성 규칙(guud 유지): --radius는 0(각짐, 버튼·카드 기본)으로 고정한다.
  * 필터 칩·배지 등 pill/원형 요소는 이 스케일을 쓰지 않고 컴포넌트에서
  * `rounded-full`(또는 개별 px 값)을 직접 지정해 각짐↔알약 이중성을 유지한다.
  */
@@ -55,7 +61,7 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* guud 전용 토큰 (shadcn 표준 의미역 밖) → bg-guud-*, text-guud-* 유틸 */
+  /* guud 접두 커스텀 토큰(shadcn 표준 의미역 밖) → bg-guud-*, text-guud-* 유틸. 값은 하나 팔레트로 교체됨 */
   --color-guud-header-band: var(--guud-header-band);
   --color-guud-badge-goodprice: var(--guud-badge-goodprice);
   --color-guud-badge-new: var(--guud-badge-new);
@@ -70,141 +76,169 @@
 }
 
 :root {
-  /* background ← colors.canvas #FFFFFF */
+  /* background ← hana colors.canvas #FFFFFF (페이지·카드 기본 배경, guud와 동일값) */
   --background: oklch(1 0 0);
-  /* foreground ← colors.ink #000000 */
-  --foreground: oklch(0 0 0);
-  /* card ← colors.canvas #FFFFFF */
+  /* foreground ← hana colors.ink #444444 (body 기본 텍스트, 흰 배경 대비 약 9.7:1) */
+  --foreground: oklch(0.387 0 0);
+  /* card ← hana colors.canvas #FFFFFF */
   --card: oklch(1 0 0);
-  /* card-foreground ← colors.ink #000000 */
-  --card-foreground: oklch(0 0 0);
-  /* popover ← colors.canvas #FFFFFF */
+  /* card-foreground ← hana colors.ink #444444 */
+  --card-foreground: oklch(0.387 0 0);
+  /* popover ← hana colors.canvas #FFFFFF */
   --popover: oklch(1 0 0);
-  /* popover-foreground ← colors.ink #000000 */
-  --popover-foreground: oklch(0 0 0);
-  /* primary ← colors.ink #000000 (button-primary 배경 — 1차 CTA 검정 채움) */
-  --primary: oklch(0 0 0);
-  /* primary-foreground ← colors.on-primary #FFFFFF */
-  --primary-foreground: oklch(1 0 0);
-  /* secondary ← colors.canvas #FFFFFF (button-secondary 배경 — 흰 배경 + 검정 테두리는 --border가 담당) */
-  --secondary: oklch(1 0 0);
-  /* secondary-foreground ← colors.ink #000000 */
-  --secondary-foreground: oklch(0 0 0);
-  /* muted ← colors.surface-alt #F7F7F7 (섹션 배경, 옵션 select 배경) */
-  --muted: oklch(0.976 0 0);
-  /* muted-foreground ← colors.text-muted #6C6C6C (부가 설명) */
-  --muted-foreground: oklch(0.531 0 0);
+  /* popover-foreground ← hana colors.ink #444444 */
+  --popover-foreground: oklch(0.387 0 0);
+  /* primary ← hana colors.primary #009178 (하나 틸그린 — 로그인 CTA 배경, 활성 탭, 브랜드 유일 고채도색) */
+  --primary: oklch(0.586 0.111 174.8);
   /*
-   * accent ← colors.accent-primary #FF3E2F (브랜드 레드)
-   * 주의: guud DESIGN.md의 Don't 규칙 — 레드는 넓은 배경 면에 채우지 않는다.
-   * shadcn의 accent는 보통 hover/선택 배경으로 넓게 쓰이므로, 이 토큰을 그대로
-   * hover 배경에 확산 적용하지 말 것. 배지·강조 텍스트 등 작은 면적에만 사용.
+   * primary-foreground ← hana colors.on-primary #FFFFFF에서 ink-strong #111111로 보정.
+   * AA 검증: 흰 텍스트 온 프라이머리 틸그린 = 3.95:1로 본문 기준(4.5:1) 미달
+   * (hana DESIGN.md 자신도 "{colors.primary} 배경 위 작은 텍스트… AA 미달"이라 명시한 결함).
+   * ink-strong on primary = 4.78:1로 AA 통과 — 흰 텍스트 대신 채택.
    */
-  --accent: oklch(0.656 0.23 29.3);
-  /* accent-foreground ← colors.on-primary #FFFFFF */
-  --accent-foreground: oklch(1 0 0);
-  /* destructive ← colors.accent-primary #FF3E2F (할인·세일·경고와 같은 레드 강조 계열) */
-  --destructive: oklch(0.656 0.23 29.3);
-  /* border ← colors.border-light #DDDDDD (카드 경계 등 일반 UI 구분선) */
-  --border: oklch(0.898 0 0);
-  /* input ← colors.border-select #D2D2D2 (select/input 테두리) */
+  --primary-foreground: oklch(0.178 0 0);
+  /* secondary ← hana colors.surface-soft #F7F9F9 (components.button-menu-pill 배경 — 고객센터 유틸 버튼) */
+  --secondary: oklch(0.981 0.002 197.1);
+  /* secondary-foreground ← hana colors.ink-strong #111111 (button-menu-pill 텍스트) */
+  --secondary-foreground: oklch(0.178 0 0);
+  /* muted ← hana colors.surface-soft #F7F9F9 (옅은 패널 배경 — secondary와 같은 값. hana는 표면 단계가 guud보다 적어 수렴) */
+  --muted: oklch(0.981 0.002 197.1);
+  /* muted-foreground ← hana colors.ink-muted #666666 (보조·유틸 텍스트) */
+  --muted-foreground: oklch(0.51 0 0);
+  /*
+   * accent ← hana colors.badge-tint #F2FAF8 (components.badge 배경 — 공지 뱃지 그린 틴트)
+   * hana는 "단일 브랜드 강조" 원칙(주조색은 오직 primary)이라 accent를 넓은 hover 배경으로
+   * 확산 적용하지 말 것 — 뱃지·강조 텍스트 배경 등 작은 면적 전용으로 제한.
+   */
+  --accent: oklch(0.979 0.009 179.6);
+  /*
+   * accent-foreground ← hana colors.primary #009178(components.badge textColor 실측값)에서
+   * ink-strong #111111로 보정. AA 검증: primary(teal) on accent(badge-tint) = 3.72:1로 미달,
+   * ink-strong on accent = 17.81:1로 AA 통과. shadcn accent는 hana의 실제 badge 하나가 아니라
+   * Select 등 범용 hover/highlight 배경 역할이라 범용 텍스트 대비를 우선한다.
+   */
+  --accent-foreground: oklch(0.178 0 0);
+  /*
+   * destructive ← [기능색 예외] hana 팔레트에는 red가 없음(DESIGN.md Known Gaps:
+   * "성공/경고/위험 등 상태 색은 home에서 미관측"). 브랜드색이 아닌 기능(오류·거절·경고)
+   * 전용 색으로, guud colors.accent-primary #FF3E2F를 그대로 쓰지 않고 동일 색상각을
+   * 유지한 채 명도만 낮춰 AA를 통과시킨 #CC0F00로 교체.
+   * AA 검증: 흰 텍스트 on guud 원본(#FF3E2F) = 3.51:1 미달 → #CC0F00 = 5.78:1로 통과.
+   */
+  --destructive: oklch(0.535 0.214 30);
+  /* border ← hana colors.surface-soft #F7F9F9 (DESIGN.md 명시: "구분선은 surface-soft") */
+  --border: oklch(0.981 0.002 197.1);
+  /*
+   * input ← guud colors.border-select #D2D2D2 유지(교체 안 함).
+   * hana DESIGN.md Known Gaps: "field/input/checkbox/radio/switch/textarea/date는 home 미관측" —
+   * 값을 지어내지 않고 이전 guud 회색을 그대로 남긴다.
+   */
   --input: oklch(0.864 0 0);
-  /* ring ← colors.border-strong #000000. focus 상태는 guud DESIGN.md Known Gaps에 미관측 — ink로 강한 대비만 확정, 추정값 */
-  --ring: oklch(0 0 0);
+  /*
+   * ring ← hana colors.primary #009178 (브랜드 일관 포커스 링으로 선택).
+   * hana DESIGN.md Known Gaps: 실제 사이트는 input focus outline이 style:none이라
+   * 가시 포커스 링이 사실상 없음(접근성 결함) — 이를 그대로 재현하지 않고
+   * 이미 관측된 브랜드색(primary)을 포커스 역할에 재사용한다.
+   */
+  --ring: oklch(0.586 0.111 174.8);
 
-  /* chart-1..5: guud DESIGN.md는 dataviz를 미관측(Known Gaps)으로 명시 — 값을 지어내지 않고 shadcn 기본 중립 스케일 유지 */
+  /* chart-1..5: guud·hana 모두 dataviz 미관측(Known Gaps) — 값을 지어내지 않고 shadcn 기본 중립 스케일 유지 */
   --chart-1: oklch(0.868 0.007 39.5);
   --chart-2: oklch(0.547 0.021 43.1);
   --chart-3: oklch(0.438 0.017 39.3);
   --chart-4: oklch(0.367 0.016 35.7);
   --chart-5: oklch(0.268 0.011 36.5);
 
-  /* radius ← guud rounded.none (0px) — 버튼·카드 기본은 각짐. pill/원형은 컴포넌트에서 rounded-full 사용 */
+  /* radius ← guud rounded.none (0px) 유지 — 색상만 교체 대상이라 형태는 그대로. pill/원형은 컴포넌트에서 rounded-full 사용 */
   --radius: 0rem;
 
-  /* guud에 sidebar 개념 없음 — 캔버스/중립 표면에 맞춰 일관되게 매핑(추정) */
+  /* sidebar: guud·hana 모두 sidebar 개념 없음 — hana 팔레트로 캔버스/중립 표면에 맞춰 일관 매핑(추정) */
   --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0 0 0);
-  --sidebar-primary: oklch(0 0 0);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.976 0 0);
-  --sidebar-accent-foreground: oklch(0 0 0);
-  --sidebar-border: oklch(0.898 0 0);
-  --sidebar-ring: oklch(0 0 0);
+  --sidebar-foreground: oklch(0.387 0 0);
+  --sidebar-primary: oklch(0.586 0.111 174.8);
+  /* sidebar-primary-foreground: --primary-foreground와 동일 사유(AA 보정)로 ink-strong 사용 */
+  --sidebar-primary-foreground: oklch(0.178 0 0);
+  --sidebar-accent: oklch(0.981 0.002 197.1);
+  --sidebar-accent-foreground: oklch(0.178 0 0);
+  --sidebar-border: oklch(0.981 0.002 197.1);
+  --sidebar-ring: oklch(0.586 0.111 174.8);
 
-  /* --- guud 전용 커스텀 토큰 (shadcn 표준 의미역 밖) --- */
-  /* header-band ← colors.header-band #EEE8E0 (헤더·카테고리 내비 베이지 밴드, 브랜드 시그니처) */
-  --guud-header-band: oklch(0.933 0.013 75.4);
-  /* badge-goodprice ← colors.badge-goodprice #B0A090 (taupe, 대비 미달 — Known Gaps 참조) */
-  --guud-badge-goodprice: oklch(0.715 0.029 67.3);
-  /* badge-new ← colors.badge-new #CC8A48 (amber, 대비 미달 — Known Gaps 참조) */
-  --guud-badge-new: oklch(0.687 0.115 63.8);
-  /* hairline ← colors.hairline #EBEBEB (구분선, 혜택정보 행 — border-light보다 더 옅은 전용 구분선) */
-  --guud-hairline: oklch(0.94 0 0);
-  /* surface-image ← colors.surface-image #F1F1F1 (상품 이미지 플레이스홀더 배경) */
-  --guud-surface-image: oklch(0.958 0 0);
-  /* surface-alt-2 ← colors.surface-alt-2 #E5E5E5 (비활성 랭킹 칩 배경) */
-  --guud-surface-alt-2: oklch(0.922 0 0);
-  /* scrim ← colors.scrim rgba(0,0,0,0.4) (오버레이 딤, 캐러셀 카운터 pill 배경) */
-  --guud-scrim: oklch(0 0 0 / 0.4);
-  /* text-strong ← colors.text-strong #333333 (보조 제목, 드묾) */
+  /* --- guud 접두 커스텀 토큰(이름 유지, 값은 hana 팔레트로 교체) --- */
+  /* header-band ← hana colors.badge-tint #F2FAF8 (연한 그린 틴트로 브랜드 정체성 유지. hana에 별도 헤더밴드색 없어 가장 가까운 브랜드 틴트로 대체) */
+  --guud-header-band: oklch(0.979 0.009 179.6);
+  /*
+   * badge-goodprice ← hana colors.primary #009178 (하나 틸그린 채움 — guud 원형 배지 형태 유지).
+   * AA 주의: 이 배경에 흰 텍스트(on-primary)를 얹으면 3.95:1로 미달(--primary-foreground와 동일 이슈).
+   * 텍스트를 얹는 소비자는 흰색 대신 ink-strong(4.78:1 통과) 또는 아이콘 전용으로 구성할 것.
+   */
+  --guud-badge-goodprice: oklch(0.586 0.111 174.8);
+  /* badge-new ← hana colors.primary-ink #002A22 (최암록 — 두 번째 원형 배지를 primary와 구분하기 위한 브랜드 내 딥톤. hana는 2차 강조색이 없어 primary-ink로 대체) */
+  --guud-badge-new: oklch(0.255 0.047 176.4);
+  /* hairline ← hana colors.surface-soft #F7F9F9 (DESIGN.md 명시 구분선 색) */
+  --guud-hairline: oklch(0.981 0.002 197.1);
+  /* surface-image ← hana colors.surface-soft-2 #F7F7F8 (태그 chip 배경 — hana에 이미지 플레이스홀더 개념 없어 가장 가까운 중립 틴트로 대체) */
+  --guud-surface-image: oklch(0.976 0.001 286.4);
+  /* surface-alt-2 ← hana colors.surface-soft #F7F9F9 (hairline/border/muted와 동일값으로 수렴 — hana 표면 단계가 guud보다 적음, Known Gap) */
+  --guud-surface-alt-2: oklch(0.981 0.002 197.1);
+  /* scrim ← hana opacity.scrim 0.5, base=black (전체메뉴/검색 레이어 딤 실측값. guud의 0.4에서 0.5로 갱신) */
+  --guud-scrim: oklch(0 0 0 / 0.5);
+  /* text-strong ← hana colors.ink-alt #333333 (일부 비활성 메뉴/탭 텍스트 — guud 원값과 동일 hex로 우연히 일치) */
   --guud-text-strong: oklch(0.321 0 0);
-  /* text-muted-2 ← colors.text-muted-2 #787878 (필터 칩·서브탭·정렬 라벨·브랜드명 기본색) */
-  --guud-text-muted-2: oklch(0.573 0 0);
-  /* text-subtle ← colors.text-subtle #999999 (캡션, 취소선 원가 — AA 미달, Known Gaps) */
-  --guud-text-subtle: oklch(0.683 0 0);
-  /* text-faint ← colors.text-faint #B2B2B2 (플레이스홀더급) */
-  --guud-text-faint: oklch(0.764 0 0);
+  /* text-muted-2 ← hana colors.ink-muted #666666 (보조·유틸 텍스트) */
+  --guud-text-muted-2: oklch(0.51 0 0);
+  /* text-subtle ← hana 잉크 스케일 보간 추정값. hana는 ink-muted(#666666)보다 옅은 단계가 없어(Known Gap) ink-muted→canvas 사이를 보간 */
+  --guud-text-subtle: oklch(0.67 0 0);
+  /* text-faint ← hana 잉크 스케일 보간 추정값(text-subtle보다 한 단계 더 옅게, 동일 사유의 Known Gap) */
+  --guud-text-faint: oklch(0.8 0 0);
 }
 
 /*
- * 다크모드: guud DESIGN.md는 다크모드/테마를 미관측으로 명시(Known Gaps —
- * "dark mode / themes — 미관측(존재 안 함 추정)"). 값을 지어내지 않고
- * 라이트 값을 그대로 유지한다. 다크 배색이 필요해지면 이 블록부터 정의할 것.
+ * 다크모드: guud·hana DESIGN.md 모두 다크모드/테마를 미관측으로 명시.
+ * 값을 지어내지 않고 라이트 값을 그대로 유지한다. 다크 배색이 필요해지면 이 블록부터 정의할 것.
  */
 .dark {
   --background: oklch(1 0 0);
-  --foreground: oklch(0 0 0);
+  --foreground: oklch(0.387 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0 0 0);
+  --card-foreground: oklch(0.387 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0 0 0);
-  --primary: oklch(0 0 0);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(1 0 0);
-  --secondary-foreground: oklch(0 0 0);
-  --muted: oklch(0.976 0 0);
-  --muted-foreground: oklch(0.531 0 0);
-  --accent: oklch(0.656 0.23 29.3);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.656 0.23 29.3);
-  --border: oklch(0.898 0 0);
+  --popover-foreground: oklch(0.387 0 0);
+  --primary: oklch(0.586 0.111 174.8);
+  --primary-foreground: oklch(0.178 0 0);
+  --secondary: oklch(0.981 0.002 197.1);
+  --secondary-foreground: oklch(0.178 0 0);
+  --muted: oklch(0.981 0.002 197.1);
+  --muted-foreground: oklch(0.51 0 0);
+  --accent: oklch(0.979 0.009 179.6);
+  --accent-foreground: oklch(0.178 0 0);
+  --destructive: oklch(0.535 0.214 30);
+  --border: oklch(0.981 0.002 197.1);
   --input: oklch(0.864 0 0);
-  --ring: oklch(0 0 0);
+  --ring: oklch(0.586 0.111 174.8);
   --chart-1: oklch(0.868 0.007 39.5);
   --chart-2: oklch(0.547 0.021 43.1);
   --chart-3: oklch(0.438 0.017 39.3);
   --chart-4: oklch(0.367 0.016 35.7);
   --chart-5: oklch(0.268 0.011 36.5);
   --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0 0 0);
-  --sidebar-primary: oklch(0 0 0);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.976 0 0);
-  --sidebar-accent-foreground: oklch(0 0 0);
-  --sidebar-border: oklch(0.898 0 0);
-  --sidebar-ring: oklch(0 0 0);
-  --guud-header-band: oklch(0.933 0.013 75.4);
-  --guud-badge-goodprice: oklch(0.715 0.029 67.3);
-  --guud-badge-new: oklch(0.687 0.115 63.8);
-  --guud-hairline: oklch(0.94 0 0);
-  --guud-surface-image: oklch(0.958 0 0);
-  --guud-surface-alt-2: oklch(0.922 0 0);
-  --guud-scrim: oklch(0 0 0 / 0.4);
+  --sidebar-foreground: oklch(0.387 0 0);
+  --sidebar-primary: oklch(0.586 0.111 174.8);
+  --sidebar-primary-foreground: oklch(0.178 0 0);
+  --sidebar-accent: oklch(0.981 0.002 197.1);
+  --sidebar-accent-foreground: oklch(0.178 0 0);
+  --sidebar-border: oklch(0.981 0.002 197.1);
+  --sidebar-ring: oklch(0.586 0.111 174.8);
+  --guud-header-band: oklch(0.979 0.009 179.6);
+  --guud-badge-goodprice: oklch(0.586 0.111 174.8);
+  --guud-badge-new: oklch(0.255 0.047 176.4);
+  --guud-hairline: oklch(0.981 0.002 197.1);
+  --guud-surface-image: oklch(0.976 0.001 286.4);
+  --guud-surface-alt-2: oklch(0.981 0.002 197.1);
+  --guud-scrim: oklch(0 0 0 / 0.5);
   --guud-text-strong: oklch(0.321 0 0);
-  --guud-text-muted-2: oklch(0.573 0 0);
-  --guud-text-subtle: oklch(0.683 0 0);
-  --guud-text-faint: oklch(0.764 0 0);
+  --guud-text-muted-2: oklch(0.51 0 0);
+  --guud-text-subtle: oklch(0.67 0 0);
+  --guud-text-faint: oklch(0.8 0 0);
 }
 
 @layer base {

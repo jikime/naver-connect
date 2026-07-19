@@ -144,6 +144,31 @@ export function computeMemberNodeIds(
   return nodeIds;
 }
 
+/**
+ * 노드별 buying power 집계(FR-GR-08 v1.1) — 해당 노드의 stageIds에 걸리는 조직들의
+ * buying_power 평균(반올림)을 노드 id → 값으로 반환한다. 연결맵·지역맵 노드 마커에
+ * 표시해 "구매력" 지표를 지도 위에서 바로 보이게 한다. 매칭 조직이 없는 노드(예:
+ * 고립 노드 주야간보호)는 결과에서 제외된다.
+ */
+export function computeNodeBuyingPower(
+  orgs: { value_chain_stage_id: number; buying_power: number }[],
+): Record<string, number> {
+  const sums = new Map<string, { total: number; count: number }>();
+  for (const org of orgs) {
+    const nodeId = stageToNode.get(org.value_chain_stage_id);
+    if (!nodeId) continue;
+    const entry = sums.get(nodeId) ?? { total: 0, count: 0 };
+    entry.total += org.buying_power;
+    entry.count += 1;
+    sums.set(nodeId, entry);
+  }
+  const result: Record<string, number> = {};
+  for (const [nodeId, { total, count }] of sums) {
+    result[nodeId] = Math.round(total / count);
+  }
+  return result;
+}
+
 // ---------------------------------------------------------------------------
 // 지역 맵 뷰(T-020) — 같은 6노드·엣지를 "구역 지도" 프레이밍으로 재배치한다.
 // 한빛구는 가상 지역이라 실제 TopoJSON 경계가 없다(팀리드 지시) — 외곽선·구역

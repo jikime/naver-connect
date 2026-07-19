@@ -15,6 +15,16 @@
     "mission_statement": "지역에서 나이 들어도 살던 곳에서 돌봄받는 통합돌봄을 만든다.",
     "trust_connections": [{ "type": "소속모임", "ref": "지역 통합지원회의" }],
     "hot_lead": false,
+    "keyword_set": [
+      "통합돌봄",
+      "재가돌봄",
+      "요양보호사",
+      "지역사회",
+      "협동조합",
+      "현장운영"
+    ],
+    "affiliation_org_id": "ORG-001",
+    "target_org_ids": ["ORG-002", "ORG-009"],
     "visibility": {
       "public": {
         "supply_tags": [
@@ -43,6 +53,16 @@
     "mission_statement": "주거와 돌봄이 결합된 케어안심주택으로 노후 주거 불안을 푼다.",
     "trust_connections": [{ "type": "아는회원", "ref": "LH 매입임대 담당" }],
     "hot_lead": true,
+    "keyword_set": [
+      "사회주택",
+      "매입임대",
+      "케어안심주택",
+      "협동조합",
+      "커뮤니티",
+      "LH연계"
+    ],
+    "affiliation_org_id": "ORG-002",
+    "target_org_ids": ["ORG-001", "ORG-021"],
     "visibility": {
       "public": {
         "supply_tags": [
@@ -73,6 +93,16 @@
       { "type": "소속모임", "ref": "전국 시민햇빛발전 네트워크" }
     ],
     "hot_lead": false,
+    "keyword_set": [
+      "시민햇빛발전",
+      "태양광",
+      "시민출자",
+      "협동조합",
+      "에너지전환",
+      "공공부지"
+    ],
+    "affiliation_org_id": "ORG-003",
+    "target_org_ids": ["ORG-017"],
     "visibility": {
       "public": {
         "supply_tags": [
@@ -100,6 +130,16 @@
     "mission_statement": "고령자가 병원과 마을을 오갈 수 있는 수요응답형 이동을 만든다.",
     "trust_connections": [{ "type": "소개자", "ref": "농촌 이동지원 연구자" }],
     "hot_lead": false,
+    "keyword_set": [
+      "DRT",
+      "수요응답교통",
+      "고령자이동",
+      "배차알고리즘",
+      "농촌",
+      "지자체위탁"
+    ],
+    "affiliation_org_id": "ORG-004",
+    "target_org_ids": ["ORG-001", "ORG-042"],
     "visibility": {
       "public": {
         "supply_tags": [
@@ -130,6 +170,16 @@
       { "type": "소속모임", "ref": "사회적경제 회계사 모임" }
     ],
     "hot_lead": false,
+    "keyword_set": [
+      "비영리회계",
+      "공모정산",
+      "사회적경제",
+      "회계사",
+      "거버넌스",
+      "등산"
+    ],
+    "affiliation_org_id": "ORG-005",
+    "target_org_ids": ["ORG-001", "ORG-008"],
     "visibility": {
       "public": {
         "supply_tags": [
@@ -159,6 +209,16 @@
       { "type": "소속모임", "ref": "통합돌봄 정책 연구네트워크" }
     ],
     "hot_lead": false,
+    "keyword_set": [
+      "돌봄정책",
+      "정책연구",
+      "현장실증",
+      "공동연구",
+      "제도동향",
+      "중간지원"
+    ],
+    "affiliation_org_id": "ORG-006",
+    "target_org_ids": ["ORG-001", "ORG-042"],
     "visibility": {
       "public": {
         "supply_tags": [
@@ -185,6 +245,16 @@
       { "type": "아는회원", "ref": "사회적경제 임팩트투자 라운드테이블" }
     ],
     "hot_lead": false,
+    "keyword_set": [
+      "임팩트투자",
+      "딜소싱",
+      "IR코칭",
+      "초기투자",
+      "돌봄주거기후",
+      "등산"
+    ],
+    "affiliation_org_id": "ORG-007",
+    "target_org_ids": ["ORG-002", "ORG-003"],
     "visibility": {
       "public": {
         "supply_tags": [
@@ -214,6 +284,16 @@
       { "type": "소속모임", "ref": "전국 로컬푸드 직매장 협의회" }
     ],
     "hot_lead": false,
+    "keyword_set": [
+      "로컬푸드",
+      "직매장",
+      "협동조합",
+      "지자체협약",
+      "먹거리순환",
+      "디지털전환"
+    ],
+    "affiliation_org_id": "ORG-008",
+    "target_org_ids": ["ORG-025"],
     "visibility": {
       "public": {
         "supply_tags": [

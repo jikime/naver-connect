@@ -6,6 +6,7 @@
     "to_member_id": "M-004",
     "match_type": "거울형",
     "value_class": "동료성장가치",
+    "rec_axis": "공통점",
     "matching_rationale": "분야는 다르지만(에너지·교통) 정책의존형 수익구조라는 동일한 고민을 공유. 거울형은 학습공동체 발전경로의 표준 입구.",
     "message": {
       "intro": "에너지 분야에서 시민 출자로 옥상 태양광 20개소를 일궈온 이하나 사무국장님이에요.",
@@ -32,6 +33,7 @@
     "to_member_id": "M-003",
     "match_type": "거울형",
     "value_class": "동료성장가치",
+    "rec_axis": "공통점",
     "matching_rationale": "이하나에게 최연우를 소개하는 역방향 카드. 같은 정책의존형 고민을 다른 분야 사례로 비춰봄. A→B와 개별 작성(복붙 대칭 금지).",
     "message": {
       "intro": "완주에서 고령자 특화 배차 알고리즘으로 수요응답형 교통을 운영하는 최연우 대표님이에요.",
@@ -53,6 +55,7 @@
     "to_member_id": "M-001",
     "match_type": "퍼즐형",
     "value_class": "사업가치",
+    "rec_axis": "차이점",
     "matching_rationale": "한쪽 수요가 다른쪽 수요와 맞물리는 '서로가 서로의 답' 구조. 박준호 핫리드 → 운영자 48시간 내 확인 대상.",
     "message": {
       "intro": "부천에서 사회주택 협동조합을 이끄는 박준호 이사장님이에요.",
@@ -74,6 +77,7 @@
     "to_member_id": "M-002",
     "match_type": "퍼즐형",
     "value_class": "사업가치",
+    "rec_axis": "차이점",
     "matching_rationale": "박준호에게 김서연을 소개하는 역방향 카드. 핫리드 퍼즐의 양방향. 개별 작성.",
     "message": {
       "intro": "은평에서 재가돌봄 사회적협동조합을 7년째 운영하는 김서연 대표님이에요.",
@@ -95,7 +99,8 @@
     "to_member_id": null,
     "match_type": "퍼즐형",
     "value_class": "관계가치",
-    "matching_rationale": "퍼즐형②(전문가 수요를 기업가 공급이 채우는 11번 태그 역방향 매칭). 대상 오유진의 expert_subtype='공공중간지원'이므로 1:1 추천을 생성하지 않고 모듬 초대 변형으로 수용(FR-RC-08·BR-04·ADR-06). '전문가는 주기만 하는 사람' 함정을 깨는 유형.",
+    "rec_axis": "차이점",
+    "matching_rationale": "퍼즐형②(전문가 수요를 기업가 공급이 채우는 11번 태그 역방향 매칭). 대상 오유진의 expert_subtype='공공중간지원'이므로 1:1 추천을 생성하지 않고 모듬 초대 변형으로 수용(FR-RC-08·BR-04·ADR-06). 상세 모듬 정보는 meetup_id 로 meetups.json(MU-001) 참조.",
     "message": {
       "intro": "세종 정책연구소의 오유진 부연구위원이 여는 '현장×연구' 공동연구 모듬이에요.",
       "contact_point": "오유진 님이 '돌봄통합지원법 시행초기 현장사례가 연구에 꼭필요해요'라고 하셨고, 김서연 님은 '통합지원회의 참여기관 사례 개방 가능'이라 서로의 필요가 맞물려요.",
@@ -106,12 +111,7 @@
     "is_hot_lead": false,
     "min_exposure_note": "현장사례 공동연구를 제안한 오유진 님",
     "authored_direction": "A→B",
-    "meetup": {
-      "meetup_id": "MU-001",
-      "type": "공공모듬",
-      "purpose": "돌봄통합지원법 시행 초기 현장사례를 함께 기록하는 '현장×연구' 공동연구 모듬",
-      "member_ids": ["M-006", "M-001", "M-002"]
-    },
+    "meetup_id": "MU-001",
     "sent_week": "2026-W28",
     "status": "sent"
   },
@@ -122,6 +122,7 @@
     "to_member_id": "M-004",
     "match_type": "다리형",
     "value_class": "사업가치",
+    "rec_axis": "차이점",
     "matching_rationale": "이종분야(돌봄·교통) 같은 고객(고령자). 분야간 연계매트릭스(도메인 룰) 근거. 실패율 최고 유형 → '예상 밖의 분야에서 왔어요' 기대치 조정 + 가장 가벼운 첫 행동.",
     "message": {
       "intro": "은평에서 재가돌봄을 운영하는 김서연 대표님이에요.",
@@ -144,6 +145,7 @@
     "to_member_id": "M-001",
     "match_type": "다리형",
     "value_class": "사업가치",
+    "rec_axis": "차이점",
     "matching_rationale": "김서연에게 최연우를 소개하는 역방향 다리형. 같은 고객(고령자)을 향한 분야 연계. 개별 작성.",
     "message": {
       "intro": "완주에서 고령자 특화 DRT를 운영하는 최연우 대표님이에요.",
@@ -165,6 +167,7 @@
     "to_member_id": "M-007",
     "match_type": "취미형",
     "value_class": "관계가치",
+    "rec_axis": "공통점",
     "matching_rationale": "일 밖의 공통점(둘 다 주말 등산, 서울)을 접점으로. 업무 접점은 괄호 속 보조 신호만. 1:1이 아닌 소모임(산행) 초대 형태. '선행신뢰효과' 가설(파일럿 검증 대상).",
     "message": {
       "intro": "서울에서 사회적경제 전문 회계사로 일하는 정민철 님이에요.",
@@ -176,6 +179,7 @@
     "is_hot_lead": false,
     "min_exposure_note": "주말 등산을 즐기는 정민철 님",
     "authored_direction": "A→B",
+    "meetup_id": "MU-003",
     "sent_week": "2026-W28",
     "status": "accepted",
     "meeting_outcome": {
@@ -191,6 +195,7 @@
     "to_member_id": "M-005",
     "match_type": "취미형",
     "value_class": "관계가치",
+    "rec_axis": "공통점",
     "matching_rationale": "정민철에게 한동수를 소개하는 역방향 취미형. 취미(등산·러닝)와 지역(서울) 겹침. 개별 작성.",
     "message": {
       "intro": "서울의 임팩트투자사에서 초기 사회적기업을 심사하는 한동수 님이에요.",
@@ -202,6 +207,7 @@
     "is_hot_lead": false,
     "min_exposure_note": "주말 등산·러닝을 즐기는 한동수 님",
     "authored_direction": "B→A",
+    "meetup_id": "MU-003",
     "sent_week": "2026-W28",
     "status": "sent"
   },
@@ -212,6 +218,7 @@
     "to_member_id": "M-003",
     "match_type": "선배형",
     "value_class": "동료성장가치",
+    "rec_axis": "공통점",
     "matching_rationale": "지나온 길 — 같은 조직 형태(협동조합) 선후배 매칭. 역방향 보조 접점(강미래 디지털전환 수요 ↔ 이하나 IT운영 경험 공급)으로 호혜 설계.",
     "message": {
       "intro": "정읍에서 로컬푸드 직매장 협동조합을 12년째 이끄는 강미래 상임이사님이에요.",
@@ -233,6 +240,7 @@
     "to_member_id": "M-008",
     "match_type": "선배형",
     "value_class": "동료성장가치",
+    "rec_axis": "공통점",
     "matching_rationale": "강미래에게 이하나를 소개하는 역방향 보조접점 카드. 선배(강미래)와 후배(이하나)가 디지털전환 주제에서는 역할이 바뀌는 상호 멘토링 설계.",
     "message": {
       "intro": "대전에서 시민햇빛발전 협동조합을 운영하며 옥상 태양광 20개소를 다뤄온 이하나 사무국장님이에요.",

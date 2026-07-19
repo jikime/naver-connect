@@ -21,6 +21,10 @@ const fixtureMember: Member = {
   mission_statement: "테스트 미션",
   trust_connections: [],
   hot_lead: false,
+  // v1.1 확장 필드(전부 공개층) — Member 타입이 요구하는 필드라 테스트 픽스처에도 채운다.
+  keyword_set: ["테스트키워드"],
+  affiliation_org_id: null,
+  target_org_ids: [],
   visibility: {
     public: {
       supply_tags: [{ tagId: 11, detail: "공개 상세" }],

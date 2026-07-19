@@ -1,8 +1,14 @@
 // 백오피스 마켓 라우트 — 전문가 서비스 카탈로그·공동구매 현황·공급자 뷰(FR-BO-01~05).
-// 근거: ARCHITECTURE.md §3(L2 BackOffice), TASKS.md T-021
+// v1.1: 등록된 딜에 맞춤 전문기관 추천(FR-BO-06)·전문가 직접 검색·연락(FR-BO-07) 추가.
+// 근거: ARCHITECTURE.md §3(L2 BackOffice), FR-BO-01~07
 // 카탈로그·공동구매는 역할 무관 공통 뷰라 Server Component에서 DAL로 가져온다(ADR-04).
-// 공급자 뷰만 현재 뷰어 역할에 의존하므로 SupplierView 내부에서 Zustand를 읽는다.
+// 공급자 뷰·맞춤 전문기관 추천은 현재 뷰어(역할/세션)에 의존하므로 각 컴포넌트가 Client에서
+// 직접 Zustand·DAL을 읽는다. ExpertMatchPanel은 useSearchParams(?dealId=)를 쓰므로
+// Suspense 경계가 필요하다(Next 16 프로덕션 빌드 요건).
 
+import { Suspense } from "react";
+import { ExpertDirectSearch } from "@/components/backoffice/ExpertDirectSearch";
+import { ExpertMatchPanel } from "@/components/backoffice/ExpertMatchPanel";
 import { ExpertServiceCatalog } from "@/components/backoffice/ExpertServiceCatalog";
 import { GroupBuyStatusPanel } from "@/components/backoffice/GroupBuyStatusPanel";
 import { SupplierView } from "@/components/backoffice/SupplierView";
@@ -32,6 +38,16 @@ export default async function BackOfficePage() {
       <GovernancePrincipleBanner />
       <ExpertServiceCatalog services={services} />
       <GroupBuyStatusPanel groupBuys={groupBuys} />
+      <Suspense
+        fallback={
+          <p className="text-sm text-guud-text-muted-2">
+            맞춤 전문기관 추천을 불러오는 중입니다…
+          </p>
+        }
+      >
+        <ExpertMatchPanel />
+      </Suspense>
+      <ExpertDirectSearch services={services} />
       <SupplierView services={services} />
     </div>
   );

@@ -13,7 +13,11 @@ import { Button } from "@/components/ui/button";
 import type { Organization, Region, StageLink } from "@/types";
 import { ConnectionMap } from "./ConnectionMap";
 import { DistrictMapView } from "./DistrictMapView";
-import { computeMemberNodeIds, MAP_NODES } from "./map-topology";
+import {
+  computeMemberNodeIds,
+  computeNodeBuyingPower,
+  MAP_NODES,
+} from "./map-topology";
 import { NodeDetailPanel } from "./NodeDetailPanel";
 
 type MapView = "graph" | "district";
@@ -30,6 +34,7 @@ export function GapEcosystemMapToggle({
   const [view, setView] = useState<MapView>("graph");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const memberNodeIds = useMemo(() => computeMemberNodeIds(orgs), [orgs]);
+  const buyingPowerByNode = useMemo(() => computeNodeBuyingPower(orgs), [orgs]);
 
   function selectNode(id: string) {
     setSelectedId((current) => (current === id ? null : id));
@@ -75,6 +80,7 @@ export function GapEcosystemMapToggle({
             region={region}
             stageLinks={stageLinks}
             memberNodeIds={memberNodeIds}
+            buyingPowerByNode={buyingPowerByNode}
             selectedId={selectedId}
             onSelectNode={selectNode}
           />
@@ -83,6 +89,7 @@ export function GapEcosystemMapToggle({
             region={region}
             stageLinks={stageLinks}
             memberNodeIds={memberNodeIds}
+            buyingPowerByNode={buyingPowerByNode}
             selectedId={selectedId}
             onSelectNode={selectNode}
           />

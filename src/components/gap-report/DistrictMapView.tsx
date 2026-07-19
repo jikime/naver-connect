@@ -32,6 +32,7 @@ function DistrictNode({
   isSelected,
   isAxisHighlight,
   hasMemberOrg,
+  buyingPower,
   onSelect,
 }: {
   nodeId: string;
@@ -39,6 +40,7 @@ function DistrictNode({
   isSelected: boolean;
   isAxisHighlight: boolean;
   hasMemberOrg: boolean;
+  buyingPower: number | undefined;
   onSelect: () => void;
 }) {
   const node = MAP_NODES.find((n) => n.id === nodeId);
@@ -52,6 +54,7 @@ function DistrictNode({
     <MapNodeMarker
       label={node.label}
       count={actorCount?.count}
+      buyingPower={buyingPower}
       x={position.x}
       y={position.y}
       isSelected={isSelected}
@@ -66,12 +69,14 @@ export function DistrictMapView({
   region,
   stageLinks,
   memberNodeIds,
+  buyingPowerByNode,
   selectedId,
   onSelectNode,
 }: {
   region: Region;
   stageLinks: StageLink[];
   memberNodeIds: Set<string>;
+  buyingPowerByNode: Record<string, number>;
   selectedId: string | null;
   onSelectNode: (id: string) => void;
 }) {
@@ -156,6 +161,7 @@ export function DistrictMapView({
               isSelected={nodeId === selectedId}
               isAxisHighlight={highlightedAxisNodes.has(nodeId)}
               hasMemberOrg={memberNodeIds.has(nodeId)}
+              buyingPower={buyingPowerByNode[nodeId]}
               onSelect={() => onSelectNode(nodeId)}
             />
           )),

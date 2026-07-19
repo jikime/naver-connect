@@ -29,6 +29,8 @@ export interface Recommendation {
   to_member_id: string | null;
   match_type: MatchType;
   value_class: RecValueClass;
+  /** v1.1 FR-RC-01: 5+5 그룹핑 축 (공통=거울/선배/취미, 차이=퍼즐/다리) */
+  rec_axis: "공통점" | "차이점";
   matching_rationale: string;
   /** FR-RC-03 5문장, BR-06 (받는사람 이익 먼저) */
   message: {
@@ -45,13 +47,8 @@ export interface Recommendation {
   min_exposure_note: string;
   /** FR-RC-07 개별 작성(복붙 대칭 금지) */
   authored_direction: "A→B" | "B→A";
-  /** rec_kind==="모듬" 일 때만 */
-  meetup?: {
-    meetup_id: string;
-    type: "학습모임" | "취미모임" | "지역앰배서더" | "공공모듬";
-    purpose: string;
-    member_ids: string[];
-  };
+  /** v1.1 ADR-06: rec_kind==="모듬"이면 meetups.json 참조(상세는 Meetup). 데이터 중복 방지. */
+  meetup_id?: string;
   sent_week: string;
   /** FR-OP-04 상태 전이 */
   status: RecStatus;

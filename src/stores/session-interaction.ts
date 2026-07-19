@@ -5,7 +5,12 @@
 // persist 미들웨어를 쓰지 않는다 — 새로고침 시 시드 초기값으로 리셋되는 것이 의도(A6).
 
 import { create } from "zustand";
-import type { DeclineReasonCode, RecStatus } from "@/types";
+import type {
+  DealRoom,
+  DeclineReasonCode,
+  RecStatus,
+  RuleWeight,
+} from "@/types";
 
 /** 추천 1건에 대한 세션 오버라이드. DAL read 함수가 시드 위에 겹쳐 반환한다. */
 export interface RecommendationOverride {
@@ -20,21 +25,32 @@ interface SessionInteractionStore {
   recommendationOverrides: Record<string, RecommendationOverride>;
   /** personaId → 온보딩 완료 여부(목업 finalizeOnboarding 플래그, FR-ON-09). */
   onboardingFinalized: Record<string, boolean>;
+  /** v1.1 FR-RL-02/03: 관리자가 편집한 키워드 가중치(세션 한정). null이면 시드 rule_weights 그대로. */
+  ruleWeightOverrides: RuleWeight[] | null;
+  /** v1.1 FR-DS-01: 딜소싱 폼으로 등록된 딜(세션 한정). getDealRooms(FR-DR-05)가 시드에 겹쳐 반환한다. */
+  registeredDeals: DealRoom[];
 
   setRecommendationOverride: (
     recId: string,
     patch: RecommendationOverride,
   ) => void;
   finalizeOnboardingFor: (personaId: string) => void;
+  setRuleWeightOverrides: (weights: RuleWeight[]) => void;
+  addRegisteredDeal: (deal: DealRoom) => void;
   reset: () => void;
 }
 
 const INITIAL_STATE: Pick<
   SessionInteractionStore,
-  "recommendationOverrides" | "onboardingFinalized"
+  | "recommendationOverrides"
+  | "onboardingFinalized"
+  | "ruleWeightOverrides"
+  | "registeredDeals"
 > = {
   recommendationOverrides: {},
   onboardingFinalized: {},
+  ruleWeightOverrides: null,
+  registeredDeals: [],
 };
 
 export const useSessionInteractionStore = create<SessionInteractionStore>(
@@ -54,6 +70,9 @@ export const useSessionInteractionStore = create<SessionInteractionStore>(
           [personaId]: true,
         },
       })),
+    setRuleWeightOverrides: (weights) => set({ ruleWeightOverrides: weights }),
+    addRegisteredDeal: (deal) =>
+      set((state) => ({ registeredDeals: [...state.registeredDeals, deal] })),
     reset: () => set(INITIAL_STATE),
   }),
 );

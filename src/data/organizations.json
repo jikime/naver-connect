@@ -10,7 +10,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": ["M-001"],
     "last_checked_at": "2026-07-10",
-    "member_id": "M-001"
+    "member_id": "M-001",
+    "buying_power": 40,
+    "five_force_role": "기존경쟁자"
   },
   {
     "id": "ORG-002",
@@ -23,7 +25,9 @@
     "source": "사회주택협회·LH/SH 공급현황",
     "verified_by": ["M-002"],
     "last_checked_at": "2026-07-10",
-    "member_id": "M-002"
+    "member_id": "M-002",
+    "buying_power": 40,
+    "five_force_role": "기존경쟁자"
   },
   {
     "id": "ORG-003",
@@ -36,7 +40,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": ["M-003"],
     "last_checked_at": "2026-07-11",
-    "member_id": "M-003"
+    "member_id": "M-003",
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-004",
@@ -49,7 +55,9 @@
     "source": "지자체 위탁·공모공고 아카이브",
     "verified_by": ["M-004"],
     "last_checked_at": "2026-07-09",
-    "member_id": "M-004"
+    "member_id": "M-004",
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-005",
@@ -62,7 +70,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": ["M-005"],
     "last_checked_at": "2026-07-08",
-    "member_id": "M-005"
+    "member_id": "M-005",
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-006",
@@ -75,7 +85,9 @@
     "source": "보건복지부 의료사협 인가현황",
     "verified_by": ["M-006"],
     "last_checked_at": "2026-07-08",
-    "member_id": "M-006"
+    "member_id": "M-006",
+    "buying_power": 60,
+    "five_force_role": null
   },
   {
     "id": "ORG-007",
@@ -88,7 +100,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": ["M-007"],
     "last_checked_at": "2026-07-07",
-    "member_id": "M-007"
+    "member_id": "M-007",
+    "buying_power": 60,
+    "five_force_role": null
   },
   {
     "id": "ORG-008",
@@ -101,7 +115,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": ["M-008"],
     "last_checked_at": "2026-07-10",
-    "member_id": "M-008"
+    "member_id": "M-008",
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-009",
@@ -114,7 +130,9 @@
     "source": "보건복지부 의료사협 인가현황",
     "verified_by": ["M-001"],
     "last_checked_at": "2026-07-05",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "기존경쟁자"
   },
   {
     "id": "ORG-010",
@@ -127,7 +145,9 @@
     "source": "보건복지부 의료사협 인가현황",
     "verified_by": [],
     "last_checked_at": "2026-07-05",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "대체재"
   },
   {
     "id": "ORG-011",
@@ -140,7 +160,9 @@
     "source": "보건복지부 의료사협 인가현황",
     "verified_by": [],
     "last_checked_at": "2026-07-05",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "대체재"
   },
   {
     "id": "ORG-012",
@@ -153,7 +175,9 @@
     "source": "보건복지부 의료사협 인가현황",
     "verified_by": [],
     "last_checked_at": "2026-07-05",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "대체재"
   },
   {
     "id": "ORG-013",
@@ -166,7 +190,9 @@
     "source": "국민건강보험공단 장기요양기관 공개DB",
     "verified_by": [],
     "last_checked_at": "2026-06-28",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "신규진입자"
   },
   {
     "id": "ORG-014",
@@ -179,7 +205,9 @@
     "source": "국민건강보험공단 장기요양기관 공개DB",
     "verified_by": [],
     "last_checked_at": "2026-06-28",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "신규진입자"
   },
   {
     "id": "ORG-015",
@@ -192,7 +220,9 @@
     "source": "국민건강보험공단 장기요양기관 공개DB",
     "verified_by": [],
     "last_checked_at": "2026-06-28",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "신규진입자"
   },
   {
     "id": "ORG-016",
@@ -205,7 +235,9 @@
     "source": "국민건강보험공단 장기요양기관 공개DB",
     "verified_by": [],
     "last_checked_at": "2026-06-28",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "신규진입자"
   },
   {
     "id": "ORG-017",
@@ -218,7 +250,9 @@
     "source": "사회주택협회·LH/SH 공급현황",
     "verified_by": ["M-002"],
     "last_checked_at": "2026-07-01",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": "기존경쟁자"
   },
   {
     "id": "ORG-018",
@@ -231,7 +265,9 @@
     "source": "사회주택협회·LH/SH 공급현황",
     "verified_by": [],
     "last_checked_at": "2026-07-01",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": "신규진입자"
   },
   {
     "id": "ORG-019",
@@ -244,7 +280,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": [],
     "last_checked_at": "2026-07-01",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": "신규진입자"
   },
   {
     "id": "ORG-020",
@@ -257,7 +295,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": [],
     "last_checked_at": "2026-07-01",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": "기존경쟁자"
   },
   {
     "id": "ORG-021",
@@ -270,7 +310,9 @@
     "source": "사회주택협회·LH/SH 공급현황",
     "verified_by": [],
     "last_checked_at": "2026-07-01",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 100,
+    "five_force_role": "공급자"
   },
   {
     "id": "ORG-022",
@@ -283,7 +325,9 @@
     "source": "사회주택협회·LH/SH 공급현황",
     "verified_by": [],
     "last_checked_at": "2026-07-01",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 100,
+    "five_force_role": "공급자"
   },
   {
     "id": "ORG-023",
@@ -296,7 +340,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": ["M-003"],
     "last_checked_at": "2026-07-02",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-024",
@@ -309,7 +355,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": [],
     "last_checked_at": "2026-07-02",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-025",
@@ -322,7 +370,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": ["M-008"],
     "last_checked_at": "2026-07-02",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": null
   },
   {
     "id": "ORG-026",
@@ -335,7 +385,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 20,
+    "five_force_role": null
   },
   {
     "id": "ORG-027",
@@ -348,7 +400,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 20,
+    "five_force_role": null
   },
   {
     "id": "ORG-028",
@@ -361,7 +415,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 20,
+    "five_force_role": null
   },
   {
     "id": "ORG-029",
@@ -374,7 +430,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 20,
+    "five_force_role": null
   },
   {
     "id": "ORG-030",
@@ -387,7 +445,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 20,
+    "five_force_role": null
   },
   {
     "id": "ORG-031",
@@ -400,7 +460,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-032",
@@ -413,7 +475,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-033",
@@ -426,7 +490,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-06-25",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 40,
+    "five_force_role": null
   },
   {
     "id": "ORG-034",
@@ -439,7 +505,9 @@
     "source": "한국사회적기업진흥원 인증목록",
     "verified_by": [],
     "last_checked_at": "2026-07-03",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 80,
+    "five_force_role": null
   },
   {
     "id": "ORG-035",
@@ -452,7 +520,9 @@
     "source": "지자체 위탁·공모공고 아카이브",
     "verified_by": [],
     "last_checked_at": "2026-07-03",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 80,
+    "five_force_role": null
   },
   {
     "id": "ORG-036",
@@ -465,7 +535,9 @@
     "source": "지자체 위탁·공모공고 아카이브",
     "verified_by": [],
     "last_checked_at": "2026-07-03",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": null
   },
   {
     "id": "ORG-037",
@@ -478,7 +550,9 @@
     "source": "사회주택협회·LH/SH 공급현황",
     "verified_by": [],
     "last_checked_at": "2026-07-03",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": null
   },
   {
     "id": "ORG-038",
@@ -491,7 +565,9 @@
     "source": "국민건강보험공단 장기요양기관 공개DB",
     "verified_by": [],
     "last_checked_at": "2026-07-04",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 100,
+    "five_force_role": "공급자"
   },
   {
     "id": "ORG-039",
@@ -504,7 +580,9 @@
     "source": "건강보험심사평가원 의료기관정보",
     "verified_by": [],
     "last_checked_at": "2026-07-04",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 100,
+    "five_force_role": null
   },
   {
     "id": "ORG-040",
@@ -517,7 +595,9 @@
     "source": "지자체 위탁·공모공고 아카이브",
     "verified_by": [],
     "last_checked_at": "2026-07-04",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 100,
+    "five_force_role": null
   },
   {
     "id": "ORG-041",
@@ -530,7 +610,9 @@
     "source": "협동조합 설립명부(COOP)",
     "verified_by": [],
     "last_checked_at": "2026-07-04",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 60,
+    "five_force_role": null
   },
   {
     "id": "ORG-042",
@@ -543,6 +625,8 @@
     "source": "지자체 위탁·공모공고 아카이브",
     "verified_by": [],
     "last_checked_at": "2026-07-12",
-    "member_id": null
+    "member_id": null,
+    "buying_power": 80,
+    "five_force_role": "구매자"
   }
 ]

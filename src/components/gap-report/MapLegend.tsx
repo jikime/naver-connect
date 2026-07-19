@@ -69,6 +69,21 @@ export function MapLegend({
         </svg>
         네트워크 회원 조직 포함(이중 테두리)
       </li>
+      <li className="flex items-center gap-1.5">
+        <svg width="54" height="8" aria-hidden="true">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <circle
+              // biome-ignore lint/suspicious/noArrayIndexKey: 5개 고정 눈금, 순서 불변
+              key={i}
+              cx={4 + i * 12}
+              cy={4}
+              r={3}
+              className={i < 3 ? "fill-primary" : "fill-none stroke-border"}
+            />
+          ))}
+        </svg>
+        buying power(구매력) 5단계
+      </li>
     </ul>
   );
 }

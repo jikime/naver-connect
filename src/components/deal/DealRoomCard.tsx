@@ -1,6 +1,7 @@
 // DealRoomCard — 딜룸 1건 카드. source_type(유입 경로) + G1~G4 게이트 상태를 표시해
-// 4입구(핫리드/격차기회카드/모임/외부공고/공고역방향)→씨앗 층 연결을 시각화한다.
-// 근거: ARCHITECTURE.md §3(L2 DealBoard), TASKS.md T-020, FR-DR-01/02/03
+// 5입구(핫리드/격차기회카드/모임/외부공고/공고역방향/딜소싱)→씨앗 층 연결을 시각화한다.
+// v1.1: viewerPersonaId가 owner/participating과 일치하면 "내가 제안"/"내가 참여" 뱃지를 붙인다(FR-DR-05).
+// 근거: ARCHITECTURE.md §3(L2 DealBoard), FR-DR-01/02/03/05
 
 import { GateStatusBadge } from "@/components/shared/GateStatusBadge";
 import { HotLeadBadge } from "@/components/shared/HotLeadBadge";
@@ -23,6 +24,7 @@ const SOURCE_TYPE_LABEL: Record<DealRoom["source_type"], string> = {
   모임: "모임 진입",
   외부공고: "외부공고 진입",
   공고역방향: "공고 역방향 진입",
+  딜소싱: "딜소싱 진입",
 };
 
 /** participating_orgs로 조직명을 붙인다. organizations.json은 비민감 시드라 직접 참조 가능(ADR-03 대상 밖). */
@@ -44,12 +46,25 @@ function resolveHotLeadMemberName(orgIds: string[]): string | null {
   return null;
 }
 
-export function DealRoomCard({ room }: { room: DealRoom }) {
+export function DealRoomCard({
+  room,
+  viewerPersonaId,
+}: {
+  room: DealRoom;
+  /** v1.1 FR-DR-05: "내가 제안·진행하는 딜" 뱃지 판별용. 미지정 시 뱃지 없음(기존 정적 스텁 화면 호환). */
+  viewerPersonaId?: string;
+}) {
   const orgNames = resolveOrgNames(room.participating_orgs);
   const hotLeadMemberName =
     room.source_type === "핫리드"
       ? resolveHotLeadMemberName(room.participating_orgs)
       : null;
+  const isOwner =
+    viewerPersonaId !== undefined && room.owner_member_id === viewerPersonaId;
+  const isParticipant =
+    !isOwner &&
+    viewerPersonaId !== undefined &&
+    room.participating_member_ids.includes(viewerPersonaId);
 
   return (
     <Card
@@ -69,6 +84,16 @@ export function DealRoomCard({ room }: { room: DealRoom }) {
           <Badge className="rounded-full border border-border bg-muted px-2.5 py-0.5 font-semibold tracking-normal text-foreground normal-case">
             {SOURCE_TYPE_LABEL[room.source_type]}
           </Badge>
+          {isOwner && (
+            <Badge className="rounded-full bg-primary px-2.5 py-0.5 font-semibold tracking-normal text-primary-foreground normal-case">
+              내가 제안
+            </Badge>
+          )}
+          {isParticipant && (
+            <Badge className="rounded-full border border-foreground px-2.5 py-0.5 font-semibold tracking-normal text-foreground normal-case">
+              내가 참여
+            </Badge>
+          )}
         </div>
         {hotLeadMemberName && (
           <p className="text-xs text-guud-text-muted-2">

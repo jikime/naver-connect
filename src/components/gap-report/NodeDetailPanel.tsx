@@ -1,4 +1,4 @@
-// NodeDetailPanel — 연결맵 노드 클릭 시 주체 상세(FR-GR-04).
+// NodeDetailPanel — 연결맵 노드 클릭 시 주체 상세(FR-GR-04) + buying power(v1.1 FR-GR-08).
 // 근거: ARCHITECTURE.md ADR-02, TASKS.md T-018
 // ConnectionMap의 선택 상태를 그대로 받아 렌더만 하는 순수 표시 컴포넌트.
 
@@ -61,7 +61,8 @@ export function NodeDetailPanel({
             <li key={org.id} className="text-sm text-foreground">
               {org.name}{" "}
               <span className="text-xs text-guud-text-muted-2">
-                ({org.actor_type} · {org.region.sido} {org.region.sigungu})
+                ({org.actor_type} · {org.region.sido} {org.region.sigungu} ·
+                buying power {org.buying_power})
               </span>
             </li>
           ))}

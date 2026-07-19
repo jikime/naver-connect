@@ -31,15 +31,23 @@ const PRIMARY_NAV = [
 ] as const;
 
 const SECONDARY_NAV = [
-  { href: "/gap-report", label: "격차 리포트" },
+  { href: "/gap-report", label: "사업기회 발굴" },
+  { href: "/collab-cases", label: "협업사례" },
+  { href: "/proposals", label: "제안 트래킹" },
   { href: "/knowledge-graph", label: "지식 그래프" },
   { href: "/deal-rooms", label: "딜룸" },
+  { href: "/deal-sourcing", label: "딜소싱" },
+  { href: "/resources", label: "자원검색" },
+  { href: "/finance", label: "금융 서비스" },
   { href: "/backoffice", label: "백오피스" },
+  { href: "/search", label: "회원 검색" },
+  { href: "/meetups", label: "모듬" },
 ] as const;
 
 const OPERATOR_NAV = [
   { href: "/operator/review", label: "검수" },
   { href: "/operator/kpi", label: "KPI" },
+  { href: "/admin/rules", label: "추천 룰" },
 ] as const;
 
 function NavLink({
@@ -60,8 +68,9 @@ function NavLink({
         "flex min-h-11 items-center px-2 py-1 text-sm",
         active
           ? "text-foreground font-semibold border-b-2 border-foreground"
-          : // guud-text-muted-2(#787878)는 header-band(#EEE8E0) 위에서 3.63:1로 AA 미달(모드 B 회송) —
-            // text-strong(#333333, header-band 위 10.38:1)으로 교체.
+          : // 2026-07-19 하나 크로스워크로 값 갱신: guud-text-muted-2(#666666)는
+            // guud-header-band(#F2FAF8, hana badge-tint)에서 5.42:1로 AA 통과지만,
+            // guud-text-strong(#333333, 11.92:1)이 더 여유 있어 기존 보정을 유지.
             "text-guud-text-strong hover:text-foreground",
       )}
     >
