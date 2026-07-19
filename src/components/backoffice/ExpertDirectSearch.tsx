@@ -8,6 +8,7 @@
 import { useState } from "react";
 import { ExpertServiceCard } from "@/components/backoffice/ExpertServiceCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetClose,
@@ -98,12 +99,11 @@ export function ExpertDirectSearch({
       <h2 className="font-heading text-lg font-bold text-foreground">
         전문가 직접 검색
       </h2>
-      <input
+      <Input
         type="search"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         placeholder="키워드로 검색 (예: 공모사업 정산, 정책분석)"
-        className="h-10 w-full border border-transparent border-b-input bg-transparent px-0 py-1 text-base outline-none placeholder:text-muted-foreground focus-visible:border-b-ring"
         aria-label="전문가 키워드 검색"
       />
       <div

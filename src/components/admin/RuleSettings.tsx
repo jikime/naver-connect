@@ -9,6 +9,7 @@
 import { useEffect, useState } from "react";
 import { AssumptionBadge } from "@/components/shared/AssumptionBadge";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { getMatchScores, setRuleWeights } from "@/lib/dal";
 import { useViewerContext } from "@/stores/viewer-context";
 import type { MatchScore, RuleWeight } from "@/types";
@@ -79,16 +80,14 @@ export function RuleSettings() {
             <div key={w.keyword} className="flex items-center gap-3 text-sm">
               <span className="w-40 shrink-0 text-foreground">{w.keyword}</span>
               {isAdmin ? (
-                <input
-                  type="range"
+                <Slider
                   min={0}
                   max={2}
                   step={0.1}
-                  value={w.weight}
-                  onChange={(e) =>
-                    updateDraft(w.keyword, Number(e.target.value))
-                  }
+                  value={[w.weight]}
+                  onValueChange={([next]) => updateDraft(w.keyword, next)}
                   className="flex-1"
+                  aria-label={`${w.keyword} 가중치`}
                 />
               ) : (
                 <div className="h-1.5 flex-1 rounded-full bg-muted">

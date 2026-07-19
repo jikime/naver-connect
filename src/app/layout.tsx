@@ -3,10 +3,7 @@ import { Geist_Mono, Hind, Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { GlobalNav } from "@/components/shell/GlobalNav";
 import { MotionProvider } from "@/components/shell/MotionProvider";
-import {
-  type PersonaRosterEntry,
-  RoleSwitcher,
-} from "@/components/shell/RoleSwitcher";
+import type { PersonaRosterEntry } from "@/components/shell/RoleSwitcher";
 import { getMembers } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 
@@ -67,14 +64,10 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <MotionProvider>
-          <header className="bg-guud-header-band">
-            <div className="flex items-center justify-between px-[30px] py-3">
-              <span className="font-heading text-lg font-bold text-foreground">
-                AX 플랫폼
-              </span>
-              <RoleSwitcher personas={personas} />
-            </div>
-            <GlobalNav />
+          <header>
+            {/* Task #32(v2): 로고·역할스위처·GNB 전부 GlobalNav가 소유(하나 GNB 패턴 —
+                utility-bar + 로고+대메뉴 GNB바 + 전체메뉴). 모바일은 햄버거+Sheet. */}
+            <GlobalNav personas={personas} />
           </header>
           <main className="flex flex-1 flex-col">{children}</main>
         </MotionProvider>

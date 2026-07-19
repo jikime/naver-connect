@@ -5,7 +5,8 @@
 // 공개층으로만 투영돼 내려온다.
 // (3D 은하 뷰는 사용자 지시로 제거·아카이브: artifacts/archive/knowledge-graph-3d/, #24)
 
-import { Pause, Play, RotateCcw, X } from "lucide-react";
+import { Pause, Play, RotateCcw, Sparkles, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -223,15 +224,23 @@ export function KnowledgeGraphView({ graph }: { graph: KnowledgeGraph }) {
             })}
           </fieldset>
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={startStory}
-            className="ml-auto gap-1.5"
-          >
-            <Play className="size-4" aria-hidden />
-            스토리
-          </Button>
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={startStory}
+              className="gap-1.5"
+            >
+              <Play className="size-4" aria-hidden />
+              스토리
+            </Button>
+            <Button asChild size="sm" variant="outline" className="gap-1.5">
+              <Link href="/knowledge-graph/galaxy">
+                <Sparkles className="size-4" aria-hidden />
+                은하 뷰
+              </Link>
+            </Button>
+          </div>
         </div>
       )}
 

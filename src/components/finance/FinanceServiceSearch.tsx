@@ -5,6 +5,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FinancialProductCard } from "@/components/finance/FinancialProductCard";
+import { Input } from "@/components/ui/input";
 import { getFinancialProducts } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import { useViewerContext } from "@/stores/viewer-context";
@@ -88,12 +89,11 @@ export function FinanceServiceSearch() {
   return (
     <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-4">
-        <input
+        <Input
           type="search"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder="키워드로 검색 (예: 임팩트투자, 보증, 신협)"
-          className="h-10 w-full border border-transparent border-b-input bg-transparent px-0 py-1 text-base outline-none placeholder:text-muted-foreground focus-visible:border-b-ring"
           aria-label="금융기관/상품 키워드 검색"
         />
         <div

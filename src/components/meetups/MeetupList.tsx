@@ -6,6 +6,15 @@
 
 import { useEffect, useId, useState } from "react";
 import { MeetupCard } from "@/components/recommendations/MeetupCard";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getFields, getMeetups } from "@/lib/dal";
 import { useViewerContext } from "@/stores/viewer-context";
 import type { Field, Meetup } from "@/types";
@@ -50,65 +59,66 @@ export function MeetupList() {
     <div className="space-y-6 px-[30px] py-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
-          <label
+          <Label
             htmlFor={queryInputId}
-            className="mb-1 block text-xs font-semibold text-guud-text-muted-2"
+            className="mb-1 text-xs font-semibold text-guud-text-muted-2"
           >
             제목·목적 키워드로 검색
-          </label>
-          <input
+          </Label>
+          <Input
             id={queryInputId}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="예: 학습모임, 돌봄"
-            className="w-full border border-input bg-background px-3 py-2 text-sm"
           />
         </div>
         <div>
-          <label
+          <Label
             htmlFor={typeSelectId}
-            className="mb-1 block text-xs font-semibold text-guud-text-muted-2"
+            className="mb-1 text-xs font-semibold text-guud-text-muted-2"
           >
             유형
-          </label>
-          <select
-            id={typeSelectId}
+          </Label>
+          <Select
             value={type}
-            onChange={(e) => setType(e.target.value as Meetup["type"] | "all")}
-            className="border border-input bg-background px-2 py-2 text-sm"
+            onValueChange={(v) => setType(v as Meetup["type"] | "all")}
           >
-            <option value="all">전체 유형</option>
-            {MEETUP_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id={typeSelectId} size="sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체 유형</SelectItem>
+              {MEETUP_TYPES.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
-          <label
+          <Label
             htmlFor={fieldSelectId}
-            className="mb-1 block text-xs font-semibold text-guud-text-muted-2"
+            className="mb-1 text-xs font-semibold text-guud-text-muted-2"
           >
             분야
-          </label>
-          <select
-            id={fieldSelectId}
-            value={fieldId}
-            onChange={(e) =>
-              setFieldId(
-                e.target.value === "all" ? "all" : Number(e.target.value),
-              )
-            }
-            className="border border-input bg-background px-2 py-2 text-sm"
+          </Label>
+          <Select
+            value={String(fieldId)}
+            onValueChange={(v) => setFieldId(v === "all" ? "all" : Number(v))}
           >
-            <option value="all">전체 분야</option>
-            {fields.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id={fieldSelectId} size="sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">전체 분야</SelectItem>
+              {fields.map((f) => (
+                <SelectItem key={f.id} value={String(f.id)}>
+                  {f.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

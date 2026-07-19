@@ -9,6 +9,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
@@ -100,12 +101,11 @@ export function DealSourcingForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <Label htmlFor="deal-title">사업명</Label>
-        <input
+        <Input
           id="deal-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="예: 로컬푸드 디지털전환 협업 딜"
-          className="h-10 w-full border border-transparent border-b-input bg-transparent px-0 py-1 text-base outline-none placeholder:text-muted-foreground focus-visible:border-b-ring"
         />
       </div>
 

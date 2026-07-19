@@ -88,15 +88,15 @@
   --popover: oklch(1 0 0);
   /* popover-foreground ← hana colors.ink #444444 */
   --popover-foreground: oklch(0.387 0 0);
-  /* primary ← hana colors.primary #009178 (하나 틸그린 — 로그인 CTA 배경, 활성 탭, 브랜드 유일 고채도색) */
-  --primary: oklch(0.586 0.111 174.8);
   /*
-   * primary-foreground ← hana colors.on-primary #FFFFFF에서 ink-strong #111111로 보정.
-   * AA 검증: 흰 텍스트 온 프라이머리 틸그린 = 3.95:1로 본문 기준(4.5:1) 미달
-   * (hana DESIGN.md 자신도 "{colors.primary} 배경 위 작은 텍스트… AA 미달"이라 명시한 결함).
-   * ink-strong on primary = 4.78:1로 AA 통과 — 흰 텍스트 대신 채택.
+   * primary ← hana colors.primary #009178의 접근성 파생 음영 #007A65 (사용자 지시 2026-07-20).
+   * 원본 #009178 + 흰 글자 = 3.95:1(AA 미달)이라 처음엔 검은 글자로 보정했으나, 사용자가
+   * "녹색 버튼에 검은 폰트는 대비가 안 좋다" 판정 → 브랜드 색상각·채도는 유지한 채 명도만
+   * 낮춘 #007A65로 교체(흰 글자 5.29:1, AA 통과). 하나 틸그린 인상 유지 + 흰 글자 복원.
    */
-  --primary-foreground: oklch(0.178 0 0);
+  --primary: oklch(0.529 0.104 174.8);
+  /* primary-foreground ← hana colors.on-primary #FFFFFF (원본 문법 복원 — 위 파생 음영으로 AA 충족) */
+  --primary-foreground: oklch(1 0 0);
   /* secondary ← hana colors.surface-soft #F7F9F9 (components.button-menu-pill 배경 — 고객센터 유틸 버튼) */
   --secondary: oklch(0.981 0.002 197.1);
   /* secondary-foreground ← hana colors.ink-strong #111111 (button-menu-pill 텍스트) */
@@ -140,7 +140,7 @@
    * 가시 포커스 링이 사실상 없음(접근성 결함) — 이를 그대로 재현하지 않고
    * 이미 관측된 브랜드색(primary)을 포커스 역할에 재사용한다.
    */
-  --ring: oklch(0.586 0.111 174.8);
+  --ring: oklch(0.529 0.104 174.8);
 
   /* chart-1..5: guud·hana 모두 dataviz 미관측(Known Gaps) — 값을 지어내지 않고 shadcn 기본 중립 스케일 유지 */
   --chart-1: oklch(0.868 0.007 39.5);
@@ -155,9 +155,9 @@
   /* sidebar: guud·hana 모두 sidebar 개념 없음 — hana 팔레트로 캔버스/중립 표면에 맞춰 일관 매핑(추정) */
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.387 0 0);
-  --sidebar-primary: oklch(0.586 0.111 174.8);
+  --sidebar-primary: oklch(0.529 0.104 174.8);
   /* sidebar-primary-foreground: --primary-foreground와 동일 사유(AA 보정)로 ink-strong 사용 */
-  --sidebar-primary-foreground: oklch(0.178 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.981 0.002 197.1);
   --sidebar-accent-foreground: oklch(0.178 0 0);
   --sidebar-border: oklch(0.981 0.002 197.1);
@@ -203,8 +203,8 @@
   --card-foreground: oklch(0.387 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.387 0 0);
-  --primary: oklch(0.586 0.111 174.8);
-  --primary-foreground: oklch(0.178 0 0);
+  --primary: oklch(0.529 0.104 174.8);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.981 0.002 197.1);
   --secondary-foreground: oklch(0.178 0 0);
   --muted: oklch(0.981 0.002 197.1);
@@ -214,7 +214,7 @@
   --destructive: oklch(0.535 0.214 30);
   --border: oklch(0.981 0.002 197.1);
   --input: oklch(0.864 0 0);
-  --ring: oklch(0.586 0.111 174.8);
+  --ring: oklch(0.529 0.104 174.8);
   --chart-1: oklch(0.868 0.007 39.5);
   --chart-2: oklch(0.547 0.021 43.1);
   --chart-3: oklch(0.438 0.017 39.3);
@@ -222,8 +222,8 @@
   --chart-5: oklch(0.268 0.011 36.5);
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.387 0 0);
-  --sidebar-primary: oklch(0.586 0.111 174.8);
-  --sidebar-primary-foreground: oklch(0.178 0 0);
+  --sidebar-primary: oklch(0.529 0.104 174.8);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.981 0.002 197.1);
   --sidebar-accent-foreground: oklch(0.178 0 0);
   --sidebar-border: oklch(0.981 0.002 197.1);
@@ -251,4 +251,40 @@
   html {
     @apply font-sans;
   }
+}
+
+/*
+ * .galaxy-dark — /knowledge-graph/galaxy 전용 다크 스테이지 팔레트(#36 대비 수정).
+ * connect-ontology 원본은 전역 다크 우주 테마였다(index.css). 우리 앱은 라이트라
+ * 이식된 오버레이(범례·HUD·검색·상세·시네마·내레이션·타이틀)가 다크 배경 위에서
+ * 어두운 텍스트로 렌더돼 안 보였다. 이 스코프에서 토큰만 원본 다크값으로 재정의해
+ * 이식 컴포넌트를 무수정으로 다크 대응시킨다. 캔버스 내부 렌더 색은 원본 유지(colors.ts).
+ * 본문 밝은 회백·보조 저채도 회청·경계선 저휘도 — WCAG AA(4.5:1↑) 목표.
+ */
+.galaxy-dark {
+  --background: hsl(222 47% 6%);
+  --foreground: hsl(210 40% 98%);
+  --card: hsl(222 44% 10%);
+  --card-foreground: hsl(210 40% 98%);
+  --popover: hsl(222 44% 10%);
+  --popover-foreground: hsl(210 40% 98%);
+  --primary: hsl(217 92% 66%);
+  --primary-foreground: hsl(222 47% 7%);
+  --secondary: hsl(217 32% 20%);
+  --secondary-foreground: hsl(210 40% 98%);
+  --muted: hsl(217 32% 20%);
+  --muted-foreground: hsl(214 22% 74%);
+  --accent: hsl(217 32% 26%);
+  --accent-foreground: hsl(210 40% 98%);
+  --destructive: hsl(0 74% 60%);
+  --destructive-foreground: hsl(210 40% 98%);
+  --border: hsl(217 30% 26%);
+  --input: hsl(217 30% 26%);
+  --ring: hsl(217 92% 66%);
+  /* 페이지 헤더가 쓰는 guud 커스텀 토큰도 다크로 */
+  --guud-hairline: hsl(217 30% 24%);
+  --guud-text-strong: hsl(210 40% 96%);
+  --guud-text-muted-2: hsl(214 22% 74%);
+  --guud-text-subtle: hsl(214 16% 62%);
+  --guud-text-faint: hsl(214 14% 52%);
 }
