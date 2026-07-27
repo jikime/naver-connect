@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { AppAccessGate } from "@/components/auth/AppAccessGate";
 import { GlobalNav } from "@/components/shell/GlobalNav";
 import { MotionProvider } from "@/components/shell/MotionProvider";
-import type { PersonaRosterEntry } from "@/components/shell/RoleSwitcher";
-import { getMembers } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 
 // mono 라벨·eyebrow·숫자 폰트(--font-mono) ← modoomat DESIGN.md typography.eyebrow/micro-label
@@ -23,9 +22,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 // 실제 font-family 스택은 globals.css @theme(--font-sans/--font-heading)에 리터럴로 정의한다.
 
 export const metadata: Metadata = {
-  title: "사회혁신기업가네트워크 AX 플랫폼 (목업)",
+  title: "사회혁신기업가네트워크 AX 플랫폼",
   description:
-    "미래 자동화 버전 UI 프리뷰 — 관계·기회·사업 3층 소셜벤처 네트워크 목업",
+    "기업가와 전문가의 관계를 기회와 사업으로 연결하는 사회혁신 네트워크 플랫폼",
 };
 
 export default async function RootLayout({
@@ -33,15 +32,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // RSC 셸은 민감 시드를 직접 import하지 않는다(ADR-03/04) — getMembers(DAL) 경유로만
-  // 이름/유형 등 공개 필드를 읽어 RoleSwitcher(Client)에 최소 props로 내려준다.
-  const members = await getMembers({ role: "기업가", personaId: "M-001" });
-  const personas: PersonaRosterEntry[] = members.map((m) => ({
-    id: m.id,
-    name: m.name,
-    member_type: m.member_type,
-  }));
-
   return (
     <html
       lang="ko"
@@ -65,9 +55,11 @@ export default async function RootLayout({
           {/* modoomat 풀폭 글래스 바 — sticky는 header에 둔다(짧은 래퍼 안에 sticky를 두면
               갇혀 스크롤 이동이 안 되므로 body 기준으로 고정되도록 header를 sticky로). */}
           <header className="sticky top-0 z-[100]">
-            <GlobalNav personas={personas} />
+            <GlobalNav />
           </header>
-          <main className="flex flex-1 flex-col">{children}</main>
+          <main className="flex flex-1 flex-col">
+            <AppAccessGate>{children}</AppAccessGate>
+          </main>
         </MotionProvider>
       </body>
     </html>

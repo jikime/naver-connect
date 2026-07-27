@@ -20,6 +20,7 @@ import {
   getOnboardingMeta,
   getTags,
 } from "@/lib/dal";
+import { useAuthSessionStore } from "@/stores/auth-session";
 import { useViewerContext } from "@/stores/viewer-context";
 import type {
   MaskedMember,
@@ -93,6 +94,9 @@ function canProceedFromStep(step: number, draft: OnboardingDraft): boolean {
 
 export function OnbWizard() {
   const vc = useViewerContext();
+  const completeOnboarding = useAuthSessionStore(
+    (state) => state.completeOnboarding,
+  );
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -281,6 +285,7 @@ export function OnbWizard() {
         visibility_consent: draft.visibilityConsent,
       });
       setResult(finalized);
+      completeOnboarding();
       if (
         finalized.firstRecommendations.some((rec) => rec.rec_kind === "모듬")
       ) {

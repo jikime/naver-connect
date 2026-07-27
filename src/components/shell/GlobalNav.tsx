@@ -4,8 +4,7 @@
 // - 플로팅 알약이 아니라 화면 전체 폭 상단 고정 바(sticky top-0, z-100 = {zIndex.sticky}).
 // - 배경 {colors.canvas} 반투명 {opacity.glass}(0.6) + backdrop-blur, 스크롤 시 {opacity.glass-strong}
 //   (0.7)로 진해짐. 바 하단 {colors.hairline} 1px.
-// - 로고(좌) · 대메뉴 링크(좌측 정렬) · 우측 유틸(RoleSwitcher — 이 앱엔 견적/상담 같은 CTA 콘텐츠가
-//   없어 기존 역할 스위처가 우측 유틸 슬롯을 차지한다. 없는 CTA 라벨을 창작하지 않는다).
+// - 비로그인: 랜딩 앵커 + 로그인/회원가입. 로그인: 기존 전체 대메뉴 + 프로필 메뉴.
 // - 모바일: 로고 + 햄버거 → Sheet 풀스크린 {colors.menu-overlay} #e8e1d9 오버레이(z-200 = {zIndex.overlay}).
 //
 // 대메뉴 상호작용(v4 계승): 라벨 우측 아래 화살표(열림 시 위로 회전), hover/포커스/클릭으로
@@ -20,7 +19,7 @@ import { ChevronDown, Menu } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   type RefObject,
   useEffect,
@@ -29,6 +28,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -39,7 +39,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { useViewerContextStore } from "@/stores/viewer-context";
+import { useAuthSessionStore } from "@/stores/auth-session";
 import {
   groupHasActiveItem,
   isItemActive,
@@ -47,7 +47,6 @@ import {
   type NavGroup,
   OPERATOR_NAV_GROUP,
 } from "./nav-groups";
-import { type PersonaRosterEntry, RoleSwitcher } from "./RoleSwitcher";
 
 /** 층 구분 mono eyebrow 라벨 — modoomat {typography.eyebrow}(대문자·양수 자간·대괄호). 색점 대체. */
 function GroupEyebrow({ text }: { text: string }) {
@@ -276,9 +275,13 @@ function AccordionSection({
   );
 }
 
-export function GlobalNav({ personas }: { personas: PersonaRosterEntry[] }) {
+export function GlobalNav() {
   const pathname = usePathname();
-  const role = useViewerContextStore((state) => state.role);
+  const router = useRouter();
+  const user = useAuthSessionStore((state) => state.user);
+  const hasHydrated = useAuthSessionStore((state) => state.hasHydrated);
+  const signOut = useAuthSessionStore((state) => state.signOut);
+  const isAuthenticated = hasHydrated && user !== null;
   const [openKey, setOpenKey] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
@@ -286,8 +289,9 @@ export function GlobalNav({ personas }: { personas: PersonaRosterEntry[] }) {
   const [scrolled, setScrolled] = useState(false);
   const groups: NavGroup[] = [
     ...NAV_GROUPS,
-    ...(role === "운영자" ? [OPERATOR_NAV_GROUP] : []),
+    ...(user?.role === "운영자" ? [OPERATOR_NAV_GROUP] : []),
   ];
+  const homeHref = isAuthenticated ? "/home" : "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -314,6 +318,11 @@ export function GlobalNav({ personas }: { personas: PersonaRosterEntry[] }) {
   function activate(key: string) {
     cancelClose();
     setOpenKey(key);
+  }
+
+  function handleSignOut() {
+    signOut();
+    router.replace("/");
   }
 
   // Escape 닫힘은 document 레벨 리스너로 — hover로 연 경우 실제 포커스는 래퍼 바깥이라
@@ -358,7 +367,10 @@ export function GlobalNav({ personas }: { personas: PersonaRosterEntry[] }) {
           className="mx-auto flex min-h-[64px] max-w-[1280px] items-center justify-between px-8"
         >
           <div className="flex items-center">
-            <Link href="/" className="flex shrink-0 items-center gap-2.5">
+            <Link
+              href={homeHref}
+              className="flex shrink-0 items-center gap-2.5"
+            >
               <Image
                 src="/images/ax-brand-mark.png"
                 width={32}
@@ -370,33 +382,59 @@ export function GlobalNav({ personas }: { personas: PersonaRosterEntry[] }) {
                 AX 플랫폼
               </span>
             </Link>
-            <nav aria-label="주 메뉴" className="ml-9 flex items-center">
-              {groups.map((group) => (
-                <GnbTriggerWithPanel
-                  key={group.key}
-                  group={group}
-                  pathname={pathname}
-                  isOpen={openKey === group.key}
-                  barRef={barRef}
-                  onActivate={() => activate(group.key)}
-                  onClick={() => activate(group.key)}
-                  onNavigate={() => setOpenKey(null)}
-                />
-              ))}
-            </nav>
+            {isAuthenticated ? (
+              <nav aria-label="주 메뉴" className="ml-9 flex items-center">
+                {groups.map((group) => (
+                  <GnbTriggerWithPanel
+                    key={group.key}
+                    group={group}
+                    pathname={pathname}
+                    isOpen={openKey === group.key}
+                    barRef={barRef}
+                    onActivate={() => activate(group.key)}
+                    onClick={() => activate(group.key)}
+                    onNavigate={() => setOpenKey(null)}
+                  />
+                ))}
+              </nav>
+            ) : (
+              <nav
+                aria-label="랜딩 메뉴"
+                className="ml-10 flex items-center gap-7"
+              >
+                <Link
+                  href="/#service"
+                  className="text-sm text-guud-text-muted-2 hover:text-primary"
+                >
+                  서비스 소개
+                </Link>
+                <Link
+                  href="/#how-it-works"
+                  className="text-sm text-guud-text-muted-2 hover:text-primary"
+                >
+                  이용 흐름
+                </Link>
+              </nav>
+            )}
           </div>
-          <div className="flex items-center gap-4">
-            <RoleSwitcher
-              personas={personas}
-              roleFieldsetClassName="hidden lg:flex"
-            />
-          </div>
+          {isAuthenticated ? (
+            <UserMenu />
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/login">로그인</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link href="/signup">회원가입</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 모바일(<768px): 로고 + 햄버거 한 행 → Sheet 풀스크린 {colors.menu-overlay} 오버레이. */}
       <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-2 md:hidden">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href={homeHref} className="flex items-center gap-2.5">
           <Image
             src="/images/ax-brand-mark.png"
             width={32}
@@ -421,21 +459,78 @@ export function GlobalNav({ personas }: { personas: PersonaRosterEntry[] }) {
             className="z-[200] w-full max-w-full overflow-y-auto bg-guud-menu-overlay sm:max-w-sm"
           >
             <SheetHeader>
-              <SheetTitle>전역 내비게이션</SheetTitle>
+              <SheetTitle>
+                {isAuthenticated ? "서비스 메뉴" : "AX 플랫폼"}
+              </SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-3 px-4 pb-4">
-              {/* 역할 스위처를 헤더에서 옮겨옴(모바일 헤더 폭 절약) */}
-              <RoleSwitcher personas={personas} className="flex-wrap gap-2" />
-              <div className="flex flex-col gap-2">
-                {groups.map((group) => (
-                  <AccordionSection
-                    key={group.key}
-                    group={group}
-                    pathname={pathname}
-                    defaultOpen={groupHasActiveItem(group, pathname)}
-                  />
-                ))}
-              </div>
+              {isAuthenticated && user ? (
+                <>
+                  <div className="flex items-center gap-3 rounded-2xl bg-background/70 p-3">
+                    <span className="flex size-9 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
+                      {user.name.slice(0, 1)}
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-guud-text-muted-2">
+                        {user.role} 계정
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {groups.map((group) => (
+                      <AccordionSection
+                        key={group.key}
+                        group={group}
+                        pathname={pathname}
+                        defaultOpen={groupHasActiveItem(group, pathname)}
+                      />
+                    ))}
+                  </div>
+                  <SheetClose asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSignOut}
+                    >
+                      로그아웃
+                    </Button>
+                  </SheetClose>
+                </>
+              ) : (
+                <>
+                  <nav className="flex flex-col" aria-label="랜딩 메뉴">
+                    <SheetClose asChild>
+                      <Link
+                        href="/#service"
+                        className="border-b border-guud-hairline px-2 py-3 text-sm font-medium text-foreground"
+                      >
+                        서비스 소개
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        href="/#how-it-works"
+                        className="border-b border-guud-hairline px-2 py-3 text-sm font-medium text-foreground"
+                      >
+                        이용 흐름
+                      </Link>
+                    </SheetClose>
+                  </nav>
+                  <SheetClose asChild>
+                    <Button asChild>
+                      <Link href="/signup">회원가입</Link>
+                    </Button>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Button asChild variant="outline">
+                      <Link href="/login">로그인</Link>
+                    </Button>
+                  </SheetClose>
+                </>
+              )}
             </div>
           </SheetContent>
         </Sheet>
