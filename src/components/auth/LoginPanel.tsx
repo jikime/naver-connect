@@ -1,6 +1,7 @@
 "use client";
 
 import { Building2, Check, ShieldCheck, Sparkles, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useState } from "react";
@@ -67,8 +68,8 @@ export function LoginPanel() {
   const activeAccount = getDemoAccount(role);
 
   return (
-    <div className="grid overflow-hidden rounded-3xl border border-guud-hairline bg-card lg:grid-cols-[0.78fr_1.22fr]">
-      <aside className="flex flex-col justify-between bg-foreground p-8 text-background sm:p-10">
+    <div className="grid overflow-hidden rounded-3xl border border-guud-hairline bg-card lg:grid-cols-[0.88fr_1.12fr]">
+      <aside className="flex flex-col bg-foreground p-6 text-background sm:p-10">
         <div className="space-y-5">
           <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-background/60 uppercase">
             [ WELCOME BACK ]
@@ -83,7 +84,17 @@ export function LoginPanel() {
             이어서 확인할 수 있어요.
           </p>
         </div>
-        <ul className="mt-12 space-y-3 text-sm text-background/80">
+        <figure className="mt-8 overflow-hidden rounded-2xl border border-background/15 bg-background/5 p-1.5">
+          <Image
+            src="/images/auth-welcome-back.webp"
+            width={1448}
+            height={1086}
+            sizes="(max-width: 1023px) calc(100vw - 64px), 38vw"
+            alt="기존 회원이 협업 동료들의 환영을 받으며 다시 모임으로 돌아오는 모습"
+            className="aspect-[16/9] w-full rounded-[calc(var(--radius)*1.2)] object-cover sm:aspect-[4/3]"
+          />
+        </figure>
+        <ul className="mt-8 space-y-3 text-sm text-background/80">
           {[
             "개인화된 주간 추천",
             "기회·사업 실행 메뉴",

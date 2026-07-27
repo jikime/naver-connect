@@ -1,6 +1,7 @@
 "use client";
 
 import { Building2, Check, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useState } from "react";
@@ -52,8 +53,8 @@ export function SignupPanel() {
   }
 
   return (
-    <div className="grid overflow-hidden rounded-3xl border border-guud-hairline bg-card lg:grid-cols-[0.78fr_1.22fr]">
-      <aside className="flex flex-col justify-between bg-secondary p-8 sm:p-10">
+    <div className="grid overflow-hidden rounded-3xl border border-guud-hairline bg-card lg:grid-cols-[0.88fr_1.12fr]">
+      <aside className="flex flex-col bg-secondary p-6 sm:p-10">
         <div className="space-y-5">
           <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
             [ JOIN THE NETWORK ]
@@ -68,7 +69,17 @@ export function SignupPanel() {
             수 있어요.
           </p>
         </div>
-        <ol className="mt-12 space-y-4 text-sm text-foreground">
+        <figure className="mt-8 overflow-hidden rounded-2xl border border-guud-hairline bg-background/55 p-1.5">
+          <Image
+            src="/images/auth-join-network.webp"
+            width={1448}
+            height={1086}
+            sizes="(max-width: 1023px) calc(100vw - 64px), 38vw"
+            alt="새 회원이 동료들과 함께 연결 조각을 놓아 네트워크를 완성하는 모습"
+            className="aspect-[16/9] w-full rounded-[calc(var(--radius)*1.2)] object-cover sm:aspect-[4/3]"
+          />
+        </figure>
+        <ol className="mt-8 space-y-4 text-sm text-foreground">
           {["회원 유형 선택", "7단계 온보딩", "프로필 확정과 첫 추천"].map(
             (item, index) => (
               <li key={item} className="flex items-center gap-3">

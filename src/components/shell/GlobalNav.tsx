@@ -48,6 +48,13 @@ import {
   OPERATOR_NAV_GROUP,
 } from "./nav-groups";
 
+const PUBLIC_NAV_ITEMS = [
+  { href: "/#service", label: "서비스 소개" },
+  { href: "/#how-it-works", label: "이용 흐름" },
+  { href: "/#fields", label: "참여 분야" },
+  { href: "/#trust", label: "운영 원칙" },
+];
+
 /** 층 구분 mono eyebrow 라벨 — modoomat {typography.eyebrow}(대문자·양수 자간·대괄호). 색점 대체. */
 function GroupEyebrow({ text }: { text: string }) {
   return (
@@ -348,12 +355,12 @@ export function GlobalNav() {
         scrolled ? "bg-background/70" : "bg-background/60",
       )}
     >
-      {/* 데스크톱(≥768px) — 이 래퍼는 hover/focus 이탈을 감지하는 단일 영역(바+패널 전체를
+      {/* 데스크톱(≥1024px) — 이 래퍼는 hover/focus 이탈을 감지하는 단일 영역(바+패널 전체를
           벗어나야 닫힘 타이머가 돈다). */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: 이 div는 상호작용 대상이 아니라
           hover/focus가 바+패널 영역을 벗어났는지 감지하는 이벤트 경계일 뿐이다. */}
       <div
-        className="relative hidden md:block"
+        className="relative hidden lg:block"
         onMouseLeave={scheduleClose}
         onMouseEnter={cancelClose}
         onBlur={(event) => {
@@ -400,20 +407,17 @@ export function GlobalNav() {
             ) : (
               <nav
                 aria-label="랜딩 메뉴"
-                className="ml-10 flex items-center gap-7"
+                className="ml-8 flex items-center gap-5 xl:ml-10 xl:gap-7"
               >
-                <Link
-                  href="/#service"
-                  className="text-sm text-guud-text-muted-2 hover:text-primary"
-                >
-                  서비스 소개
-                </Link>
-                <Link
-                  href="/#how-it-works"
-                  className="text-sm text-guud-text-muted-2 hover:text-primary"
-                >
-                  이용 흐름
-                </Link>
+                {PUBLIC_NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-sm text-guud-text-muted-2 hover:text-primary"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </nav>
             )}
           </div>
@@ -432,8 +436,8 @@ export function GlobalNav() {
         </div>
       </div>
 
-      {/* 모바일(<768px): 로고 + 햄버거 한 행 → Sheet 풀스크린 {colors.menu-overlay} 오버레이. */}
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-2 md:hidden">
+      {/* 모바일·태블릿(<1024px): 로고 + 햄버거 한 행 → Sheet 풀스크린 오버레이. */}
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between px-5 py-2 sm:px-6 lg:hidden">
         <Link href={homeHref} className="flex items-center gap-2.5">
           <Image
             src="/images/ax-brand-mark.png"
@@ -502,22 +506,16 @@ export function GlobalNav() {
               ) : (
                 <>
                   <nav className="flex flex-col" aria-label="랜딩 메뉴">
-                    <SheetClose asChild>
-                      <Link
-                        href="/#service"
-                        className="border-b border-guud-hairline px-2 py-3 text-sm font-medium text-foreground"
-                      >
-                        서비스 소개
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        href="/#how-it-works"
-                        className="border-b border-guud-hairline px-2 py-3 text-sm font-medium text-foreground"
-                      >
-                        이용 흐름
-                      </Link>
-                    </SheetClose>
+                    {PUBLIC_NAV_ITEMS.map((item) => (
+                      <SheetClose asChild key={item.href}>
+                        <Link
+                          href={item.href}
+                          className="border-b border-guud-hairline px-2 py-3 text-sm font-medium text-foreground"
+                        >
+                          {item.label}
+                        </Link>
+                      </SheetClose>
+                    ))}
                   </nav>
                   <SheetClose asChild>
                     <Button asChild>

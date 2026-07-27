@@ -7,8 +7,8 @@ export const metadata: Metadata = {
 
 export default function SignupPage() {
   return (
-    <div className="flex flex-1 items-center px-5 py-12 sm:px-8 lg:py-16">
-      <div className="mx-auto w-full max-w-5xl">
+    <div className="flex flex-1 items-center bg-muted/50 px-5 py-8 sm:px-8 sm:py-12 lg:py-16">
+      <div className="mx-auto w-full max-w-6xl">
         <SignupPanel />
       </div>
     </div>
