@@ -11,20 +11,24 @@ export const metadata: Metadata = {
 
 export default function ProposalsPage() {
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 px-[30px] py-10">
-      <header className="mb-6 space-y-2">
-        <p className="text-xs font-semibold text-guud-text-muted-2">
-          2단계 · 프로젝트 제안·트래킹
-        </p>
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          프로젝트 제안 트래킹
-        </h1>
-        <p className="max-w-2xl text-sm text-guud-text-muted-2">
-          생태계맵·협업사례에서 나온 프로젝트 제안을 제안됨→검토→성사/중단
-          단계로 관리합니다.
-        </p>
+    <div className="flex flex-1 flex-col">
+      <header className="border-b border-guud-hairline bg-guud-header-band">
+        <div className="mx-auto w-full max-w-6xl space-y-3 px-6 py-14 sm:px-10 lg:px-16">
+          <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+            [ LAYER 02 · PROPOSAL TRACKING ]
+          </p>
+          <h1 className="font-heading text-3xl font-light tracking-tight text-foreground sm:text-4xl">
+            프로젝트 제안 <span className="text-primary">트래킹</span>
+          </h1>
+          <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
+            생태계맵·협업사례에서 나온 프로젝트 제안을 제안됨→검토→성사/중단
+            단계로 관리합니다.
+          </p>
+        </div>
       </header>
-      <ProposalsView />
+      <div className="mx-auto w-full max-w-6xl px-6 py-14 sm:px-10 lg:px-16">
+        <ProposalsView />
+      </div>
     </div>
   );
 }

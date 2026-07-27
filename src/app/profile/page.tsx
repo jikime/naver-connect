@@ -10,10 +10,16 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-[30px] py-10">
-      <h1 className="mb-6 font-heading text-2xl font-bold text-foreground">
-        프로필
-      </h1>
+    <div className="mx-auto w-full max-w-3xl flex-1 px-6 py-16 sm:px-10 sm:py-20">
+      {/* ④ detail 헤더: eyebrow + headline 1점 강조 */}
+      <header className="mb-8 space-y-3">
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+          [ MEMBER · PROFILE ]
+        </p>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
+          내 <span className="text-primary">프로필</span>
+        </h1>
+      </header>
       <ProfileCard />
     </div>
   );

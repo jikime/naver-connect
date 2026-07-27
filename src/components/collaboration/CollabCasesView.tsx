@@ -37,7 +37,7 @@ function orgName(id: string): string {
 
 function CaseCard({ collabCase }: { collabCase: CollabCase }) {
   return (
-    <li className="border border-guud-hairline p-3">
+    <li className="rounded-2xl border border-guud-hairline bg-card p-4">
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-semibold text-foreground">
           {collabCase.title}
@@ -307,9 +307,12 @@ export function CollabCasesView() {
       <section aria-labelledby="collab-cases-heading">
         <h2
           id="collab-cases-heading"
-          className="mb-2 font-heading text-lg font-bold text-foreground"
+          className="mb-3 flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground"
         >
-          협업 사례 ({loading ? "…" : cases.length})
+          협업 사례
+          <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+            [ {loading ? "…" : cases.length} ]
+          </span>
         </h2>
         {loading ? (
           <p className="text-sm text-guud-text-muted-2">불러오는 중…</p>

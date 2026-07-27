@@ -167,8 +167,11 @@ export function ProposalsView() {
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {TRACK_STATUSES.map((status) => (
         <div key={status} className="space-y-3">
-          <h2 className="border-b border-guud-hairline pb-2 font-heading text-sm font-bold text-foreground">
-            {status} ({grouped.get(status)?.length ?? 0})
+          <h2 className="flex items-center justify-between border-b border-guud-hairline pb-2 font-mono text-xs font-medium tracking-[0.12em] text-foreground uppercase">
+            {status}
+            <span className="text-guud-text-muted-2">
+              {grouped.get(status)?.length ?? 0}건
+            </span>
           </h2>
           <div className="space-y-3">
             {(grouped.get(status) ?? []).map((p) => (

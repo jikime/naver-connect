@@ -138,7 +138,7 @@ export function KnowledgeGraphView({ graph }: { graph: KnowledgeGraph }) {
                 variant={speed === sp ? "default" : "ghost"}
                 aria-pressed={speed === sp}
                 onClick={() => setSpeed(sp)}
-                className="rounded-none border-0 tabular-nums"
+                className="rounded-full border-0 tabular-nums"
               >
                 {sp}×
               </Button>
@@ -258,8 +258,8 @@ export function KnowledgeGraphView({ graph }: { graph: KnowledgeGraph }) {
 
         {/* 커버리지 카드(마무리 스텝) */}
         {frame?.showCoverage && meta && (
-          <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 border border-guud-hairline bg-card px-5 py-3 text-center shadow-xl">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-guud-text-muted-2">
+          <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 border border-guud-hairline bg-card px-5 py-3 text-center shadow-md">
+            <p className="font-mono text-[10px] font-medium uppercase tracking-wide text-guud-text-muted-2">
               {meta.region} 연결 커버리지
             </p>
             <p className="mt-0.5">
@@ -278,7 +278,7 @@ export function KnowledgeGraphView({ graph }: { graph: KnowledgeGraph }) {
             node={selectedNode}
             onClose={() => setSelectedId(null)}
             className={cn(
-              "absolute z-10 shadow-xl",
+              "absolute z-10 shadow-md",
               "inset-x-0 bottom-0 h-[58%] border-t border-guud-hairline",
               "md:inset-y-0 md:right-0 md:left-auto md:h-auto md:w-[340px] md:border-l md:border-t-0",
             )}

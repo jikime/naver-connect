@@ -9,11 +9,11 @@ export function CoverageSummary({ region }: { region: Region }) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-[minmax(0,220px)_1fr]">
-      <div className="border border-guud-hairline p-4">
-        <p className="text-xs font-semibold text-guud-text-muted-2">
+      <div className="rounded-2xl border border-guud-hairline bg-card p-5">
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
           연결 커버리지
         </p>
-        <p className="mt-1 font-heading text-3xl font-bold text-foreground">
+        <p className="mt-2 font-heading text-4xl font-light tracking-tight text-foreground">
           {rate}%
         </p>
         <p className="mt-1 text-xs text-guud-text-muted-2">
@@ -31,11 +31,13 @@ export function CoverageSummary({ region }: { region: Region }) {
         </div>
       </div>
 
-      <div className="border border-destructive/40 bg-muted p-4">
+      <div className="rounded-2xl border border-destructive/40 bg-card p-5">
         {/* 모드 B 회송: text-destructive on bg-destructive/5는 3.28:1로 AA 미달 —
             배경 틴트를 제거하고 텍스트는 text-foreground(21:1)로, 강조는 테두리(destructive)만 담당 */}
-        <p className="text-xs font-semibold text-foreground">완전 공백 축</p>
-        <p className="mt-1 font-heading text-xl font-bold text-foreground">
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
+          완전 공백 축
+        </p>
+        <p className="mt-2 font-heading text-2xl font-light tracking-tight text-foreground">
           {region.highlighted_gap_axis}
         </p>
         <p className="mt-1 text-xs text-guud-text-muted-2">

@@ -32,12 +32,12 @@ export function ExpertServiceCatalog({
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg font-bold text-foreground">
+      <div className="flex items-baseline justify-between gap-2">
+        <h2 className="font-heading text-2xl font-light tracking-tight text-foreground">
           전문가 서비스 카탈로그
         </h2>
-        <span className="text-xs text-guud-text-muted-2">
-          {filtered.length}건
+        <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+          [ {filtered.length}건 ]
         </span>
       </div>
       <div
@@ -53,10 +53,10 @@ export function ExpertServiceCatalog({
             aria-selected={selected === category}
             onClick={() => setSelected(category)}
             className={cn(
-              "rounded-full border px-4 py-1.5 text-sm font-medium",
+              "rounded-full border px-4 py-1.5 text-sm transition-colors",
               selected === category
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-muted text-guud-text-muted-2",
+                ? "border-transparent bg-secondary font-semibold text-secondary-foreground"
+                : "border-guud-hairline bg-transparent font-medium text-guud-text-muted-2 hover:text-foreground",
             )}
           >
             {category}

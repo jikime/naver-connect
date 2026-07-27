@@ -7,17 +7,22 @@ import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
 export default function MeetupsPage() {
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-guud-hairline px-[30px] py-5">
-        <div>
-          <h1 className="font-heading text-2xl font-bold text-foreground">
-            개설된 모듬
-          </h1>
-          <p className="mt-1 text-sm text-guud-text-muted-2">
-            유형·분야·지역으로 개설된 모듬을 찾아 참여해보세요.
-          </p>
+      <header className="border-b border-guud-hairline bg-guud-header-band">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-end justify-between gap-4 px-6 py-14 sm:px-10 lg:px-16">
+          <div className="space-y-3">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ OPEN MEETUPS ]
+            </p>
+            <h1 className="font-heading text-3xl font-light tracking-tight text-foreground sm:text-4xl">
+              개설된 <span className="text-primary">모듬</span>
+            </h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
+              유형·분야·지역으로 개설된 모듬을 찾아 참여해보세요.
+            </p>
+          </div>
+          <AutomationLevelBadge frId="FR-MG-01" />
         </div>
-        <AutomationLevelBadge frId="FR-MG-01" />
-      </div>
+      </header>
       <MeetupList />
     </div>
   );

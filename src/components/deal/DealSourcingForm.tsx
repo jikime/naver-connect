@@ -68,7 +68,7 @@ export function DealSourcingForm() {
 
   if (registered) {
     return (
-      <div className="flex flex-col gap-4 border border-guud-hairline bg-muted p-6">
+      <div className="flex flex-col gap-4 rounded-2xl border border-guud-hairline bg-muted p-6">
         <p className="text-sm font-semibold text-foreground">
           "{registered.title}" 딜이 씨앗 단계로 등록되었습니다(세션 한정,
           새로고침 시 초기화).
@@ -98,7 +98,7 @@ export function DealSourcingForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-7">
       <div className="flex flex-col gap-2">
         <Label htmlFor="deal-title">사업명</Label>
         <Input
@@ -137,10 +137,11 @@ export function DealSourcingForm() {
                   aria-pressed={active}
                   onClick={() => toggleParticipant(member.id)}
                   className={cn(
-                    "w-full border px-3 py-2 text-left text-xs",
+                    // ④ select-card 수렴: 라운드 카드면 + 선택 시 primary 보더 강조
+                    "w-full rounded-lg border px-3 py-2.5 text-left text-xs transition-colors",
                     active
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border bg-background text-guud-text-muted-2",
+                      ? "border-primary bg-card font-medium text-foreground"
+                      : "border-border bg-card text-guud-text-muted-2 hover:text-foreground",
                   )}
                 >
                   {member.name} · {member.org.name}

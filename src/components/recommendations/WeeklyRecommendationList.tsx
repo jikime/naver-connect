@@ -144,12 +144,16 @@ function RecommendationGroup({
 
   return (
     <section className="space-y-3">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground">
-          {title}{" "}
-          <span className="text-guud-text-muted-2">{capped.length}명</span>
+      <div className="space-y-1.5">
+        <h2 className="flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground">
+          {title}
+          <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+            [ {capped.length}명 ]
+          </span>
         </h2>
-        <p className="text-xs text-guud-text-muted-2">{description}</p>
+        <p className="text-sm leading-relaxed text-guud-text-muted-2">
+          {description}
+        </p>
       </div>
       <motion.div
         variants={container}
@@ -220,7 +224,7 @@ export function WeeklyRecommendationList() {
 
   if (groups === null) {
     return (
-      <p className="px-[30px] py-6 text-sm text-guud-text-muted-2">
+      <p className="mx-auto w-full max-w-7xl px-6 py-14 text-sm text-guud-text-muted-2 sm:px-10 lg:px-16">
         추천을 불러오는 중입니다…
       </p>
     );
@@ -228,14 +232,14 @@ export function WeeklyRecommendationList() {
 
   if (groups.common.length === 0 && groups.different.length === 0) {
     return (
-      <p className="px-[30px] py-6 text-sm text-guud-text-muted-2">
+      <p className="mx-auto w-full max-w-7xl px-6 py-14 text-sm text-guud-text-muted-2 sm:px-10 lg:px-16">
         이번 주 추천이 아직 없습니다. 온보딩을 완료하면 추천이 생성됩니다.
       </p>
     );
   }
 
   return (
-    <div className="space-y-8 px-[30px] py-6">
+    <div className="mx-auto w-full max-w-7xl space-y-16 px-6 py-14 sm:px-10 lg:px-16">
       <RecommendationGroup
         title="공통점이 많은 회원"
         description="거울형·선배형·취미형 등 나와 비슷한 축의 매칭입니다. 매칭 점수가 높은 순으로 보여드려요."

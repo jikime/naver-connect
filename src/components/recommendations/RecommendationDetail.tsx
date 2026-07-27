@@ -56,7 +56,7 @@ export function RecommendationDetail({ id }: { id: string }) {
 
   if (rec === null) {
     return (
-      <p className="px-[30px] py-6 text-sm text-guud-text-muted-2">
+      <p className="mx-auto w-full max-w-2xl px-6 py-14 text-sm text-guud-text-muted-2 sm:px-10">
         추천 상세를 불러오는 중입니다…
       </p>
     );
@@ -64,7 +64,7 @@ export function RecommendationDetail({ id }: { id: string }) {
 
   if (rec === "not-found") {
     return (
-      <p className="px-[30px] py-6 text-sm text-guud-text-muted-2">
+      <p className="mx-auto w-full max-w-2xl px-6 py-14 text-sm text-guud-text-muted-2 sm:px-10">
         해당 추천을 찾을 수 없습니다.
       </p>
     );
@@ -75,7 +75,10 @@ export function RecommendationDetail({ id }: { id: string }) {
     : undefined;
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-[30px] py-6">
+    <div className="mx-auto w-full max-w-2xl space-y-6 px-6 py-14 sm:px-10">
+      <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+        [ MATCH DETAIL ]
+      </p>
       <Card>
         <CardHeader className="space-y-3">
           <div className="flex flex-wrap items-center gap-1.5">

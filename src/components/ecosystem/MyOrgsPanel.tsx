@@ -62,9 +62,9 @@ export function MyOrgsPanel({ orgs }: { orgs: Organization[] }) {
   }
 
   return (
-    <div className="space-y-4 border border-guud-hairline p-4">
+    <div className="space-y-4 rounded-2xl border border-guud-hairline bg-card p-5">
       <div>
-        <p className="text-xs font-semibold text-guud-text-muted-2">
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
           내 소속 단체
         </p>
         <Select
@@ -85,7 +85,7 @@ export function MyOrgsPanel({ orgs }: { orgs: Organization[] }) {
       </div>
 
       <div>
-        <p className="text-xs font-semibold text-guud-text-muted-2">
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
           내가 대상으로 하는 단체
         </p>
         <ul className="mt-1 max-h-48 space-y-1 overflow-y-auto border border-guud-hairline p-2">
@@ -110,7 +110,9 @@ export function MyOrgsPanel({ orgs }: { orgs: Organization[] }) {
       </div>
 
       <div className="border-t border-guud-hairline pt-3">
-        <p className="text-xs font-semibold text-guud-text-muted-2">종합 뷰</p>
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
+          종합 뷰
+        </p>
         {!affiliationOrg ? (
           <p className="mt-1 text-sm text-guud-text-muted-2">
             소속 단체를 선택하면 대상 단체와의 관계를 비교해 보여줍니다.

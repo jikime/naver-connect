@@ -23,32 +23,41 @@ export default async function BackOfficePage() {
   });
 
   return (
-    <div className="flex flex-col gap-6 px-[30px] py-8">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          백오피스 마켓
-        </h1>
-        <AutomationLevelBadge frId="FR-BO-01" />
+    <div className="flex flex-1 flex-col">
+      <header className="border-b border-guud-hairline bg-guud-header-band">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-end justify-between gap-4 px-6 py-14 sm:px-10 lg:px-16">
+          <div className="space-y-3">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ BACKOFFICE MARKET ]
+            </p>
+            <h1 className="font-heading text-3xl font-light tracking-tight text-foreground sm:text-4xl">
+              백오피스 <span className="text-primary">마켓</span>
+            </h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
+              전문가 회원이 직접 공급하는 회계·법무·기획 서비스를 카탈로그로
+              만나고, 공동구매로 단가를 낮춥니다. 전문가 역할로 전환하면 본인
+              카탈로그·수임량·이해충돌 공시가 담긴 공급자 뷰가 추가로 열립니다.
+            </p>
+          </div>
+          <AutomationLevelBadge frId="FR-BO-01" />
+        </div>
+      </header>
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-16 px-6 py-14 sm:px-10 lg:px-16">
+        <GovernancePrincipleBanner />
+        <ExpertServiceCatalog services={services} />
+        <GroupBuyStatusPanel groupBuys={groupBuys} />
+        <Suspense
+          fallback={
+            <p className="text-sm text-guud-text-muted-2">
+              맞춤 전문기관 추천을 불러오는 중입니다…
+            </p>
+          }
+        >
+          <ExpertMatchPanel />
+        </Suspense>
+        <ExpertDirectSearch services={services} />
+        <SupplierView services={services} />
       </div>
-      <p className="max-w-2xl text-sm text-guud-text-muted-2">
-        전문가 회원이 직접 공급하는 회계·법무·기획 서비스를 카탈로그로 만나고,
-        공동구매로 단가를 낮춥니다. 전문가 역할로 전환하면 본인
-        카탈로그·수임량·이해충돌 공시가 담긴 공급자 뷰가 추가로 열립니다.
-      </p>
-      <GovernancePrincipleBanner />
-      <ExpertServiceCatalog services={services} />
-      <GroupBuyStatusPanel groupBuys={groupBuys} />
-      <Suspense
-        fallback={
-          <p className="text-sm text-guud-text-muted-2">
-            맞춤 전문기관 추천을 불러오는 중입니다…
-          </p>
-        }
-      >
-        <ExpertMatchPanel />
-      </Suspense>
-      <ExpertDirectSearch services={services} />
-      <SupplierView services={services} />
     </div>
   );
 }

@@ -83,10 +83,11 @@ export function DemandSelectStep({
             <li key={tag.id}>
               <div
                 className={cn(
-                  "flex items-start gap-2 border p-3 text-left transition-colors",
+                  // ④ select-card 수렴: 라운드 카드면, 선택 시 primary 보더로 강조(채움 대신 보더)
+                  "flex items-start gap-2 rounded-xl border-2 p-3 text-left transition-colors",
                   active
-                    ? "border-primary bg-muted"
-                    : "border-border bg-background",
+                    ? "border-primary bg-card"
+                    : "border-border bg-card",
                   disabled && "opacity-50",
                 )}
               >

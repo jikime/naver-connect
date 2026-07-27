@@ -133,9 +133,9 @@ export function ProfileCard() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {member && !loading && (
-        <div className="space-y-4 border border-guud-hairline">
-          <div className="space-y-2 border-b border-guud-hairline p-4">
-            <h2 className="font-heading text-xl font-bold text-foreground">
+        <div className="space-y-4 overflow-hidden rounded-2xl border border-guud-hairline bg-card">
+          <div className="space-y-2 border-b border-guud-hairline p-5">
+            <h2 className="font-heading text-2xl font-light tracking-tight text-foreground">
               {member.name}
             </h2>
             <p className="text-sm text-guud-text-muted-2">
@@ -163,14 +163,14 @@ export function ProfileCard() {
             </dl>
           </div>
 
-          <div className="grid gap-0 p-4 pt-0 sm:grid-cols-2 sm:gap-4">
+          <div className="grid gap-0 p-5 pt-0 sm:grid-cols-2 sm:gap-4">
             <section
               aria-labelledby={`${selectId}-public`}
               className="space-y-2 py-2"
             >
               <h3
                 id={`${selectId}-public`}
-                className="text-xs font-semibold tracking-wide text-guud-text-muted-2 uppercase"
+                className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase"
               >
                 공개 프로필 (전체 회원 열람 가능)
               </h3>
@@ -189,7 +189,7 @@ export function ProfileCard() {
             >
               <h3
                 id={`${selectId}-private`}
-                className="text-xs font-semibold tracking-wide text-guud-text-muted-2 uppercase"
+                className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase"
               >
                 비공개 (본인·운영자만)
               </h3>

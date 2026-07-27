@@ -57,7 +57,7 @@ export function GapEcosystemMapToggle({
             size="sm"
             aria-pressed={view === "graph"}
             onClick={() => setView("graph")}
-            className="gap-1.5 rounded-none border-0"
+            className="gap-1.5 rounded-full border-0"
           >
             <Waypoints className="size-4" aria-hidden />
             연결맵
@@ -68,7 +68,7 @@ export function GapEcosystemMapToggle({
             size="sm"
             aria-pressed={view === "district"}
             onClick={() => setView("district")}
-            className="gap-1.5 rounded-none border-0"
+            className="gap-1.5 rounded-full border-0"
           >
             <MapIcon className="size-4" aria-hidden />
             지역 맵

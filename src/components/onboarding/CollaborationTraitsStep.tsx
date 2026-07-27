@@ -43,10 +43,11 @@ function ChipGroup({
               aria-pressed={active}
               onClick={() => onToggle(option)}
               className={cn(
+                // modoomat tab-selected 어휘: 선택=secondary 면, 비선택=투명+muted-fg
                 "inline-flex min-h-11 items-center rounded-full border px-3 py-1.5 text-xs font-semibold",
                 active
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-guud-text-muted-2 hover:text-foreground",
+                  ? "border-secondary bg-secondary text-secondary-foreground"
+                  : "border-border bg-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               {option}
@@ -85,10 +86,11 @@ function RadioChipGroup({
               key={option}
               value={option}
               className={cn(
+                // modoomat tab-selected 어휘: 선택=secondary 면, 비선택=투명+muted-fg
                 "inline-flex min-h-11 cursor-pointer items-center rounded-full border px-3 py-1.5 text-xs font-semibold",
                 active
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-guud-text-muted-2 hover:text-foreground",
+                  ? "border-secondary bg-secondary text-secondary-foreground"
+                  : "border-border bg-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               {option}

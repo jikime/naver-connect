@@ -10,8 +10,11 @@ export const metadata: Metadata = {
 
 export default function OnboardingPage() {
   return (
-    <div className="mx-auto w-full max-w-2xl flex-1 px-[30px] py-10">
-      <OnbWizard />
+    // ④ 폼 아키타입 수렴: 캔버스 밴드 + 반응형 거터(px-6→px-16) + 넉넉한 수직 리듬, 폼 폭 중앙 정렬.
+    <div className="flex-1 bg-background px-6 py-16 md:px-16 md:py-24">
+      <div className="mx-auto w-full max-w-3xl">
+        <OnbWizard />
+      </div>
     </div>
   );
 }

@@ -52,7 +52,7 @@ export function KgFlowNode({ data }: NodeProps) {
           style={{ background: meta.color }}
           aria-hidden
         />
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-guud-text-strong">
+        <span className="font-mono text-[10px] font-medium uppercase tracking-wide text-guud-text-strong">
           {meta.ko}
         </span>
       </div>

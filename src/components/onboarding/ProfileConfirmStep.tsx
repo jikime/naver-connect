@@ -177,10 +177,11 @@ export function ProfileConfirmStep({
                 onClick={() => toggleField(field.id)}
                 className={cn(
                   // 모드 B 회송: 터치 타깃 44px 미만(26px) — min-h-11 + inline-flex로 확보
+                  // modoomat tab-selected 어휘: 선택=secondary 면, 비선택=투명+muted-fg
                   "inline-flex min-h-11 items-center rounded-full border px-3 py-1 text-xs font-semibold",
                   active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-guud-text-muted-2 hover:text-foreground",
+                    ? "border-secondary bg-secondary text-secondary-foreground"
+                    : "border-border bg-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
                 {field.name}

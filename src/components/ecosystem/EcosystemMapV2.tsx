@@ -106,7 +106,7 @@ export function EcosystemMapV2({
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="space-y-6">
         <section>
-          <h2 className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+          <h2 className="mb-2 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
             1. 분야 선택
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -135,7 +135,7 @@ export function EcosystemMapV2({
 
         {fieldId !== null && (
           <section>
-            <h2 className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+            <h2 className="mb-2 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
               2. 밸류체인 단계
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -167,7 +167,7 @@ export function EcosystemMapV2({
 
         {stageId !== null && (
           <section>
-            <h2 className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+            <h2 className="mb-2 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
               3. 5-force 이해관계자
             </h2>
             {/* 포터(Porter) 5-force 모델 관례 배치 — 기존경쟁자를 중앙에 두고
@@ -221,7 +221,7 @@ export function EcosystemMapV2({
 
         {selectedForce && (
           <section>
-            <h2 className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+            <h2 className="mb-2 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
               4. 실제 단체 — 지역별 세분화 ({orgsForForce.length}곳)
             </h2>
             <div className="space-y-3">

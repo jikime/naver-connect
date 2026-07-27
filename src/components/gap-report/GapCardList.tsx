@@ -41,8 +41,8 @@ export function GapCardList({
       {gapCards.map((card) => (
         <Card key={card.id} className="ring-1 ring-border">
           <CardHeader>
-            <p className="text-xs font-semibold text-guud-text-muted-2">
-              {card.id} · 연결 {card.connection_count}건
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
+              [ {card.id} · 연결 {card.connection_count}건 ]
             </p>
             <CardTitle className="normal-case tracking-normal">
               {card.title}

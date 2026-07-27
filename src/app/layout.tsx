@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Hind, Noto_Sans_KR } from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { GlobalNav } from "@/components/shell/GlobalNav";
 import { MotionProvider } from "@/components/shell/MotionProvider";
@@ -7,28 +7,20 @@ import type { PersonaRosterEntry } from "@/components/shell/RoleSwitcher";
 import { getMembers } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 
-// 한글 본문 폰트(--font-sans) ← guud DESIGN.md typography.family "NotoSansCJKkr" 대응.
-// 가변 폰트라 weight 미지정 시 100~900 전 구간 사용 가능(body 400 / subhead·chip·button 600 / headline·title 700 / label-strong 800).
-const notoSansKR = Noto_Sans_KR({
+// mono 라벨·eyebrow·숫자 폰트(--font-mono) ← modoomat DESIGN.md typography.eyebrow/micro-label
+// "IBM Plex Mono". eyebrow(대괄호·양수 자간·대문자)의 시그니처 폰트라 self-host로 확정 로드한다.
+// 400=eyebrow/기본, 500=micro-label. (교체 전: Geist_Mono → IBM_Plex_Mono)
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ["400", "500"],
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-plex-mono",
   display: "swap",
 });
 
-// 라틴/숫자/디스플레이 폰트(--font-heading) ← guud DESIGN.md typography.family "GillSansWGL" 대체.
-// GillSansWGL 웹폰트 실체 미확인(Known Gaps) → DESIGN.md의 오픈소스 대체 규정("Hind·Mukta 또는 시스템 humanist sans")에 따라 Hind 채택.
-// display-xl/display-lg(700) · price(700) · eyebrow(600) 타이포에 사용.
-const gillSansSubstitute = Hind({
-  subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-heading",
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// 한글 본문·헤딩(--font-sans / --font-heading)은 modoomat 대체 규정(General Sans·A2z 미보유 →
+// 한글 Pretendard)에 따라 Pretendard를 쓴다. Pretendard는 next/font/google에 없어(확인 완료)
+// next/font 문서가 안내하는 대안 중 CDN link 방식으로 로드한다(<head>의 preconnect+stylesheet).
+// 실제 font-family 스택은 globals.css @theme(--font-sans/--font-heading)에 리터럴로 정의한다.
 
 export const metadata: Metadata = {
   title: "사회혁신기업가네트워크 AX 플랫폼 (목업)",
@@ -53,20 +45,26 @@ export default async function RootLayout({
   return (
     <html
       lang="ko"
-      className={cn(
-        "h-full",
-        "antialiased",
-        "font-sans",
-        notoSansKR.variable,
-        gillSansSubstitute.variable,
-        geistMono.variable,
-      )}
+      className={cn("h-full", "antialiased", "font-sans", ibmPlexMono.variable)}
     >
+      <head>
+        {/* Pretendard(한글 본문/헤딩 대체) — next/font/google 미제공이라 CDN link로 로드.
+            React 19이 <head>로 호이스트한다. 스택은 globals.css @theme에서 참조. */}
+        <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <MotionProvider>
-          <header>
-            {/* Task #32(v2): 로고·역할스위처·GNB 전부 GlobalNav가 소유(하나 GNB 패턴 —
-                utility-bar + 로고+대메뉴 GNB바 + 전체메뉴). 모바일은 햄버거+Sheet. */}
+          {/* modoomat 풀폭 글래스 바 — sticky는 header에 둔다(짧은 래퍼 안에 sticky를 두면
+              갇혀 스크롤 이동이 안 되므로 body 기준으로 고정되도록 header를 sticky로). */}
+          <header className="sticky top-0 z-[100]">
             <GlobalNav personas={personas} />
           </header>
           <main className="flex flex-1 flex-col">{children}</main>

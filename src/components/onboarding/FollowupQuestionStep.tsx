@@ -22,7 +22,7 @@ export interface FollowupQueueItem {
 
 function BotBubble({ text }: { text: string }) {
   return (
-    <div className="max-w-[85%] rounded-none border border-guud-hairline bg-muted px-3 py-2 text-sm text-foreground">
+    <div className="max-w-[85%] rounded-2xl border border-guud-hairline bg-muted px-3 py-2 text-sm text-foreground">
       {text}
     </div>
   );
@@ -30,7 +30,7 @@ function BotBubble({ text }: { text: string }) {
 
 function UserBubble({ text }: { text: string }) {
   return (
-    <div className="ml-auto max-w-[85%] border border-primary bg-primary/5 px-3 py-2 text-sm text-foreground">
+    <div className="ml-auto max-w-[85%] rounded-2xl border border-primary bg-primary/5 px-3 py-2 text-sm text-foreground">
       {text.length > 0 ? (
         text
       ) : (

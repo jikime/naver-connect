@@ -65,10 +65,11 @@ export function SupplySelectStep({
             <li key={tag.id} className="sm:col-span-1">
               <div
                 className={cn(
-                  "border p-3 transition-colors",
+                  // ④ select-card 수렴: 라운드 카드면, 선택 시 primary 보더로 강조
+                  "rounded-xl border-2 p-3 transition-colors",
                   active
-                    ? "border-primary bg-muted"
-                    : "border-border bg-background",
+                    ? "border-primary bg-card"
+                    : "border-border bg-card",
                   disabled && "opacity-50",
                 )}
               >

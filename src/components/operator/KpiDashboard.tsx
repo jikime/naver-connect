@@ -32,9 +32,7 @@ export function KpiDashboard() {
 
   if (kpis === null) {
     return (
-      <p className="px-[30px] py-6 text-sm text-guud-text-muted-2">
-        KPI를 불러오는 중입니다…
-      </p>
+      <p className="text-sm text-guud-text-muted-2">KPI를 불러오는 중입니다…</p>
     );
   }
 
@@ -43,11 +41,12 @@ export function KpiDashboard() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="grid gap-4 px-[30px] py-6 sm:grid-cols-2 lg:grid-cols-3"
+      className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
     >
-      {kpis.map((kpi) => (
+      {kpis.map((kpi, index) => (
         <motion.div key={kpi.id} variants={item}>
-          <KpiCard kpi={kpi} />
+          {/* ④ 첫 지표를 card-color-block 강조 셀로(1점 강조, 남발 금지) */}
+          <KpiCard kpi={kpi} highlight={index === 0} />
         </motion.div>
       ))}
     </motion.div>

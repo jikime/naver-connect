@@ -6,7 +6,7 @@ import type { GroupBuy } from "@/types";
 export function GroupBuyStatusPanel({ groupBuys }: { groupBuys: GroupBuy[] }) {
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="font-heading text-lg font-bold text-foreground">
+      <h2 className="font-heading text-2xl font-light tracking-tight text-foreground">
         공동구매 현황
       </h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -18,7 +18,10 @@ export function GroupBuyStatusPanel({ groupBuys }: { groupBuys: GroupBuy[] }) {
             ),
           );
           return (
-            <div key={groupBuy.id} className="border border-guud-hairline p-4">
+            <div
+              key={groupBuy.id}
+              className="rounded-2xl border border-guud-hairline bg-card p-5"
+            >
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-foreground">
                   {groupBuy.service_name}

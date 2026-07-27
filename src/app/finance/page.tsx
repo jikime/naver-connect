@@ -7,20 +7,29 @@ import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
 
 export default function FinancePage() {
   return (
-    <div className="flex flex-col gap-6 px-[30px] py-8">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          금융 서비스
-        </h1>
-        <AutomationLevelBadge frId="FR-FN-01" />
+    <div className="flex flex-1 flex-col">
+      <header className="border-b border-guud-hairline bg-guud-header-band">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-end justify-between gap-4 px-6 py-14 sm:px-10 lg:px-16">
+          <div className="space-y-3">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ FINANCE ]
+            </p>
+            <h1 className="font-heading text-3xl font-light tracking-tight text-foreground sm:text-4xl">
+              금융 <span className="text-primary">서비스</span>
+            </h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
+              프로젝트 분야·단계·지역에 맞는 금융기관/상품을 제안받거나 직접
+              검색·연락합니다. 법률 검토가 끝나지 않은 상품(예: 신협 연계)은 상태
+              뱃지만 표시하며 확정·계약 기능은 제공하지 않습니다.
+            </p>
+          </div>
+          <AutomationLevelBadge frId="FR-FN-01" />
+        </div>
+      </header>
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-14 sm:px-10 lg:px-16">
+        <GovernancePrincipleBanner />
+        <FinanceServiceSearch />
       </div>
-      <p className="max-w-2xl text-sm text-guud-text-muted-2">
-        프로젝트 분야·단계·지역에 맞는 금융기관/상품을 제안받거나 직접
-        검색·연락합니다. 법률 검토가 끝나지 않은 상품(예: 신협 연계)은 상태
-        뱃지만 표시하며 확정·계약 기능은 제공하지 않습니다.
-      </p>
-      <GovernancePrincipleBanner />
-      <FinanceServiceSearch />
     </div>
   );
 }

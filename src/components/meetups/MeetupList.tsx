@@ -56,7 +56,7 @@ export function MeetupList() {
   }, [vc, query, type, fieldId]);
 
   return (
-    <div className="space-y-6 px-[30px] py-6">
+    <div className="mx-auto w-full max-w-7xl space-y-8 px-6 py-14 sm:px-10 lg:px-16">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
           <Label

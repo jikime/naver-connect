@@ -184,17 +184,20 @@ export function ReviewQueueDashboard() {
 
   if (queue === null) {
     return (
-      <p className="px-[30px] py-6 text-sm text-guud-text-muted-2">
+      <p className="mx-auto w-full max-w-7xl px-6 py-14 text-sm text-guud-text-muted-2 sm:px-10 lg:px-16">
         검수 큐를 불러오는 중입니다…
       </p>
     );
   }
 
   return (
-    <div className="space-y-8 px-[30px] py-6">
+    <div className="mx-auto w-full max-w-7xl space-y-8 px-6 py-14 sm:px-10 lg:px-16">
       <div>
-        <h2 className="mb-3 text-sm font-semibold text-foreground">
-          검수 대기 {queue.length}건
+        <h2 className="mb-4 flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground">
+          검수 대기
+          <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+            [ {queue.length}건 ]
+          </span>
         </h2>
         {queue.length === 0 ? (
           <p className="text-sm text-guud-text-muted-2">

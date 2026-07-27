@@ -15,7 +15,7 @@ const LEVEL_STYLE: Record<AutomationLevel, string> = {
 
 export function AutomationLevelBadge({ frId }: { frId: string }) {
   const meta = getAutomationMeta(frId);
-  if (!meta) {
+  if (!meta || meta.level === "수동") {
     return null;
   }
   return (

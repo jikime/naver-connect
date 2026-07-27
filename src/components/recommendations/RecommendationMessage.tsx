@@ -18,7 +18,7 @@ export function RecommendationMessage({ rec }: { rec: Recommendation }) {
       </section>
 
       <section>
-        <h3 className="mb-1.5 text-xs font-semibold tracking-wide text-guud-text-muted-2 uppercase">
+        <h3 className="mb-1.5 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
           접점
         </h3>
         <blockquote className="border-l-2 border-guud-hairline pl-3 text-sm leading-relaxed text-foreground italic">
@@ -33,7 +33,7 @@ export function RecommendationMessage({ rec }: { rec: Recommendation }) {
       </section>
 
       <section className="border border-guud-hairline p-3">
-        <h3 className="mb-1 text-xs font-semibold tracking-wide text-guud-text-muted-2 uppercase">
+        <h3 className="mb-1 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
           당신의 이익
         </h3>
         <p className="text-sm leading-relaxed text-foreground">
@@ -42,7 +42,7 @@ export function RecommendationMessage({ rec }: { rec: Recommendation }) {
       </section>
 
       <section>
-        <h3 className="mb-1 text-xs font-semibold tracking-wide text-guud-text-muted-2 uppercase">
+        <h3 className="mb-1 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
           상대의 이익
         </h3>
         <p className="text-sm leading-relaxed text-foreground">
@@ -51,7 +51,7 @@ export function RecommendationMessage({ rec }: { rec: Recommendation }) {
       </section>
 
       <section className="bg-muted p-3">
-        <h3 className="mb-1 text-xs font-semibold tracking-wide text-guud-text-muted-2 uppercase">
+        <h3 className="mb-1 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-guud-text-muted-2 uppercase">
           첫 행동
         </h3>
         <p className="text-sm leading-relaxed font-medium text-foreground">

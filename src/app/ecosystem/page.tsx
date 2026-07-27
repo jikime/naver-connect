@@ -21,21 +21,32 @@ export default async function EcosystemPage() {
   const { stages, forces, orgs } = await getEcosystemMap(PLACEHOLDER_VIEWER);
 
   return (
-    <div className="mx-auto w-full max-w-5xl flex-1 px-[30px] py-10">
-      <header className="mb-6 space-y-2">
-        <p className="text-xs font-semibold text-guud-text-muted-2">
-          2단계 · 생태계맵
-        </p>
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          생태계맵 — 밸류체인 · 5-force · 실제 단체
-        </h1>
-        <p className="max-w-2xl text-sm text-guud-text-muted-2">
-          분야별 밸류체인에서 한 단계를 고르면 그 단계의 5-force 이해관계자와
-          실제 존재하는 단체를 지역별로 볼 수 있어요. 내 소속 단체와 대상 단체를
-          설정하면 그 관계 중심의 종합 뷰도 함께 보여줍니다.
-        </p>
-      </header>
-      <EcosystemMapV2 stages={stages} forces={forces} orgs={orgs} />
+    <div className="flex flex-1 flex-col">
+      {/* ④ 헤더 밴드(canvas): eyebrow + headline 1점 강조 — home 맵 아키타입 */}
+      <section className="border-b border-guud-hairline bg-background py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16">
+          <header className="max-w-2xl space-y-3">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ STAGE 02 · ECOSYSTEM MAP ]
+            </p>
+            <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground">
+              생태계맵 — 밸류체인 · 5-force · 실제{" "}
+              <span className="text-primary">단체</span>
+            </h1>
+            <p className="text-sm text-guud-text-muted-2">
+              분야별 밸류체인에서 한 단계를 고르면 그 단계의 5-force 이해관계자와
+              실제 존재하는 단체를 지역별로 볼 수 있어요. 내 소속 단체와 대상
+              단체를 설정하면 그 관계 중심의 종합 뷰도 함께 보여줍니다.
+            </p>
+          </header>
+        </div>
+      </section>
+      {/* ④ 맵 밴드(canvas): 드릴다운 캔버스 보존, 컨테이너·거터만 리듬화 */}
+      <section className="flex-1 bg-background py-12 sm:py-16">
+        <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16">
+          <EcosystemMapV2 stages={stages} forces={forces} orgs={orgs} />
+        </div>
+      </section>
     </div>
   );
 }

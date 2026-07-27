@@ -302,7 +302,7 @@ export function OnbWizard() {
 
   if (loadError) {
     return (
-      <div className="flex items-start gap-2 border border-destructive/40 bg-destructive/5 p-4 text-sm text-foreground">
+      <div className="flex items-start gap-2 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-foreground">
         <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" />
         <p>{loadError}</p>
       </div>
@@ -312,8 +312,11 @@ export function OnbWizard() {
   if (result) {
     return (
       <div className="space-y-5">
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          온보딩 완료
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+          [ 온보딩 · 완료 ]
+        </p>
+        <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
+          온보딩 <span className="text-primary">완료</span>
         </h1>
         <p className="text-sm text-guud-text-muted-2">
           확정된 프로필로 며칠 안에 꼭 만나야 할 회원 세 분을 준비했어요.
@@ -322,7 +325,7 @@ export function OnbWizard() {
           {result.firstRecommendations.map((rec) => (
             <li
               key={rec.id}
-              className="flex flex-wrap items-center gap-2 border border-guud-hairline p-3"
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-guud-hairline p-3"
             >
               <MatchTypeBadge type={rec.match_type} />
               <span className="text-sm text-foreground">
@@ -353,18 +356,25 @@ export function OnbWizard() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <div className="h-1.5 w-full bg-muted" aria-hidden>
+      <div className="space-y-3">
+        {/* ④ 스텝 헤더: mono eyebrow + headline 위계 */}
+        <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+          [ 온보딩 위저드 · STEP {step} ]
+        </p>
+        <div
+          className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
+          aria-hidden
+        >
           <div
-            className="h-full bg-primary transition-all"
+            className="h-full rounded-full bg-primary transition-all"
             style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
           />
         </div>
-        <div className="flex items-center justify-between">
-          <h1 className="font-heading text-2xl font-bold text-foreground">
+        <div className="flex items-end justify-between gap-4">
+          <h1 className="font-heading text-3xl font-semibold tracking-tight text-foreground">
             {STEP_TITLES[step - 1]}
           </h1>
-          <span className="text-xs font-semibold text-guud-text-muted-2">
+          <span className="font-mono text-xs text-guud-text-muted-2">
             {step}/{TOTAL_STEPS}단계
           </span>
         </div>
@@ -426,8 +436,8 @@ export function OnbWizard() {
                 mode="review"
               />
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="border border-guud-hairline p-3">
-                  <p className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+                <div className="rounded-xl border border-guud-hairline p-3">
+                  <p className="mb-2 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
                     공개 프로필에 표시
                   </p>
                   <ul className="space-y-1 text-sm text-foreground">
@@ -443,8 +453,8 @@ export function OnbWizard() {
                     <li>선호 방식: {draft.preferredMode}</li>
                   </ul>
                 </div>
-                <div className="border border-dashed border-guud-text-faint p-3">
-                  <p className="mb-2 text-xs font-semibold text-guud-text-muted-2">
+                <div className="rounded-xl border border-dashed border-guud-text-faint p-3">
+                  <p className="mb-2 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
                     비공개(본인·운영자만)
                   </p>
                   <ul className="space-y-1 text-sm text-foreground">

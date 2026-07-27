@@ -34,10 +34,10 @@ function FilterChip({
       aria-selected={active}
       onClick={onClick}
       className={cn(
-        "rounded-full border px-4 py-1.5 text-sm font-medium",
+        "rounded-full border px-4 py-1.5 text-sm transition-colors",
         active
-          ? "border-foreground bg-foreground text-background"
-          : "border-border bg-muted text-guud-text-muted-2",
+          ? "border-transparent bg-secondary font-semibold text-secondary-foreground"
+          : "border-guud-hairline bg-transparent font-medium text-guud-text-muted-2 hover:text-foreground",
       )}
     >
       {label}
@@ -76,8 +76,8 @@ function MyDealMatches() {
   }
 
   return (
-    <section className="flex flex-col gap-3 border border-guud-hairline bg-muted p-4">
-      <h2 className="font-heading text-base font-bold text-foreground">
+    <section className="flex flex-col gap-3 rounded-2xl border border-guud-hairline bg-muted p-5">
+      <h2 className="font-heading text-lg font-light tracking-tight text-foreground">
         내 딜 매칭 (FR-RS-02)
       </h2>
       {myDeals.map((room) => {

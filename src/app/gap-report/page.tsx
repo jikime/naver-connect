@@ -36,83 +36,105 @@ export default async function GapReportPage() {
   const memberNames = new Map(members.map((m) => [m.id, m.name]));
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-[30px] py-8">
-      <header className="space-y-2">
-        <p className="text-xs font-semibold text-guud-text-muted-2">
-          2단계 · 사업기회 발굴{" "}
-          <span className="text-guud-text-faint">(구 격차 리포트)</span>
-        </p>
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          {region.name} 사업기회 발굴
-        </h1>
-        <p className="max-w-2xl text-sm text-guud-text-muted-2">
-          지역 주체 유형별 규모, 연결 커버리지·buying power(구매력), 완전 공백
-          축, 과거·진행 중 협업 사례, 그리고 그 공백을 메울 기회 카드를 한
-          화면에서 봅니다.
-        </p>
-      </header>
+    <div className="flex flex-1 flex-col">
+      {/* ④ 밴드 A(canvas): 헤더 eyebrow + headline 1점 강조 + 지역 현황 테이블 */}
+      <section className="bg-background py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-7xl space-y-10 px-6 sm:px-10 lg:px-16">
+          <header className="max-w-2xl space-y-3">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ STAGE 02 · OPPORTUNITY DISCOVERY ]
+            </p>
+            <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground">
+              {region.name} <span className="text-primary">사업기회</span> 발굴
+            </h1>
+            <p className="text-sm text-guud-text-muted-2">
+              지역 주체 유형별 규모, 연결 커버리지·buying power(구매력), 완전 공백
+              축, 과거·진행 중 협업 사례, 그리고 그 공백을 메울 기회 카드를 한
+              화면에서 봅니다.
+            </p>
+          </header>
 
-      <section className="space-y-3" aria-labelledby="region-status-heading">
-        <div className="flex items-center gap-2">
-          <h2
-            id="region-status-heading"
-            className="font-heading text-lg font-bold text-foreground"
-          >
-            지역 현황
-          </h2>
-          <AutomationLevelBadge frId="FR-GR-01" />
+          <section className="space-y-4" aria-labelledby="region-status-heading">
+            <div className="flex items-center gap-2">
+              <h2
+                id="region-status-heading"
+                className="font-heading text-2xl font-light tracking-tight text-foreground"
+              >
+                지역 현황
+              </h2>
+              <AutomationLevelBadge frId="FR-GR-01" />
+            </div>
+            <RegionStatusTable region={region} />
+          </section>
         </div>
-        <RegionStatusTable region={region} />
       </section>
 
-      <section className="space-y-3" aria-labelledby="coverage-heading">
-        <div className="flex items-center gap-2">
-          <h2
-            id="coverage-heading"
-            className="font-heading text-lg font-bold text-foreground"
+      {/* ④ 밴드 B(muted): 커버리지 요약 */}
+      <section className="bg-muted py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-7xl space-y-4 px-6 sm:px-10 lg:px-16">
+          <div
+            className="flex items-center gap-2"
+            aria-labelledby="coverage-heading"
           >
-            커버리지 요약
-          </h2>
-          <AutomationLevelBadge frId="FR-GR-03" />
+            <h2
+              id="coverage-heading"
+              className="font-heading text-2xl font-light tracking-tight text-foreground"
+            >
+              커버리지 요약
+            </h2>
+            <AutomationLevelBadge frId="FR-GR-03" />
+          </div>
+          <CoverageSummary region={region} />
         </div>
-        <CoverageSummary region={region} />
       </section>
 
-      <section className="space-y-3" aria-labelledby="connection-map-heading">
-        <div className="flex items-center gap-2">
-          <h2
-            id="connection-map-heading"
-            className="font-heading text-lg font-bold text-foreground"
+      {/* ④ 밴드 C(canvas): 연결맵 · 지역 맵(캔버스 보존, 크롬만 리듬화) */}
+      <section className="bg-background py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-7xl space-y-4 px-6 sm:px-10 lg:px-16">
+          <div
+            className="flex items-center gap-2"
+            aria-labelledby="connection-map-heading"
           >
-            연결맵 · 지역 맵
-          </h2>
-          <AutomationLevelBadge frId="FR-GR-02" />
+            <h2
+              id="connection-map-heading"
+              className="font-heading text-2xl font-light tracking-tight text-foreground"
+            >
+              연결맵 · 지역 맵
+            </h2>
+            <AutomationLevelBadge frId="FR-GR-02" />
+          </div>
+          <GapEcosystemMapToggle
+            region={region}
+            stageLinks={stageLinks}
+            orgs={orgs}
+          />
         </div>
-        <GapEcosystemMapToggle
-          region={region}
-          stageLinks={stageLinks}
-          orgs={orgs}
-        />
       </section>
 
-      <section className="space-y-3" aria-labelledby="gap-cards-heading">
-        <div className="flex items-center gap-2">
-          <h2
-            id="gap-cards-heading"
-            className="font-heading text-lg font-bold text-foreground"
+      {/* ④ 밴드 D(muted): 기회 카드(card 어휘, muted 위 card 면으로 판독) */}
+      <section className="flex-1 bg-muted py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-7xl space-y-4 px-6 sm:px-10 lg:px-16">
+          <div
+            className="flex items-center gap-2"
+            aria-labelledby="gap-cards-heading"
           >
-            기회 카드
-          </h2>
-          <AutomationLevelBadge frId="FR-GR-05" />
+            <h2
+              id="gap-cards-heading"
+              className="font-heading text-2xl font-light tracking-tight text-foreground"
+            >
+              기회 카드
+            </h2>
+            <AutomationLevelBadge frId="FR-GR-05" />
+          </div>
+          <GapCardList
+            gapCards={gapCards}
+            stageLinks={stageLinks}
+            memberNames={memberNames}
+            orgs={orgs}
+            collabCases={collabCases}
+            proposals={proposals}
+          />
         </div>
-        <GapCardList
-          gapCards={gapCards}
-          stageLinks={stageLinks}
-          memberNames={memberNames}
-          orgs={orgs}
-          collabCases={collabCases}
-          proposals={proposals}
-        />
       </section>
     </div>
   );

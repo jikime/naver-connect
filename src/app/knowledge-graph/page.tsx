@@ -16,16 +16,16 @@ export default async function KnowledgeGraphPage() {
   const graph = await getKnowledgeGraph(PLACEHOLDER_VIEWER);
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-[30px] py-8">
-      <header className="space-y-2">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-16 sm:px-10 sm:py-20 lg:px-16">
+      <header className="space-y-3">
         <div className="flex items-center gap-2">
-          <p className="text-xs font-semibold text-guud-text-muted-2">
-            도메인 지식 그래프 · A-v2
+          <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+            [ KNOWLEDGE GRAPH · A-v2 ]
           </p>
           <AutomationLevelBadge frId="FR-GR-02" />
         </div>
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          사회혁신 네트워크 지식 그래프
+        <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground">
+          사회혁신 네트워크 <span className="text-primary">지식 그래프</span>
         </h1>
         <p className="max-w-2xl text-sm text-guud-text-muted-2">
           회원·조직·딜룸·문서·시스템이 어떻게 이어지는지 한 화면에서 봅니다.

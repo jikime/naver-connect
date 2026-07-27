@@ -29,10 +29,10 @@ function FilterChip({
       aria-selected={active}
       onClick={onClick}
       className={cn(
-        "rounded-full border px-4 py-1.5 text-sm font-medium",
+        "rounded-full border px-4 py-1.5 text-sm transition-colors",
         active
-          ? "border-foreground bg-foreground text-background"
-          : "border-border bg-muted text-guud-text-muted-2",
+          ? "border-transparent bg-secondary font-semibold text-secondary-foreground"
+          : "border-guud-hairline bg-transparent font-medium text-guud-text-muted-2 hover:text-foreground",
       )}
     >
       {label}

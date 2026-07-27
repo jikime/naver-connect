@@ -16,7 +16,7 @@ export function VisibilityConsent({
 }) {
   const id = useId();
   return (
-    <div className="flex items-start gap-2 border border-guud-hairline p-3">
+    <div className="flex items-start gap-2 rounded-xl border border-guud-hairline p-3">
       <Checkbox
         id={id}
         checked={checked}

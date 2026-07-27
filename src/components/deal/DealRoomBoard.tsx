@@ -51,8 +51,8 @@ export function DealRoomBoard() {
   return (
     <div className="flex flex-col gap-6">
       {myDeals.length > 0 && (
-        <section className="flex flex-col gap-3 border border-guud-hairline bg-muted p-4">
-          <h2 className="font-heading text-base font-bold text-foreground">
+        <section className="flex flex-col gap-3 rounded-2xl border border-guud-hairline bg-muted p-5">
+          <h2 className="font-heading text-lg font-light tracking-tight text-foreground">
             내가 제안·진행하는 딜 (FR-DR-05)
           </h2>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -72,7 +72,7 @@ export function DealRoomBoard() {
           return (
             <div key={stage} className="flex flex-col gap-3">
               <div className="flex items-center justify-between border-b border-guud-hairline pb-2">
-                <h2 className="font-heading text-sm font-bold tracking-wide text-foreground uppercase">
+                <h2 className="font-mono text-xs font-medium tracking-[0.12em] text-foreground uppercase">
                   {stage}
                 </h2>
                 <span className="text-xs text-guud-text-muted-2">

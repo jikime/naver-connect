@@ -1,10 +1,10 @@
-// GlobalNav 그룹 데이터 — To-Be 메뉴 개편(Task #31, team-lead 승인 개선안
-// /Users/jikime/Downloads/naver-connect_menu-ui-proposal_5.html 그대로).
+// GlobalNav 그룹 데이터 — To-Be 메뉴 개편(Task #31, team-lead 승인 개선안).
 // 근거: naver-connect_process-map.pptx 3번 슬라이드 층 구조. 4개 층 + 조건부 "운영 관리".
 //
-// 색상은 앱 전역 hana 크로스워크 토큰(guud-*)과 무관한 "로컬 기능 팔레트"다 — 지식 그래프의
-// KG_TYPE_META(graph-meta.ts)와 동일한 패턴: 브랜드 토큰이 아니라 이 메뉴 그룹 전용 hex를
-// 하드코딩하고 인라인 style로 적용한다(개선안 프로세스맵 팔레트 그대로 재사용, 앱 크롬은 불변).
+// modoomat 전환(2026-07-27): 이전의 쿨/앰버 로컬 색점 팔레트(textColor/dotColor/softBg)를
+// 폐기하고, 층 구분을 modoomat 시그니처인 mono eyebrow 라벨(`[ LAYER 01 ]` 식, 대문자+양수 자간)
+// 로 대체했다. off-system 색을 제거하고 브랜드 토큰만 쓰는 원칙 준수 — 색이 아니라 타이포
+// 위계로 층을 구분한다(DESIGN.md: 웜 1점 강조, 다색 그룹 구분 없음).
 
 export interface NavItem {
   href: string;
@@ -16,12 +16,8 @@ export interface NavItem {
 export interface NavGroup {
   key: string;
   label: string;
-  /** 그룹 라벨 텍스트 색(대비 확보용 — amber는 dotColor보다 어두운 ink 변형을 쓴다) */
-  textColor: string;
-  /** 그룹 점(dot) 색 — 개선안 프로세스맵 원색 */
-  dotColor: string;
-  /** 태블릿 카드 배경(소프트 틴트) */
-  softBg: string;
+  /** 층 구분용 mono eyebrow 라벨(대괄호는 렌더 시 부착) — modoomat {typography.eyebrow} */
+  eyebrow: string;
   items: NavItem[];
 }
 
@@ -29,9 +25,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "relationship",
     label: "관계 형성",
-    textColor: "#1C7293",
-    dotColor: "#1C7293",
-    softBg: "#E4F0F2",
+    eyebrow: "LAYER 01",
     items: [
       {
         href: "/onboarding",
@@ -68,9 +62,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "opportunity",
     label: "기회 발굴",
-    textColor: "#8A5A00", // amber-ink — amber(#F2A541)는 흰 배경 위 텍스트 대비가 약해 라벨은 ink 변형 사용
-    dotColor: "#F2A541",
-    softBg: "#FDF3E2",
+    eyebrow: "LAYER 02",
     items: [
       {
         href: "/gap-report",
@@ -97,9 +89,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "execution",
     label: "사업 실행",
-    textColor: "#0B3C49",
-    dotColor: "#0B3C49",
-    softBg: "#E5EBEC",
+    eyebrow: "LAYER 03",
     items: [
       {
         href: "/deal-rooms",
@@ -116,9 +106,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     key: "support",
     label: "지원 서비스",
-    textColor: "#5B6B73",
-    dotColor: "#5B6B73",
-    softBg: "#EEF1F2",
+    eyebrow: "LAYER 04",
     items: [
       {
         href: "/resources",
@@ -146,17 +134,13 @@ export const NAV_GROUPS: NavGroup[] = [
 
 /**
  * 운영자 전용 5번째 그룹 — 개선안 목업에는 없다(원본엔 운영자 메뉴가 반영 안 됨). team-lead 지시로
- * 같은 문법(색점+라벨+카운트)으로 추가하되 색은 hana primary-ink(#002A22, guud-badge-new 토큰의
- * 실값과 동일 — globals.css 참조)를 재사용해 "운영"이 곧 브랜드 잉크색이라는 위계를 준다.
- * softBg는 개선안에 지정이 없어 hana의 기존 브랜드 틴트(badge-tint #F2FAF8, guud-header-band와
- * 동일 값)를 재사용했다 — 운영 잉크색과 같은 브랜드 계열이라 임의 신규색 없이 자연스럽게 어울린다.
+ * 같은 문법(eyebrow 라벨 + 카운트)으로 추가한다. modoomat 전환 후 색점 대신 mono eyebrow
+ * (`[ OPS ]`)로 운영 층을 구분한다.
  */
 export const OPERATOR_NAV_GROUP: NavGroup = {
   key: "operator",
   label: "운영 관리",
-  textColor: "#002A22",
-  dotColor: "#002A22",
-  softBg: "#F2FAF8",
+  eyebrow: "OPS",
   items: [
     {
       href: "/operator/review",

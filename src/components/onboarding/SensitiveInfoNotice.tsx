@@ -15,7 +15,7 @@ export function SensitiveInfoNotice({
   onAcknowledge: () => void;
 }) {
   return (
-    <div className="space-y-4 border border-guud-hairline bg-muted p-4">
+    <div className="space-y-4 rounded-2xl border border-guud-hairline bg-muted p-4">
       <div className="flex items-start gap-2">
         <ShieldCheck
           className="mt-0.5 size-5 shrink-0 text-foreground"

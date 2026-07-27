@@ -58,7 +58,7 @@ export function KgDetailPanel({
       <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {d.rows?.map((r) => (
           <div key={r.k}>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-guud-text-muted-2">
+            <p className="font-mono text-[10px] font-medium uppercase tracking-wide text-guud-text-muted-2">
               {r.k}
             </p>
             <p className="text-sm text-foreground">{r.v}</p>
@@ -73,7 +73,7 @@ export function KgDetailPanel({
 
         {d.gates && (
           <div>
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-guud-text-muted-2">
+            <p className="mb-1 font-mono text-[10px] font-medium uppercase tracking-wide text-guud-text-muted-2">
               게이트 통과
             </p>
             <div className="flex gap-1.5">
@@ -96,7 +96,7 @@ export function KgDetailPanel({
 
         {d.tags?.map((t) => (
           <div key={t.k}>
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-guud-text-muted-2">
+            <p className="mb-1 font-mono text-[10px] font-medium uppercase tracking-wide text-guud-text-muted-2">
               {t.k}
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -109,7 +109,7 @@ export function KgDetailPanel({
 
         {d.list && (
           <div>
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-guud-text-muted-2">
+            <p className="mb-1 font-mono text-[10px] font-medium uppercase tracking-wide text-guud-text-muted-2">
               {d.list.k}
             </p>
             <ul className="space-y-1 text-[13px] leading-relaxed text-foreground">

@@ -19,9 +19,9 @@ export function SupplierView({ services }: { services: ExpertService[] }) {
   const own = services.find((service) => service.expert_id === personaId);
 
   return (
-    <section className="flex flex-col gap-4 border border-guud-hairline bg-muted p-5">
-      <div>
-        <h2 className="font-heading text-lg font-bold text-foreground">
+    <section className="flex flex-col gap-4 rounded-2xl border border-guud-hairline bg-muted p-6">
+      <div className="space-y-1.5">
+        <h2 className="font-heading text-2xl font-light tracking-tight text-foreground">
           공급자 뷰
         </h2>
         <p className="text-xs text-guud-text-muted-2">

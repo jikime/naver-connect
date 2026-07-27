@@ -52,30 +52,37 @@ export function RuleSettings() {
 
   if (scores === null) {
     return (
-      <p className="px-[30px] py-6 text-sm text-guud-text-muted-2">
+      <p className="px-6 py-16 text-sm text-guud-text-muted-2 md:px-16">
         불러오는 중입니다…
       </p>
     );
   }
 
   return (
-    <div className="space-y-8 px-[30px] py-6">
-      {!isAdmin && (
-        <div className="border border-guud-hairline bg-muted px-4 py-3 text-sm text-guud-text-muted-2">
-          가중치 편집은 운영자만 할 수 있어요. 상단 역할 스위처에서 “운영자”로
-          전환하면 편집 폼이 나타나요(FR-RL-02).
-        </div>
-      )}
+    // ④ 캔버스 밴드 + 반응형 거터 + 중앙 정렬 폭, 섹션 간 수직 리듬
+    <div className="bg-background px-6 py-16 md:px-16">
+      <div className="mx-auto w-full max-w-5xl space-y-16">
+        {!isAdmin && (
+          <div className="rounded-2xl border border-guud-hairline bg-muted px-4 py-3 text-sm text-guud-text-muted-2">
+            가중치 편집은 운영자만 할 수 있어요. 상단 역할 스위처에서 “운영자”로
+            전환하면 편집 폼이 나타나요(FR-RL-02).
+          </div>
+        )}
 
-      <section>
-        <h2 className="mb-1 text-sm font-semibold text-foreground">
-          연관 키워드 가중치 <AssumptionBadge />
-        </h2>
-        <p className="mb-3 text-xs text-guud-text-muted-2">
-          성장스토리·회사정보에서 추출된 키워드 세트 기반 가중치입니다(창작 목업
-          — 실추출 전 시드 값).
-        </p>
-        <div className="space-y-2">
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ WEIGHTS ]
+            </p>
+            <h2 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
+              연관 키워드 가중치 <AssumptionBadge />
+            </h2>
+            <p className="text-xs text-guud-text-muted-2">
+              성장스토리·회사정보에서 추출된 키워드 세트 기반 가중치입니다(창작
+              목업 — 실추출 전 시드 값).
+            </p>
+          </div>
+          <div className="space-y-2">
           {(isAdmin ? draftWeights : weights).map((w) => (
             <div key={w.keyword} className="flex items-center gap-3 text-sm">
               <span className="w-40 shrink-0 text-foreground">{w.keyword}</span>
@@ -117,44 +124,53 @@ export function RuleSettings() {
         )}
       </section>
 
-      <section>
-        <h2 className="mb-3 text-sm font-semibold text-foreground">
-          회원 쌍 매칭 점수
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-guud-hairline text-left text-xs text-guud-text-muted-2">
-                <th className="py-2 pr-3 font-semibold">회원 쌍</th>
-                <th className="py-2 pr-3 font-semibold">점수</th>
-                <th className="py-2 pr-3 font-semibold">축</th>
-                <th className="py-2 font-semibold">근거 키워드</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scores.map((s) => (
-                <tr
-                  key={`${s.from_member_id}-${s.to_member_id}`}
-                  className="border-b border-guud-hairline"
-                >
-                  <td className="py-2 pr-3 text-foreground">
-                    {s.from_member_id} → {s.to_member_id}
-                  </td>
-                  <td className="py-2 pr-3 font-semibold text-foreground">
-                    {s.score}
-                  </td>
-                  <td className="py-2 pr-3 text-guud-text-muted-2">{s.axis}</td>
-                  <td className="py-2 text-guud-text-muted-2">
-                    {[...s.shared_keywords, ...s.complementary_keywords].join(
-                      ", ",
-                    ) || "—"}
-                  </td>
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ MATCH SCORES ]
+            </p>
+            <h2 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
+              회원 쌍 매칭 점수
+            </h2>
+          </div>
+          {/* ④ 데이터 표면 카드 + mono 테이블 헤더 라벨 */}
+          <div className="overflow-x-auto rounded-2xl border border-guud-hairline bg-card p-4 md:p-6">
+            <table className="w-full min-w-[560px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-guud-hairline text-left font-mono text-[0.625rem] tracking-[0.12em] text-guud-text-muted-2 uppercase">
+                  <th className="py-2 pr-3 font-medium">회원 쌍</th>
+                  <th className="py-2 pr-3 font-medium">점수</th>
+                  <th className="py-2 pr-3 font-medium">축</th>
+                  <th className="py-2 font-medium">근거 키워드</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+              </thead>
+              <tbody>
+                {scores.map((s) => (
+                  <tr
+                    key={`${s.from_member_id}-${s.to_member_id}`}
+                    className="border-b border-guud-hairline"
+                  >
+                    <td className="py-2 pr-3 text-foreground">
+                      {s.from_member_id} → {s.to_member_id}
+                    </td>
+                    <td className="py-2 pr-3 font-semibold text-foreground">
+                      {s.score}
+                    </td>
+                    <td className="py-2 pr-3 text-guud-text-muted-2">
+                      {s.axis}
+                    </td>
+                    <td className="py-2 text-guud-text-muted-2">
+                      {[...s.shared_keywords, ...s.complementary_keywords].join(
+                        ", ",
+                      ) || "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
