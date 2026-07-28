@@ -15,6 +15,10 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  ScrollReveal,
+  ScrollRevealGroup,
+} from "@/components/landing/ScrollReveal";
 import { Button } from "@/components/ui/button";
 
 const SERVICE_LAYERS = [
@@ -172,7 +176,7 @@ export default function LandingPage() {
         className="scroll-mt-20 border-y border-guud-hairline bg-card"
       >
         <div className="mx-auto w-full max-w-[1280px] px-6 py-20 sm:px-10 lg:px-16 lg:py-28">
-          <div className="max-w-2xl space-y-4">
+          <ScrollReveal className="max-w-2xl space-y-4">
             <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
               [ ONE CONNECTED FLOW ]
             </p>
@@ -184,15 +188,18 @@ export default function LandingPage() {
               개인의 프로필, 지역 생태계의 빈틈, 협업 실행을 따로 보지 않고
               하나의 흐름으로 연결합니다.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-3">
+          <ScrollRevealGroup
+            className="mt-12 grid gap-4 md:grid-cols-3"
+            itemClassName="h-full"
+          >
             {SERVICE_LAYERS.map((item, index) => {
               const Icon = item.icon;
               return (
                 <article
                   key={item.eyebrow}
-                  className="group flex min-h-80 flex-col justify-between rounded-2xl border border-guud-hairline bg-background p-6 transition-colors hover:bg-secondary"
+                  className="group flex h-full min-h-80 flex-col justify-between rounded-2xl border border-guud-hairline bg-background p-6 transition-colors hover:bg-secondary"
                 >
                   <div className="flex items-center justify-between">
                     <span className="flex size-11 items-center justify-center rounded-full bg-secondary text-primary group-hover:bg-background">
@@ -219,13 +226,13 @@ export default function LandingPage() {
                 </article>
               );
             })}
-          </div>
+          </ScrollRevealGroup>
         </div>
       </section>
 
       <section id="how-it-works" className="scroll-mt-20 bg-muted">
         <div className="mx-auto grid w-full max-w-[1280px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-[0.68fr_1.32fr] lg:px-16 lg:py-28">
-          <div className="space-y-5 lg:sticky lg:top-28 lg:self-start">
+          <ScrollReveal className="space-y-5 lg:sticky lg:top-28 lg:self-start">
             <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
               [ HOW IT WORKS ]
             </p>
@@ -245,45 +252,49 @@ export default function LandingPage() {
                 있습니다.
               </p>
             </div>
-          </div>
+          </ScrollReveal>
 
-          <ol className="space-y-3">
-            {ONBOARDING_STEPS.map((step, index) => (
-              <li
-                key={step.title}
-                className="grid gap-4 rounded-2xl border border-guud-hairline bg-card p-5 sm:grid-cols-[3rem_1fr] sm:items-start sm:p-6"
-              >
-                <span className="flex size-10 items-center justify-center rounded-full bg-secondary font-mono text-xs font-medium text-primary">
-                  0{index + 1}
-                </span>
-                <div>
-                  <h3 className="font-heading text-lg font-semibold text-foreground">
-                    {step.title}
-                  </h3>
-                  <p className="mt-1 text-sm leading-6 text-guud-text-muted-2">
-                    {step.description}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <ScrollReveal delay={0.08}>
+            <ol className="space-y-3">
+              {ONBOARDING_STEPS.map((step, index) => (
+                <li
+                  key={step.title}
+                  className="grid gap-4 rounded-2xl border border-guud-hairline bg-card p-5 sm:grid-cols-[3rem_1fr] sm:items-start sm:p-6"
+                >
+                  <span className="flex size-10 items-center justify-center rounded-full bg-secondary font-mono text-xs font-medium text-primary">
+                    0{index + 1}
+                  </span>
+                  <div>
+                    <h3 className="font-heading text-lg font-semibold text-foreground">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-guud-text-muted-2">
+                      {step.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </ScrollReveal>
         </div>
       </section>
 
       <section id="fields" className="scroll-mt-20 bg-background">
         <div className="mx-auto grid w-full max-w-[1280px] items-center gap-10 px-6 py-20 sm:px-10 lg:grid-cols-[1.15fr_0.85fr] lg:px-16 lg:py-28">
-          <figure className="overflow-hidden rounded-3xl border border-guud-hairline bg-secondary p-2">
-            <Image
-              src="/images/social-ecosystem-network.webp"
-              width={1536}
-              height={1024}
-              sizes="(max-width: 1023px) calc(100vw - 48px), 55vw"
-              alt="돌봄, 의료, 주거, 에너지, 먹거리, 교통 등 지역의 여러 주체가 길로 연결된 생태계"
-              className="aspect-[4/3] w-full rounded-[calc(var(--radius)*1.6)] object-cover lg:aspect-[3/2]"
-            />
-          </figure>
+          <ScrollReveal direction="left">
+            <figure className="overflow-hidden rounded-3xl border border-guud-hairline bg-secondary p-2">
+              <Image
+                src="/images/social-ecosystem-network.webp"
+                width={1536}
+                height={1024}
+                sizes="(max-width: 1023px) calc(100vw - 48px), 55vw"
+                alt="돌봄, 의료, 주거, 에너지, 먹거리, 교통 등 지역의 여러 주체가 길로 연결된 생태계"
+                className="aspect-[4/3] w-full rounded-[calc(var(--radius)*1.6)] object-cover lg:aspect-[3/2]"
+              />
+            </figure>
+          </ScrollReveal>
 
-          <div className="space-y-7">
+          <ScrollReveal className="space-y-7" direction="right" delay={0.08}>
             <div className="space-y-4">
               <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
                 [ EIGHT FIELDS · ONE ECOSYSTEM ]
@@ -314,7 +325,7 @@ export default function LandingPage() {
               공개 데이터와 회원의 현장 검증을 함께 반영해 지역별 빈 연결과
               기회를 갱신합니다.
             </p>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -323,7 +334,7 @@ export default function LandingPage() {
         className="scroll-mt-20 bg-foreground text-background"
       >
         <div className="mx-auto w-full max-w-[1280px] px-6 py-20 sm:px-10 lg:px-16 lg:py-24">
-          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+          <ScrollReveal className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
             <div className="space-y-4">
               <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-background/55 uppercase">
                 [ TRUST BY DESIGN ]
@@ -338,14 +349,17 @@ export default function LandingPage() {
               솔직해질 수 없습니다. 정보와 추천, 운영의 원칙을 처음부터 분명하게
               둡니다.
             </p>
-          </div>
-          <div className="mt-10 grid gap-3 md:grid-cols-3">
+          </ScrollReveal>
+          <ScrollRevealGroup
+            className="mt-10 grid gap-3 md:grid-cols-3"
+            itemClassName="h-full"
+          >
             {TRUST_PRINCIPLES.map((item) => {
               const Icon = item.icon;
               return (
                 <article
                   key={item.title}
-                  className="rounded-2xl border border-background/15 bg-background/5 p-5 sm:p-6"
+                  className="h-full rounded-2xl border border-background/15 bg-background/5 p-5 sm:p-6"
                 >
                   <Icon className="size-5 text-primary" />
                   <h3 className="mt-8 font-heading text-lg font-semibold">
@@ -357,12 +371,12 @@ export default function LandingPage() {
                 </article>
               );
             })}
-          </div>
+          </ScrollRevealGroup>
         </div>
       </section>
 
       <section className="px-5 py-16 sm:px-8 lg:py-24">
-        <div className="mx-auto flex w-full max-w-[1280px] flex-col items-start justify-between gap-8 rounded-3xl bg-secondary p-8 sm:p-12 lg:flex-row lg:items-end">
+        <ScrollReveal className="mx-auto flex w-full max-w-[1280px] flex-col items-start justify-between gap-8 rounded-3xl bg-secondary p-8 sm:p-12 lg:flex-row lg:items-end">
           <div className="max-w-2xl space-y-4">
             <UserRoundCheck className="size-7 text-primary" />
             <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
@@ -379,7 +393,7 @@ export default function LandingPage() {
               <ArrowRight className="size-4" />
             </Link>
           </Button>
-        </div>
+        </ScrollReveal>
       </section>
 
       <footer className="border-t border-guud-hairline px-6 py-8 sm:px-10">
