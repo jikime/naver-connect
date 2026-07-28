@@ -3,6 +3,7 @@
 // 컴포넌트는 이 배럴(또는 각 모듈)만 import한다. 시드는 여기서만 읽는다(FR-DA-01).
 
 export * from "./collaboration";
+// collaboration-server는 server-only이므로 barrel에서 제외 (Client에서 import 금지)
 export * from "./deal";
 export * from "./ecosystem";
 export * from "./errors";

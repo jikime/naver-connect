@@ -1,15 +1,27 @@
-// /collab-cases — 협업사례 입력·조회 + 시뮬레이션(FR-CS-01/02, v1.1 §8.16 신규 화면).
+// /collab-cases — 협업사례 입력·조회 + 시뮬레이션(FR-CS-01/02, v1.3 Supabase 연동).
 // 근거: PRD §8.16, ARCHITECTURE.md §3, TASKS #28
-// 입력·시뮬레이션이 핵심 인터랙션이라 본문 전체를 Client로 둔다(ADR-04 — 정적 셸만 없음).
+// v1.3: async Server Component에서 DB 데이터를 fetch해 CollabCasesView에 props로 전달.
+// 세션 내 write(inputCollabCase)는 기존 방식(Zustand) 유지.
 
 import type { Metadata } from "next";
+import {
+  getCollabCasesFromDB,
+  getCollabRelationsFromDB,
+  getOrganizationsFromDB,
+} from "@/lib/dal/collaboration-server";
 import { CollabCasesView } from "@/components/collaboration/CollabCasesView";
 
 export const metadata: Metadata = {
   title: "협업사례 | 사회혁신기업가네트워크 AX 플랫폼 (목업)",
 };
 
-export default function CollabCasesPage() {
+export default async function CollabCasesPage() {
+  const [cases, relations, orgs] = await Promise.all([
+    getCollabCasesFromDB(),
+    getCollabRelationsFromDB(),
+    getOrganizationsFromDB(),
+  ]);
+
   return (
     <div className="flex flex-1 flex-col">
       <header className="border-b border-guud-hairline bg-guud-header-band">
@@ -22,13 +34,16 @@ export default function CollabCasesPage() {
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
             진행됐거나 진행 중인 협력 사례를 확인하고, 우리 조직 기준으로 가능한
-            협업 조합을 시뮬레이션해보세요. 새로운 사례도 입력할 수 있어요(이번
-            세션에만 반영).
+            협업 조합을 시뮬레이션해보세요. 새로운 사례도 직접 입력할 수 있습니다.
           </p>
         </div>
       </header>
       <div className="mx-auto w-full max-w-5xl px-6 py-14 sm:px-10 lg:px-16">
-        <CollabCasesView />
+        <CollabCasesView
+          initialCases={cases}
+          initialRelations={relations}
+          initialOrgs={orgs}
+        />
       </div>
     </div>
   );

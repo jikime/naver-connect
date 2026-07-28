@@ -68,6 +68,9 @@ export interface Organization {
     | "구매자"
     | "대체재"
     | null;
+  // ── v1.2 확장: 협업관계 그래프 ──
+  /** 14개 하위그룹 코드 (subgroup_map.json에서 런타임 조인, JSON에는 없음) */
+  subgroup_code?: import("./collaboration").SubgroupCode;
 }
 
 /** 밸류체인 단계별 5-force 이해관계자 세팅 (FR-EM2-01/02/04, 운영자 사전세팅 대체) [창작 목업] */

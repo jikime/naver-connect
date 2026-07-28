@@ -1,0 +1,334 @@
+[
+  {
+    "org_id": "ORG-001",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "사회적협동조합 형태의 재가돌봄 운영체. 공동 판로·조합원 구조로 확산 단계(STAGE 4)에서 활동."
+  },
+  {
+    "org_id": "ORG-002",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "주택 협동조합. 조합원 출자 기반 사회주택 공급."
+  },
+  {
+    "org_id": "ORG-003",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "시민 출자 기반 재생에너지 협동조합."
+  },
+  {
+    "org_id": "ORG-004",
+    "subgroup_code": "A6",
+    "subgroup_label": "성장혁신형",
+    "kind": "activist",
+    "rationale": "DRT 기반 교통 스타트업. 빠른 성장·기술 혁신 중심."
+  },
+  {
+    "org_id": "ORG-005",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "영리 회계법인으로 사회적경제 조직에 전문 서비스 제공. 지원가를 거치지 않고 활동가와 직접 협업."
+  },
+  {
+    "org_id": "ORG-006",
+    "subgroup_code": "C4",
+    "subgroup_label": "학계·공공·언론형",
+    "kind": "non-social",
+    "rationale": "정책연구소. 연구·정책·제언으로 돌봄 분야를 지원."
+  },
+  {
+    "org_id": "ORG-007",
+    "subgroup_code": "B1",
+    "subgroup_label": "자금공급형",
+    "kind": "supporter",
+    "rationale": "임팩트 투자사. 보조금·펀드 형태로 사회적경제 활동가에게 자금 공급."
+  },
+  {
+    "org_id": "ORG-008",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "로컬푸드 직매장 협동조합. 조합원 생산-소비 공동 구조."
+  },
+  {
+    "org_id": "ORG-009",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "보건복지부 인가 의료복지사회적협동조합. 인증 기반 지역 의료 서비스 제공."
+  },
+  {
+    "org_id": "ORG-010",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "보건복지부 인가 의료복지사협."
+  },
+  {
+    "org_id": "ORG-011",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "보건복지부 인가 의료복지사협."
+  },
+  {
+    "org_id": "ORG-012",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "보건복지부 인가 의료복지사협."
+  },
+  {
+    "org_id": "ORG-013",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "돌봄 중개 영리 플랫폼. 기술 역량으로 활동가와 직접 협업하는 전문서비스 형태."
+  },
+  {
+    "org_id": "ORG-014",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "돌봄 중개 영리 플랫폼."
+  },
+  {
+    "org_id": "ORG-015",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "고령화 연구 영리기관."
+  },
+  {
+    "org_id": "ORG-016",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "돌봄 매칭 영리 플랫폼."
+  },
+  {
+    "org_id": "ORG-017",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "에너지-주거 결합 사회적경제 조직. 실행·확산 양 단계에서 활동."
+  },
+  {
+    "org_id": "ORG-018",
+    "subgroup_code": "A3",
+    "subgroup_label": "지역밀착형",
+    "kind": "activist",
+    "rationale": "지역 기반 사회주택 공급 조직. 현장 문제 직접 해결 중심."
+  },
+  {
+    "org_id": "ORG-019",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "주택 협동조합."
+  },
+  {
+    "org_id": "ORG-020",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "주택 협동조합."
+  },
+  {
+    "org_id": "ORG-021",
+    "subgroup_code": "C4",
+    "subgroup_label": "학계·공공·언론형",
+    "kind": "non-social",
+    "rationale": "공공기관(LH). 주거 정책 집행·공급 역할."
+  },
+  {
+    "org_id": "ORG-022",
+    "subgroup_code": "C4",
+    "subgroup_label": "학계·공공·언론형",
+    "kind": "non-social",
+    "rationale": "공공기관(SH). 주거 정책 집행·공급 역할."
+  },
+  {
+    "org_id": "ORG-023",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "시민 출자 재생에너지 협동조합."
+  },
+  {
+    "org_id": "ORG-024",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "시민 출자 재생에너지 협동조합."
+  },
+  {
+    "org_id": "ORG-025",
+    "subgroup_code": "A4",
+    "subgroup_label": "조합형",
+    "kind": "activist",
+    "rationale": "로컬푸드 협동조합."
+  },
+  {
+    "org_id": "ORG-026",
+    "subgroup_code": "A3",
+    "subgroup_label": "지역밀착형",
+    "kind": "activist",
+    "rationale": "농어촌 지역 밀착형 사회적기업."
+  },
+  {
+    "org_id": "ORG-027",
+    "subgroup_code": "A3",
+    "subgroup_label": "지역밀착형",
+    "kind": "activist",
+    "rationale": "농어촌 지역 밀착형 사회적기업."
+  },
+  {
+    "org_id": "ORG-028",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "한국사회적기업진흥원 인증 사회적기업."
+  },
+  {
+    "org_id": "ORG-029",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "한국사회적기업진흥원 인증 사회적기업."
+  },
+  {
+    "org_id": "ORG-030",
+    "subgroup_code": "A5",
+    "subgroup_label": "인증기업형",
+    "kind": "activist",
+    "rationale": "한국사회적기업진흥원 인증 사회적기업."
+  },
+  {
+    "org_id": "ORG-031",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "문화 콘텐츠 영리 플랫폼. 지역 문화 조직과 직접 협업."
+  },
+  {
+    "org_id": "ORG-032",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "문화 공간 영리 플랫폼."
+  },
+  {
+    "org_id": "ORG-033",
+    "subgroup_code": "C2",
+    "subgroup_label": "전문서비스파트너형",
+    "kind": "non-social",
+    "rationale": "문화 콘텐츠 영리 플랫폼."
+  },
+  {
+    "org_id": "ORG-034",
+    "subgroup_code": "B3",
+    "subgroup_label": "인프라·네트워크형",
+    "kind": "supporter",
+    "rationale": "한국사회적기업진흥원. 인증·네트워크 전 분야 지원 허브."
+  },
+  {
+    "org_id": "ORG-035",
+    "subgroup_code": "B2",
+    "subgroup_label": "역량강화형",
+    "kind": "supporter",
+    "rationale": "창업진흥원. 창업 멘토링·컨설팅 역량강화 지원."
+  },
+  {
+    "org_id": "ORG-036",
+    "subgroup_code": "B3",
+    "subgroup_label": "인프라·네트워크형",
+    "kind": "supporter",
+    "rationale": "서울사회적경제지원센터. 공간·네트워크 연결 허브."
+  },
+  {
+    "org_id": "ORG-037",
+    "subgroup_code": "B3",
+    "subgroup_label": "인프라·네트워크형",
+    "kind": "supporter",
+    "rationale": "사회주택협회. 주거 분야 표준화·네트워크 인프라 역할."
+  },
+  {
+    "org_id": "ORG-038",
+    "subgroup_code": "C4",
+    "subgroup_label": "학계·공공·언론형",
+    "kind": "non-social",
+    "rationale": "국민건강보험공단. 제도·재원 기반 공공 공급자."
+  },
+  {
+    "org_id": "ORG-039",
+    "subgroup_code": "C4",
+    "subgroup_label": "학계·공공·언론형",
+    "kind": "non-social",
+    "rationale": "건강보험심사평가원. 의료정보 공공 기관."
+  },
+  {
+    "org_id": "ORG-040",
+    "subgroup_code": "C4",
+    "subgroup_label": "학계·공공·언론형",
+    "kind": "non-social",
+    "rationale": "조달청 나라장터. 공공조달 플랫폼."
+  },
+  {
+    "org_id": "ORG-041",
+    "subgroup_code": "B1",
+    "subgroup_label": "자금공급형",
+    "kind": "supporter",
+    "rationale": "가치금융신협. 사회적경제 대상 금융·자금 공급."
+  },
+  {
+    "org_id": "ORG-042",
+    "subgroup_code": "B4",
+    "subgroup_label": "대변·제도형",
+    "kind": "supporter",
+    "rationale": "한빛구청 통합지원전담팀. 공공 제도·서비스 연계 역할."
+  },
+  { "org_id": "ORG-043", "subgroup_code": "A2", "subgroup_label": "리사이클·자원순환형", "kind": "activist", "rationale": "아름다운가게. 물품 재사용·기부 순환 구조로 자원 재순환 활동가." },
+  { "org_id": "ORG-044", "subgroup_code": "A3", "subgroup_label": "지역밀착형", "kind": "activist", "rationale": "노리단. 지역 기반 문화예술 공연·교육 사회적기업." },
+  { "org_id": "ORG-045", "subgroup_code": "A3", "subgroup_label": "지역밀착형", "kind": "activist", "rationale": "트래블러스맵. 공정여행 지역밀착형 사회적기업." },
+  { "org_id": "ORG-046", "subgroup_code": "A2", "subgroup_label": "리사이클·자원순환형", "kind": "activist", "rationale": "에코파티메아리. 업사이클링·자원순환 중심 사회적기업." },
+  { "org_id": "ORG-047", "subgroup_code": "A1", "subgroup_label": "사회적기업형", "kind": "activist", "rationale": "함께일하는세상. 취약계층 일자리제공형 인증 사회적기업." },
+  { "org_id": "ORG-048", "subgroup_code": "A1", "subgroup_label": "사회적기업형", "kind": "activist", "rationale": "세상을바꾸는에너지. 에너지 분야 인증 사회적기업." },
+  { "org_id": "ORG-049", "subgroup_code": "A5", "subgroup_label": "인증기업형", "kind": "activist", "rationale": "민달팽이유니온. 주거권 보장 인증 사회적기업." },
+  { "org_id": "ORG-050", "subgroup_code": "A3", "subgroup_label": "지역밀착형", "kind": "activist", "rationale": "지구인컴퍼니. 음식 낭비 저감 지역밀착형 사회혁신." },
+  { "org_id": "ORG-051", "subgroup_code": "A3", "subgroup_label": "지역밀착형", "kind": "activist", "rationale": "어반비즈서울. 도시 양봉·농업 지역밀착 사회혁신기업." },
+  { "org_id": "ORG-052", "subgroup_code": "A4", "subgroup_label": "조합형", "kind": "activist", "rationale": "두레생협. 조합원 출자 먹거리 생협." },
+  { "org_id": "ORG-053", "subgroup_code": "B4", "subgroup_label": "대변·제도형", "kind": "supporter", "rationale": "광주사회서비스원. 공공 돌봄 서비스 전달 및 정책 연계." },
+  { "org_id": "ORG-054", "subgroup_code": "C4", "subgroup_label": "학계·공공·언론형", "kind": "non-social", "rationale": "제주환경운동연합. 환경 정책 대변 비영리." },
+  { "org_id": "ORG-055", "subgroup_code": "B3", "subgroup_label": "인프라·네트워크형", "kind": "supporter", "rationale": "부산사회연대경제지원센터. 부산 지역 사회적경제 인프라 허브." },
+  { "org_id": "ORG-056", "subgroup_code": "A6", "subgroup_label": "성장혁신형", "kind": "activist", "rationale": "경북청년연대. 청년 창업·일자리 중심 성장혁신형." },
+  { "org_id": "ORG-057", "subgroup_code": "B4", "subgroup_label": "대변·제도형", "kind": "supporter", "rationale": "대전복지재단. 공공 복지 정책 집행 및 제도 연계." },
+  { "org_id": "ORG-058", "subgroup_code": "B1", "subgroup_label": "자금공급형", "kind": "supporter", "rationale": "재단법인 동천. 법률지원 및 공익 자금 연계." },
+  { "org_id": "ORG-059", "subgroup_code": "B1", "subgroup_label": "자금공급형", "kind": "supporter", "rationale": "한국사회투자. 사회적금융 중개 및 임팩트 투자 연계." },
+  { "org_id": "ORG-060", "subgroup_code": "B2", "subgroup_label": "역량강화형", "kind": "supporter", "rationale": "루트임팩트. 창업가 역량강화 허브·코워킹 공간 운영." },
+  { "org_id": "ORG-061", "subgroup_code": "B2", "subgroup_label": "역량강화형", "kind": "supporter", "rationale": "임팩트스퀘어. 소셜임팩트 측정·컨설팅 역량강화 플랫폼." },
+  { "org_id": "ORG-062", "subgroup_code": "A5", "subgroup_label": "인증기업형", "kind": "activist", "rationale": "원주 의료생협. 보건복지부 인가 지역 의료복지사협." },
+  { "org_id": "ORG-063", "subgroup_code": "A4", "subgroup_label": "조합형", "kind": "activist", "rationale": "성남 청년주택 협동조합. 청년 대상 주택 협동조합." },
+  { "org_id": "ORG-064", "subgroup_code": "A4", "subgroup_label": "조합형", "kind": "activist", "rationale": "광주 햇빛발전 협동조합. 시민 출자 에너지 협동조합." },
+  { "org_id": "ORG-065", "subgroup_code": "A4", "subgroup_label": "조합형", "kind": "activist", "rationale": "충남 친환경농산물 협동조합. 친환경 농업 협동조합." },
+  { "org_id": "ORG-066", "subgroup_code": "A6", "subgroup_label": "성장혁신형", "kind": "activist", "rationale": "대전 생태교통 협동조합. 생태교통·DRT 혁신 조합." },
+  { "org_id": "ORG-067", "subgroup_code": "A3", "subgroup_label": "지역밀착형", "kind": "activist", "rationale": "인천 도시재생 커뮤니티. 인천 원도심 도시재생 지역밀착 조직." },
+  { "org_id": "ORG-068", "subgroup_code": "A6", "subgroup_label": "성장혁신형", "kind": "activist", "rationale": "전주 사회혁신 협동조합. 사회혁신 실험·스케일업 중심." },
+  { "org_id": "ORG-069", "subgroup_code": "A2", "subgroup_label": "리사이클·자원순환형", "kind": "activist", "rationale": "두꺼비하우징. 빈집 리모델링·자원순환 주거 사회적기업." },
+  { "org_id": "ORG-070", "subgroup_code": "B2", "subgroup_label": "역량강화형", "kind": "supporter", "rationale": "다음세대재단. 디지털 리터러시 역량강화 재단." },
+  { "org_id": "ORG-071", "subgroup_code": "B1", "subgroup_label": "자금공급형", "kind": "supporter", "rationale": "한국사회투자 사회성과연계채권. SIB 구조화 금융 공급." },
+  { "org_id": "ORG-072", "subgroup_code": "B3", "subgroup_label": "인프라·네트워크형", "kind": "supporter", "rationale": "광주사회연대경제지원센터. 광주 지역 사회적경제 네트워크 허브." },
+  { "org_id": "ORG-073", "subgroup_code": "B3", "subgroup_label": "인프라·네트워크형", "kind": "supporter", "rationale": "부산 사회적경제지원센터. 부산 지역 사회적경제 인프라." },
+  { "org_id": "ORG-074", "subgroup_code": "C4", "subgroup_label": "학계·공공·언론형", "kind": "non-social", "rationale": "KAIST 사회적가치연구소. 학술 연구 기반 정책 자문." },
+  { "org_id": "ORG-075", "subgroup_code": "C1", "subgroup_label": "일반기업형", "kind": "non-social", "rationale": "SK 행복나래. 대기업 계열 사회적경제 구매연계 플랫폼." },
+  { "org_id": "ORG-076", "subgroup_code": "B4", "subgroup_label": "대변·제도형", "kind": "supporter", "rationale": "한국협동조합협의회. 협동조합 정책 대변·제도 개선 역할." },
+  { "org_id": "ORG-077", "subgroup_code": "A1", "subgroup_label": "사회적기업형", "kind": "activist", "rationale": "경남 고령친화 사회적기업. 노인 돌봄 일자리제공형 인증 사회적기업." },
+  { "org_id": "ORG-078", "subgroup_code": "A3", "subgroup_label": "지역밀착형", "kind": "activist", "rationale": "강원 산촌생활서비스 협동조합. 농촌 지역 생활서비스 지역밀착형." },
+  { "org_id": "ORG-079", "subgroup_code": "A5", "subgroup_label": "인증기업형", "kind": "activist", "rationale": "공정무역가게 울림. 공정무역 인증 사회적기업." },
+  { "org_id": "ORG-080", "subgroup_code": "A4", "subgroup_label": "조합형", "kind": "activist", "rationale": "부산 해운대 돌봄 사협. 돌봄 특화 사회적협동조합." }
+]

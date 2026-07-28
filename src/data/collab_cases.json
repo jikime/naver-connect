@@ -78,5 +78,325 @@
     "outcome_summary": "사회주택 프로젝트에 신협 조합원 가입·정산 인프라를 연계하는 시범. 금융상품 FIN-01(법률검토 미착수)과 연동, 상품 확정은 검토 완료 전 보류.",
     "field_tags": [2, 3],
     "input_by": "운영자"
+  },
+  {
+    "id": "CC-09",
+    "title": "아름다운가게 × 에코파티메아리 업사이클링 공동 판로",
+    "status": "완료",
+    "participant_org_ids": ["ORG-043", "ORG-046"],
+    "period": "2024-01 ~ 2024-12",
+    "outcome_summary": "자원순환 사회적기업 두 곳이 업사이클 제품 공동 판로를 개척해 매출 30% 상승. 자원순환 클러스터 확장.",
+    "field_tags": [8, 4],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-10",
+    "title": "루트임팩트 × 임팩트스퀘어 임팩트 측정 공동 플랫폼",
+    "status": "완료",
+    "participant_org_ids": ["ORG-060", "ORG-061"],
+    "period": "2024-03 ~ 2025-02",
+    "outcome_summary": "창업가 역량강화와 소셜임팩트 측정 전문기관이 통합 임팩트 측정 플랫폼 공동 개발. 20개 사회적기업 적용.",
+    "field_tags": [13, 10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-11",
+    "title": "세상을바꾸는에너지 × 광주 햇빛발전 에너지 전환 연대",
+    "status": "완료",
+    "participant_org_ids": ["ORG-048", "ORG-064"],
+    "period": "2023-09 ~ 2024-08",
+    "outcome_summary": "에너지 전환 협동조합 간 기술·경험 공유로 소규모 태양광 설치 비용 20% 절감.",
+    "field_tags": [4],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-12",
+    "title": "민달팽이유니온 × 성남 청년주택 협동조합 주거권 캠페인",
+    "status": "완료",
+    "participant_org_ids": ["ORG-049", "ORG-063"],
+    "period": "2024-06 ~ 2024-11",
+    "outcome_summary": "청년 주거권 정책 개선 공동 캠페인. 지자체 정책 입안에 반영.",
+    "field_tags": [3, 9],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-13",
+    "title": "한국사회투자 × 가치금융신협 소셜임팩트 금융 연계",
+    "status": "완료",
+    "participant_org_ids": ["ORG-059", "ORG-041"],
+    "period": "2024-04 ~ 2025-01",
+    "outcome_summary": "임팩트 투자와 신협 금융을 연계한 사회적기업 복합 금융 지원 모델 구축. 5개 기업 수혜.",
+    "field_tags": [10, 13],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-14",
+    "title": "대전복지재단 × 대전민들레의료사협 지역 의료-복지 통합",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-057", "ORG-011"],
+    "period": "2026-03 ~ (진행중)",
+    "outcome_summary": "대전 지역 의료복지사협과 복지재단이 퇴원환자 지역사회 통합 돌봄 체계 구축.",
+    "field_tags": [1, 2],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-15",
+    "title": "두꺼비하우징 × 인천 도시재생 커뮤니티 빈집 활용 협력",
+    "status": "완료",
+    "participant_org_ids": ["ORG-069", "ORG-067"],
+    "period": "2023-07 ~ 2024-06",
+    "outcome_summary": "빈집 리모델링 전문 조직과 도시재생 커뮤니티가 인천 원도심 빈집 10채를 공유주거로 전환.",
+    "field_tags": [3, 8],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-16",
+    "title": "충남 친환경농산물 협동조합 × 지구인컴퍼니 식물성 식품 협업",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-065", "ORG-050"],
+    "period": "2026-04 ~ (진행중)",
+    "outcome_summary": "친환경 농산물 협동조합과 음식 낭비 저감 기업이 식물성 원료 공급망 구축.",
+    "field_tags": [5],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-17",
+    "title": "한국사회적기업진흥원 × 부산사회연대경제지원센터 지역 생태계 강화",
+    "status": "완료",
+    "participant_org_ids": ["ORG-034", "ORG-055"],
+    "period": "2024-01 ~ 2024-12",
+    "outcome_summary": "진흥원과 지역 중간지원조직이 협력해 부산 사회적기업 인증·지원 체계 효율화.",
+    "field_tags": [10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-18",
+    "title": "어반비즈서울 × 두레생협 도시농업 먹거리 연계",
+    "status": "완료",
+    "participant_org_ids": ["ORG-051", "ORG-052"],
+    "period": "2023-04 ~ 2023-12",
+    "outcome_summary": "도시 양봉·도시농업 생산물을 생협 판매망과 연결해 도시농업 생산자 소득 향상.",
+    "field_tags": [5],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-19",
+    "title": "대전 생태교통 협동조합 × 대전 시민햇빛발전 전기차 에너지 협력",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-066", "ORG-003"],
+    "period": "2026-02 ~ (진행중)",
+    "outcome_summary": "생태교통 협동조합 전기차량에 시민햇빛발전 재생에너지를 공급하는 에너지 자립 모델.",
+    "field_tags": [6, 4],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-20",
+    "title": "SK 행복나래 × 아름다운가게 대기업-사회적기업 조달 연계",
+    "status": "완료",
+    "participant_org_ids": ["ORG-075", "ORG-043"],
+    "period": "2023-01 ~ 2023-12",
+    "outcome_summary": "대기업 구매연계 플랫폼을 통한 사회적기업 제품 우선 조달 사례. 아름다운가게 매출 기여.",
+    "field_tags": [8, 10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-21",
+    "title": "광주사회연대경제지원센터 × 광주사회서비스원 돌봄 생태계",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-072", "ORG-053"],
+    "period": "2026-01 ~ (진행중)",
+    "outcome_summary": "광주 지역 사회적경제 조직과 공공 사회서비스원이 돌봄 생태계 공동 구축.",
+    "field_tags": [2, 10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-22",
+    "title": "원주 의료생협 × 강원 산촌생활서비스 협동조합 산촌 의료-생활 패키지",
+    "status": "완료",
+    "participant_org_ids": ["ORG-062", "ORG-078"],
+    "period": "2024-05 ~ 2025-04",
+    "outcome_summary": "강원도 산촌 지역 의료 접근성 향상을 위해 의료생협과 생활서비스 협동조합이 순회 의료·생활 패키지 운영.",
+    "field_tags": [1, 2, 6],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-23",
+    "title": "노리단 × 경북청년연대 문화예술 청년 일자리 연계",
+    "status": "완료",
+    "participant_org_ids": ["ORG-044", "ORG-056"],
+    "period": "2024-02 ~ 2024-10",
+    "outcome_summary": "문화예술 사회적기업과 청년 단체가 공동 문화 일자리 프로그램 운영. 청년 15명 취업 연계.",
+    "field_tags": [9, 13],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-24",
+    "title": "KAIST 사회적가치연구소 × 임팩트스퀘어 임팩트 측정 방법론 개발",
+    "status": "완료",
+    "participant_org_ids": ["ORG-074", "ORG-061"],
+    "period": "2024-07 ~ 2025-06",
+    "outcome_summary": "학술 연구 기반 임팩트 측정 방법론과 현장 컨설팅 노하우를 결합해 표준 임팩트 측정 가이드 발간.",
+    "field_tags": [10, 13],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-25",
+    "title": "재단법인 동천 × 함께일하는세상 취약계층 법률-고용 통합 지원",
+    "status": "완료",
+    "participant_org_ids": ["ORG-058", "ORG-047"],
+    "period": "2023-10 ~ 2024-09",
+    "outcome_summary": "법률 지원 재단과 취약계층 고용 사회적기업이 법률-취업 통합 지원 패키지 제공.",
+    "field_tags": [2, 10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-26",
+    "title": "부산광역시 사회적경제지원센터 × 부산 해운대 돌봄 협동조합 지역 협업",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-073", "ORG-080"],
+    "period": "2026-04 ~ (진행중)",
+    "outcome_summary": "부산 지역 중간지원조직이 해운대 돌봄 협동조합의 사업 확장을 위해 네트워크·공간·컨설팅 지원.",
+    "field_tags": [2, 10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-27",
+    "title": "트래블러스맵 × 팜프라 농촌 공정여행-로컬 연계",
+    "status": "완료",
+    "participant_org_ids": ["ORG-045", "ORG-026"],
+    "period": "2023-05 ~ 2023-12",
+    "outcome_summary": "공정여행 플랫폼이 농어촌 사회적기업과 연계해 농촌 체험 여행 상품 개발. 농가 수익 증대.",
+    "field_tags": [7, 8],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-28",
+    "title": "다음세대재단 × 창업진흥원 디지털 사회혁신 청년 육성",
+    "status": "완료",
+    "participant_org_ids": ["ORG-070", "ORG-035"],
+    "period": "2024-03 ~ 2025-01",
+    "outcome_summary": "디지털 리터러시 교육재단과 창업 지원 기관이 협력해 사회혁신 청년 50명 육성.",
+    "field_tags": [9, 13],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-29",
+    "title": "한국협동조합협의회 × 서울사회적경제지원센터 협동조합 생태계 협력",
+    "status": "완료",
+    "participant_org_ids": ["ORG-076", "ORG-036"],
+    "period": "2023-09 ~ 2024-08",
+    "outcome_summary": "전국 협동조합 연합체와 지역 중간지원조직이 협동조합 설립 지원 체계를 공동 강화.",
+    "field_tags": [10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-30",
+    "title": "공정무역가게 울림 × 두레생협 공정무역 먹거리 공동 판매",
+    "status": "완료",
+    "participant_org_ids": ["ORG-079", "ORG-052"],
+    "period": "2024-01 ~ 2024-12",
+    "outcome_summary": "공정무역 상품과 생협 유통망을 결합해 공정무역 먹거리 판매량 40% 증가.",
+    "field_tags": [5, 8],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-31",
+    "title": "경남 고령친화 사회적기업 × 부산 해운대 돌봄 협동조합 돌봄 모델 공유",
+    "status": "완료",
+    "participant_org_ids": ["ORG-077", "ORG-080"],
+    "period": "2024-04 ~ 2024-11",
+    "outcome_summary": "경남과 부산 인접 돌봄 기관 간 운영 노하우 및 인력 공유. 돌봄 서비스 품질 향상.",
+    "field_tags": [2],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-32",
+    "title": "안산의료사협 × 안산시민햇빛발전 의료-에너지 복합 서비스",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-012", "ORG-023"],
+    "period": "2026-03 ~ (진행중)",
+    "outcome_summary": "의료사협 건물에 시민햇빛발전 태양광 설치로 에너지 비용 절감 및 에너지 자립 시범.",
+    "field_tags": [1, 4],
+    "input_by": "회원"
+  },
+  {
+    "id": "CC-33",
+    "title": "아이부키 × 드로우주택 사회주택 공동 설계",
+    "status": "완료",
+    "participant_org_ids": ["ORG-018", "ORG-019"],
+    "period": "2023-11 ~ 2024-07",
+    "outcome_summary": "사회주택 전문 조직 두 곳이 공동 설계 프로세스를 개발해 설계 비용 절감.",
+    "field_tags": [3],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-34",
+    "title": "임팩트투자사 × 한국사회투자 임팩트 투자 협력",
+    "status": "완료",
+    "participant_org_ids": ["ORG-007", "ORG-059"],
+    "period": "2024-05 ~ 2025-03",
+    "outcome_summary": "임팩트 투자사와 사회적 금융 기관이 공동 투자 심사 기준을 수립해 소셜벤처 투자 효율화.",
+    "field_tags": [13, 10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-35",
+    "title": "전주 사회혁신 협동조합 × 세상을바꾸는에너지 전북 에너지 전환 협력",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-068", "ORG-048"],
+    "period": "2026-05 ~ (진행중)",
+    "outcome_summary": "전북 지역 사회혁신 조직이 에너지 전환 사회적기업과 협력해 지역 에너지 자립마을 조성.",
+    "field_tags": [4, 9],
+    "input_by": "회원"
+  },
+  {
+    "id": "CC-36",
+    "title": "제주환경운동연합 × 해녀의부엌 제주 지속가능 먹거리",
+    "status": "완료",
+    "participant_org_ids": ["ORG-054", "ORG-028"],
+    "period": "2023-06 ~ 2024-04",
+    "outcome_summary": "환경 단체와 해녀 기반 식품 사회적기업이 제주 지속가능 먹거리 인증 캠페인 공동 진행.",
+    "field_tags": [7, 5],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-37",
+    "title": "광주 햇빛발전 협동조합 × 광주사회서비스원 돌봄시설 에너지 전환",
+    "status": "완료",
+    "participant_org_ids": ["ORG-064", "ORG-053"],
+    "period": "2024-02 ~ 2024-10",
+    "outcome_summary": "광주 공공 돌봄 시설에 시민 에너지 협동조합 태양광을 설치해 운영비 절감.",
+    "field_tags": [4, 2],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-38",
+    "title": "서울사회적경제지원센터 × 루트임팩트 스타트업 성장 지원",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-036", "ORG-060"],
+    "period": "2026-01 ~ (진행중)",
+    "outcome_summary": "중간지원조직과 임팩트 허브가 협력해 사회적경제 스타트업 10개사 성장 지원.",
+    "field_tags": [13, 10],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-39",
+    "title": "두레생협 × 충남 친환경농산물 협동조합 로컬푸드 공급망",
+    "status": "완료",
+    "participant_org_ids": ["ORG-052", "ORG-065"],
+    "period": "2024-09 ~ 2025-06",
+    "outcome_summary": "경기 생협과 충남 농업 협동조합이 친환경 로컬푸드 직거래 공급망 구축.",
+    "field_tags": [5],
+    "input_by": "운영자"
+  },
+  {
+    "id": "CC-40",
+    "title": "살림의료복지사협 × 원주 의료생협 의료사협 연대 네트워크",
+    "status": "진행중",
+    "participant_org_ids": ["ORG-009", "ORG-062"],
+    "period": "2026-06 ~ (진행중)",
+    "outcome_summary": "서울과 강원 의료사협이 공동 진료 프로토콜 표준화 및 원격의료 시범 운영.",
+    "field_tags": [1, 2],
+    "input_by": "운영자"
   }
 ]
