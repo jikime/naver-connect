@@ -6,14 +6,22 @@
 
 import fiveForcesSeed from "@/data/five_forces.json";
 import organizationsSeed from "@/data/organizations.json";
+import stageLinksSeed from "@/data/stage_links.json";
 import vcStagesSeed from "@/data/vc_stages.json";
 import { getMember } from "@/lib/dal/members";
 import { useBusinessRelationSessionStore } from "@/stores/business-relation-session";
-import type { FiveForce, Organization, VCStage, ViewerContext } from "@/types";
+import type {
+  FiveForce,
+  Organization,
+  StageLink,
+  VCStage,
+  ViewerContext,
+} from "@/types";
 
 const vcStages = vcStagesSeed as VCStage[];
 const fiveForces = fiveForcesSeed as FiveForce[];
 const organizations = organizationsSeed as Organization[];
+const stageLinks = stageLinksSeed as StageLink[];
 
 /**
  * 생태계맵 v2 번들(FR-EM2-01/02/04): 밸류체인 단계 → 5-force 이해관계자 → 실제 단체.
@@ -24,7 +32,12 @@ export async function getEcosystemMap(
   _vc: ViewerContext,
   field?: number,
   region?: string,
-): Promise<{ stages: VCStage[]; forces: FiveForce[]; orgs: Organization[] }> {
+): Promise<{
+  stages: VCStage[];
+  forces: FiveForce[];
+  orgs: Organization[];
+  stageLinks: StageLink[];
+}> {
   const stages = field
     ? vcStages.filter((s) => s.field_id === field)
     : vcStages;
@@ -40,7 +53,11 @@ export async function getEcosystemMap(
     orgs = orgs.filter((o) => o.region.sido === region);
   }
 
-  return { stages, forces, orgs };
+  const links = stageLinks.filter(
+    (link) => stageIds.has(link.from_stage) || stageIds.has(link.to_stage),
+  );
+
+  return { stages, forces, orgs, stageLinks: links };
 }
 
 /**
