@@ -7,6 +7,7 @@
 // 그룹핑·정렬(핫리드+퍼즐형 우선)·15건 캡은 getRecommendations(DAL)가 이미 처리하므로
 // 이 컴포넌트는 초기 5건/더보기 페이지네이션과 렌더만 담당한다.
 
+import { Users } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -21,12 +22,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getMatchScores, getMeetups, getRecommendations } from "@/lib/dal";
+import {
+  getFields,
+  getMatchScores,
+  getMeetups,
+  getMembers,
+  getRecommendations,
+} from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import { useViewerContext } from "@/stores/viewer-context";
-import type { MatchScore, Meetup, Recommendation } from "@/types";
-import { MeetupCard } from "./MeetupCard";
+import type {
+  Field,
+  MaskedMember,
+  MatchScore,
+  Meetup,
+  Recommendation,
+} from "@/types";
+import { MeetupCard, type MeetupMemberSummary } from "./MeetupCard";
 
 const INITIAL_VISIBLE = 5;
 const MAX_VISIBLE = 15;
@@ -48,9 +61,11 @@ const item = {
 function RecommendationSummaryCard({
   rec,
   score,
+  linkedMeetup,
 }: {
   rec: Recommendation;
   score?: MatchScore;
+  linkedMeetup?: Meetup;
 }) {
   const reasonKeywords = score
     ? rec.rec_axis === "공통점"
@@ -90,6 +105,18 @@ function RecommendationSummaryCard({
               {reasonKeywords.join(", ")}
             </p>
           )}
+          {linkedMeetup && (
+            <div className="flex items-start gap-2 rounded-xl bg-muted/60 p-3">
+              <Users className="mt-0.5 size-4 shrink-0 text-primary" />
+              <p className="text-xs leading-5 text-guud-text-muted-2">
+                대화가 잘 맞으면{" "}
+                <span className="font-semibold text-foreground">
+                  {linkedMeetup.title}
+                </span>
+                으로 이어질 수 있어요.
+              </p>
+            </div>
+          )}
           <span className="text-xs font-semibold text-foreground underline underline-offset-2">
             상세 보기 →
           </span>
@@ -104,20 +131,42 @@ function RecommendationCard({
   rec,
   meetupsById,
   scoresByPair,
+  membersById,
+  fieldNamesById,
+  viewerId,
 }: {
   rec: Recommendation;
   meetupsById: Map<string, Meetup>;
   scoresByPair: Map<string, MatchScore>;
+  membersById: Record<string, MeetupMemberSummary>;
+  fieldNamesById: Record<number, string>;
+  viewerId: string;
 }) {
+  const linkedMeetup = rec.meetup_id
+    ? meetupsById.get(rec.meetup_id)
+    : undefined;
   if (rec.rec_kind === "모듬") {
-    const meetup = rec.meetup_id ? meetupsById.get(rec.meetup_id) : undefined;
-    if (!meetup) return null;
-    return <MeetupCard meetup={meetup} introText={rec.message.intro} />;
+    if (!linkedMeetup) return null;
+    return (
+      <MeetupCard
+        meetup={linkedMeetup}
+        recommendation={rec}
+        membersById={membersById}
+        fieldNamesById={fieldNamesById}
+        viewerId={viewerId}
+      />
+    );
   }
   const score = scoresByPair.get(
     scoreKey(rec.from_member_id, rec.to_member_id),
   );
-  return <RecommendationSummaryCard rec={rec} score={score} />;
+  return (
+    <RecommendationSummaryCard
+      rec={rec}
+      score={score}
+      linkedMeetup={linkedMeetup}
+    />
+  );
 }
 
 /** 공통점/차이점 한 그룹 — 초기 5건 + "더 보기"로 최대 15건까지 확장(FR-RC-01). */
@@ -127,12 +176,18 @@ function RecommendationGroup({
   recs,
   meetupsById,
   scoresByPair,
+  membersById,
+  fieldNamesById,
+  viewerId,
 }: {
   title: string;
   description: string;
   recs: Recommendation[];
   meetupsById: Map<string, Meetup>;
   scoresByPair: Map<string, MatchScore>;
+  membersById: Record<string, MeetupMemberSummary>;
+  fieldNamesById: Record<number, string>;
+  viewerId: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   if (recs.length === 0) {
@@ -148,7 +203,7 @@ function RecommendationGroup({
         <h2 className="flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground">
           {title}
           <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-            [ {capped.length}명 ]
+            [ {capped.length}건 ]
           </span>
         </h2>
         <p className="text-sm leading-relaxed text-guud-text-muted-2">
@@ -167,13 +222,16 @@ function RecommendationGroup({
               rec={rec}
               meetupsById={meetupsById}
               scoresByPair={scoresByPair}
+              membersById={membersById}
+              fieldNamesById={fieldNamesById}
+              viewerId={viewerId}
             />
           </motion.div>
         ))}
       </motion.div>
       {hasMore && (
         <Button variant="outline" size="sm" onClick={() => setExpanded(true)}>
-          더 보기({capped.length - visible.length}명 더, 최대 {MAX_VISIBLE}명)
+          더 보기({capped.length - visible.length}건 더, 최대 {MAX_VISIBLE}건)
         </Button>
       )}
     </section>
@@ -192,6 +250,8 @@ export function WeeklyRecommendationList() {
   const [meetupsById, setMeetupsById] = useState<Map<string, Meetup>>(
     new Map(),
   );
+  const [members, setMembers] = useState<MaskedMember[]>([]);
+  const [fields, setFields] = useState<Field[]>([]);
   const [scoresByPair, setScoresByPair] = useState<Map<string, MatchScore>>(
     new Map(),
   );
@@ -203,10 +263,14 @@ export function WeeklyRecommendationList() {
       getRecommendations(vc),
       getMeetups(vc),
       getMatchScores(vc),
-    ]).then(([result, meetups, matchScores]) => {
+      getMembers(vc),
+      getFields(),
+    ]).then(([result, meetups, matchScores, memberResult, fieldResult]) => {
       if (!cancelled) {
         setGroups(result);
         setMeetupsById(new Map(meetups.map((m) => [m.id, m])));
+        setMembers(memberResult);
+        setFields(fieldResult);
         setScoresByPair(
           new Map(
             matchScores.scores.map((s) => [
@@ -238,6 +302,21 @@ export function WeeklyRecommendationList() {
     );
   }
 
+  const membersById: Record<string, MeetupMemberSummary> = Object.fromEntries(
+    members.map((member) => [
+      member.id,
+      {
+        id: member.id,
+        name: member.name,
+        orgName: member.org.name,
+        role: member.org.role,
+      },
+    ]),
+  );
+  const fieldNamesById = Object.fromEntries(
+    fields.map((field) => [field.id, field.name]),
+  );
+
   return (
     <div className="mx-auto w-full max-w-7xl space-y-16 px-6 py-14 sm:px-10 lg:px-16">
       <RecommendationGroup
@@ -246,6 +325,9 @@ export function WeeklyRecommendationList() {
         recs={groups.common}
         meetupsById={meetupsById}
         scoresByPair={scoresByPair}
+        membersById={membersById}
+        fieldNamesById={fieldNamesById}
+        viewerId={vc.personaId}
       />
       <RecommendationGroup
         title="차이점이 많은 회원"
@@ -253,6 +335,9 @@ export function WeeklyRecommendationList() {
         recs={groups.different}
         meetupsById={meetupsById}
         scoresByPair={scoresByPair}
+        membersById={membersById}
+        fieldNamesById={fieldNamesById}
+        viewerId={vc.personaId}
       />
     </div>
   );

@@ -17,7 +17,8 @@ export default function MeetupsPage() {
               개설된 <span className="text-primary">모듬</span>
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
-              유형·분야·지역으로 개설된 모듬을 찾아 참여해보세요.
+              모듬이 만들어진 이유와 참여 구성을 먼저 확인하고, 나에게 맞는
+              연결에 참여해보세요.
             </p>
           </div>
           <AutomationLevelBadge frId="FR-MG-01" />
