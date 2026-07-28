@@ -4,10 +4,10 @@
 // 근거: ARCHITECTURE.md §3(L2 OnbWizard), TASKS.md T-009a
 // 태그 선택 카드(pill 토글) + 별표 최우선 표시. 정확히 3개 미만/초과, 최우선 미지정 시 다음 버튼 비활성(셸이 검증).
 
-import { Star } from "lucide-react";
+import { Check, EyeOff, Star } from "lucide-react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import type { Tag } from "@/types";
+import type { MemberType, Tag } from "@/types";
 import type { DemandSelection, OnboardingDraft } from "./onboarding-draft";
 
 const REQUIRED_COUNT = 3;
@@ -16,10 +16,12 @@ export function DemandSelectStep({
   tags,
   draft,
   onChange,
+  memberType,
 }: {
   tags: Tag[];
   draft: OnboardingDraft;
   onChange: (patch: Partial<OnboardingDraft>) => void;
+  memberType: MemberType;
 }) {
   const selections = draft.demandSelections;
   const selectedIds = new Set(selections.map((s) => s.tagId));
@@ -53,29 +55,44 @@ export function DemandSelectStep({
   const hasPriority = selections.some((s) => s.priority);
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-guud-text-muted-2">
-        지금 가장 아쉬운 것 3가지를 골라주세요. 그중 가장 급한 하나에{" "}
-        <Star className="inline size-3.5 align-text-bottom" aria-hidden />{" "}
-        별표를 눌러주세요.
-      </p>
-      <p
-        aria-live="polite"
-        className={cn(
-          "text-xs font-semibold",
-          selections.length === REQUIRED_COUNT && hasPriority
-            ? "text-foreground"
-            : "text-guud-text-muted-2",
-        )}
-      >
-        {selections.length}/{REQUIRED_COUNT}개 선택됨
+    <div className="space-y-5">
+      <div className="flex flex-col gap-4 rounded-2xl bg-muted p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm leading-6 text-foreground">
+            {memberType === "전문가"
+              ? "이 네트워크에서 얻고 싶은 것 세 가지를 골라주세요. 전문가도 얻어가는 것이 있어야 건강한 연결이 됩니다."
+              : "지금 우리 조직에 가장 필요한 것 세 가지를 골라주세요."}
+          </p>
+          <p className="mt-1 flex items-center gap-1.5 text-xs text-guud-text-muted-2">
+            <EyeOff className="size-3.5" /> 선택 내용은 공개 프로필에 표시되지
+            않아요.
+          </p>
+        </div>
+        <div
+          aria-live="polite"
+          className={cn(
+            "flex shrink-0 items-center gap-2 rounded-full bg-background px-3 py-2 text-xs font-semibold",
+            selections.length === REQUIRED_COUNT && hasPriority
+              ? "text-primary"
+              : "text-guud-text-muted-2",
+          )}
+        >
+          {selections.length === REQUIRED_COUNT && hasPriority && (
+            <Check className="size-3.5" />
+          )}
+          {selections.length}/{REQUIRED_COUNT} 선택
+        </div>
+      </div>
+
+      <p className="text-xs leading-5 text-guud-text-muted-2">
+        세 가지를 고르면 가장 급한 항목 하나에 별표를 지정할 수 있어요.
         {selections.length === REQUIRED_COUNT &&
           !hasPriority &&
-          " · 최우선 하나에 별표를 눌러주세요"}
+          " 최우선 하나에 별표를 눌러주세요."}
       </p>
 
-      <ul className="grid gap-2 sm:grid-cols-2">
-        {tags.map((tag) => {
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {tags.map((tag, index) => {
           const selection = selections.find((s) => s.tagId === tag.id);
           const active = Boolean(selection);
           const disabled = !active && selections.length >= REQUIRED_COUNT;
@@ -83,11 +100,10 @@ export function DemandSelectStep({
             <li key={tag.id}>
               <div
                 className={cn(
-                  // ④ select-card 수렴: 라운드 카드면, 선택 시 primary 보더로 강조(채움 대신 보더)
-                  "flex items-start gap-2 rounded-xl border-2 p-3 text-left transition-colors",
+                  "flex min-h-32 items-start gap-3 rounded-2xl border p-4 text-left transition-all",
                   active
-                    ? "border-primary bg-card"
-                    : "border-border bg-card",
+                    ? "border-primary bg-secondary/50 shadow-sm"
+                    : "border-guud-hairline bg-background hover:border-primary/40 hover:bg-muted/50",
                   disabled && "opacity-50",
                 )}
               >
@@ -98,13 +114,25 @@ export function DemandSelectStep({
                   onClick={() => toggleTag(tag.id)}
                   whileTap={disabled ? undefined : { scale: 0.97 }}
                   transition={{ duration: 0.1 }}
-                  className="flex-1 text-left disabled:cursor-not-allowed"
+                  className="flex min-w-0 flex-1 gap-3 text-left disabled:cursor-not-allowed"
                 >
-                  <span className="block text-sm font-semibold text-foreground">
-                    {tag.name}
+                  <span
+                    className={cn(
+                      "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border text-[0.625rem] font-semibold",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-guud-hairline text-guud-text-muted-2",
+                    )}
+                  >
+                    {active ? <Check className="size-3.5" /> : index + 1}
                   </span>
-                  <span className="block text-xs text-guud-text-muted-2">
-                    {tag.demand_desc}
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">
+                      {tag.name}
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-guud-text-muted-2">
+                      {tag.demand_desc}
+                    </span>
                   </span>
                 </motion.button>
                 {active && (
@@ -115,16 +143,20 @@ export function DemandSelectStep({
                     onClick={() => setPriority(tag.id)}
                     whileTap={{ scale: 0.85 }}
                     transition={{ duration: 0.1 }}
-                    className="shrink-0 p-1"
+                    className={cn(
+                      "flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[0.625rem] font-semibold",
+                      selection?.priority
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background text-guud-text-muted-2",
+                    )}
                   >
                     <Star
                       className={cn(
-                        "size-5",
-                        selection?.priority
-                          ? "fill-destructive text-destructive"
-                          : "text-guud-text-faint",
+                        "size-3.5",
+                        selection?.priority && "fill-current",
                       )}
                     />
+                    {selection?.priority ? "가장 급함" : "우선순위"}
                   </motion.button>
                 )}
               </div>

@@ -9,6 +9,13 @@
 // 유지 — RadioGroupItem에 children을 넘기면 기본 원형 라디오닷 대신 그 내용을 렌더한다(ui/radio-group.tsx).
 // 관심 활동은 복수 선택이라 라디오 시맨틱이 맞지 않아 기존 토글 버튼 그룹을 유지한다.
 
+import {
+  CalendarClock,
+  Handshake,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import {
@@ -24,16 +31,23 @@ function ChipGroup({
   options,
   selected,
   onToggle,
+  description,
 }: {
   legend: string;
   options: readonly string[];
   selected: string[];
   onToggle: (value: string) => void;
+  description: string;
 }) {
   return (
-    <fieldset className="space-y-2">
-      <legend className="text-sm font-medium text-foreground">{legend}</legend>
-      <div className="flex flex-wrap gap-2">
+    <fieldset className="rounded-2xl border border-guud-hairline bg-background p-5">
+      <legend className="px-1 text-sm font-semibold text-foreground">
+        {legend}
+      </legend>
+      <p className="mt-1 text-xs leading-5 text-guud-text-muted-2">
+        {description}
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
         {options.map((option) => {
           const active = selected.includes(option);
           return (
@@ -44,10 +58,10 @@ function ChipGroup({
               onClick={() => onToggle(option)}
               className={cn(
                 // modoomat tab-selected 어휘: 선택=secondary 면, 비선택=투명+muted-fg
-                "inline-flex min-h-11 items-center rounded-full border px-3 py-1.5 text-xs font-semibold",
+                "inline-flex min-h-11 items-center rounded-full border px-4 py-2 text-xs font-semibold transition-colors",
                 active
-                  ? "border-secondary bg-secondary text-secondary-foreground"
-                  : "border-border bg-transparent text-muted-foreground hover:text-foreground",
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-guud-hairline bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground",
               )}
             >
               {option}
@@ -65,19 +79,29 @@ function RadioChipGroup({
   options,
   value,
   onChange,
+  description,
+  icon: Icon,
 }: {
   legend: string;
   options: readonly string[];
   value: string;
   onChange: (value: string) => void;
+  description: string;
+  icon: typeof CalendarClock;
 }) {
   return (
-    <fieldset className="space-y-2">
-      <legend className="text-sm font-medium text-foreground">{legend}</legend>
+    <fieldset className="rounded-2xl border border-guud-hairline bg-background p-5">
+      <legend className="px-1 text-sm font-semibold text-foreground">
+        {legend}
+      </legend>
+      <div className="mt-1 flex items-start gap-2 text-xs leading-5 text-guud-text-muted-2">
+        <Icon className="mt-0.5 size-3.5 shrink-0 text-primary" />
+        <p>{description}</p>
+      </div>
       <RadioGroup
         value={value}
         onValueChange={onChange}
-        className="flex w-auto flex-row flex-wrap gap-2"
+        className="mt-4 flex w-auto flex-row flex-wrap gap-2"
       >
         {options.map((option) => {
           const active = value === option;
@@ -87,10 +111,10 @@ function RadioChipGroup({
               value={option}
               className={cn(
                 // modoomat tab-selected 어휘: 선택=secondary 면, 비선택=투명+muted-fg
-                "inline-flex min-h-11 cursor-pointer items-center rounded-full border px-3 py-1.5 text-xs font-semibold",
+                "inline-flex min-h-11 cursor-pointer items-center rounded-full border px-4 py-2 text-xs font-semibold transition-colors",
                 active
-                  ? "border-secondary bg-secondary text-secondary-foreground"
-                  : "border-border bg-transparent text-muted-foreground hover:text-foreground",
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-guud-hairline bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground",
               )}
             >
               {option}
@@ -105,9 +129,13 @@ function RadioChipGroup({
 export function CollaborationTraitsStep({
   draft,
   onChange,
+  isExpert,
+  requiresParticipationScope,
 }: {
   draft: OnboardingDraft;
   onChange: (patch: Partial<OnboardingDraft>) => void;
+  isExpert: boolean;
+  requiresParticipationScope: boolean;
 }) {
   function toggleActivity(value: string) {
     const next = draft.activities.includes(value)
@@ -116,32 +144,68 @@ export function CollaborationTraitsStep({
     onChange({ activities: next });
   }
 
+  const activityOptions = isExpert
+    ? [...ACTIVITY_OPTIONS, "프로보노 자문"]
+    : ACTIVITY_OPTIONS;
+
   return (
-    <div className="space-y-6">
-      <ChipGroup
-        legend="관심 활동(복수 선택 가능)"
-        options={ACTIVITY_OPTIONS}
-        selected={draft.activities}
-        onToggle={toggleActivity}
-      />
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div className="sm:col-span-2">
+        <ChipGroup
+          legend="관심 활동"
+          description={
+            isExpert
+              ? "참여하고 싶은 활동을 모두 골라주세요. 프로보노 자문도 선택할 수 있어요."
+              : "부담 없이 참여하고 싶은 활동을 모두 골라주세요."
+          }
+          options={activityOptions}
+          selected={draft.activities}
+          onToggle={toggleActivity}
+        />
+      </div>
       <RadioChipGroup
-        legend="가용 시간"
+        legend="낼 수 있는 시간"
+        description="추천 빈도와 모임 제안을 조절하는 기준이에요."
+        icon={CalendarClock}
         options={AVAILABILITY_OPTIONS}
         value={draft.availability}
         onChange={(value) => onChange({ availability: value })}
       />
       <RadioChipGroup
         legend="선호 방식"
+        description="온라인과 오프라인 중 더 편안한 방식을 골라주세요."
+        icon={MapPin}
         options={PREFERRED_MODE_OPTIONS}
         value={draft.preferredMode}
         onChange={(value) => onChange({ preferredMode: value })}
       />
-      <RadioChipGroup
-        legend="협업 준비도"
-        options={READINESS_OPTIONS}
-        value={draft.readiness}
-        onChange={(value) => onChange({ readiness: value })}
-      />
+      <div className="sm:col-span-2">
+        <RadioChipGroup
+          legend="협업 준비도"
+          description="구체적인 프로젝트가 있다면 추가 질문으로 필요한 파트너까지 정리해드려요."
+          icon={isExpert ? Sparkles : Handshake}
+          options={READINESS_OPTIONS}
+          value={draft.readiness}
+          onChange={(value) => onChange({ readiness: value })}
+        />
+      </div>
+      {requiresParticipationScope && (
+        <div className="sm:col-span-2">
+          <RadioChipGroup
+            legend="참여 자격"
+            description="기관의 이해관계와 개인의 네트워크 활동을 구분해 공정한 추천을 만들어요."
+            icon={ShieldCheck}
+            options={["개인 자격으로 참여", "소속 기관을 대표해 참여"]}
+            value={draft.participationScope}
+            onChange={(value) =>
+              onChange({
+                participationScope:
+                  value as OnboardingDraft["participationScope"],
+              })
+            }
+          />
+        </div>
+      )}
     </div>
   );
 }

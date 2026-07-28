@@ -82,6 +82,7 @@ export interface OnboardingFinalizeInput {
   supply_tags: { tagId: number; detail: string }[];
   activities: string[];
   preferred_mode: string;
+  participation_scope: "개인 자격으로 참여" | "소속 기관을 대표해 참여" | null;
   hot_lead: {
     flag: boolean;
     project_summary: string;

@@ -3,8 +3,17 @@
 // ProfileConfirmStep — 스텝1(운영자 사전입력 확인·수정) + 스텝7(review 모드, 확정 요약)에서 재사용.
 // 근거: ARCHITECTURE.md §3(L2 OnbWizard), TASKS.md T-009a/T-009b, FR-ON-01/08
 // FR-ON-01: 조직·역할·지역·분야·밸류체인·미션·신뢰연결점 7항목 전부 확인·수정 가능.
-// fields.json은 비민감 시드라 컴포넌트가 직접 참조할 수 있다(ARCHITECTURE.md §2, DAL 경유 예외).
 
+import {
+  Building2,
+  Check,
+  MapPin,
+  Network,
+  Plus,
+  Quote,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import { useId } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +44,6 @@ export function ProfileConfirmStep({
 }: {
   draft: OnboardingDraft;
   onChange: (patch: Partial<OnboardingDraft>) => void;
-  /** edit: 스텝1 수정 폼. review: 스텝7 확정 요약(읽기전용 + 재수정 진입은 이전 스텝으로). */
   mode?: "edit" | "review";
 }) {
   const orgNameId = useId();
@@ -57,8 +65,8 @@ export function ProfileConfirmStep({
     index: number,
     patch: Partial<TrustConnectionDraft>,
   ) {
-    const next = draft.trustConnections.map((tc, i) =>
-      i === index ? { ...tc, ...patch } : tc,
+    const next = draft.trustConnections.map((connection, itemIndex) =>
+      itemIndex === index ? { ...connection, ...patch } : connection,
     );
     onChange({ trustConnections: next });
   }
@@ -67,203 +75,295 @@ export function ProfileConfirmStep({
     onChange({
       trustConnections: [
         ...draft.trustConnections,
-        { type: "아는회원", ref: "" },
+        {
+          draftId: `trust-${draft.trustConnections.length}-${Date.now()}`,
+          type: "아는회원",
+          ref: "",
+        },
       ],
     });
   }
 
   function removeTrustConnection(index: number) {
     onChange({
-      trustConnections: draft.trustConnections.filter((_, i) => i !== index),
+      trustConnections: draft.trustConnections.filter(
+        (_, itemIndex) => itemIndex !== index,
+      ),
     });
   }
 
   if (mode === "review") {
     const fieldNames = draft.fieldTags
-      .map((id) => fields.find((f) => f.id === id)?.name ?? `#${id}`)
+      .map((id) => fields.find((field) => field.id === id)?.name ?? `#${id}`)
       .join(", ");
+
     return (
-      <div className="space-y-3 text-sm">
-        <dl className="grid grid-cols-[7rem_1fr] gap-y-2">
-          <dt className="text-guud-text-muted-2">조직</dt>
-          <dd className="text-foreground">
-            {draft.orgName} · {draft.orgType} · {draft.orgRole}
-          </dd>
-          <dt className="text-guud-text-muted-2">지역</dt>
-          <dd className="text-foreground">
-            {draft.sido} {draft.sigungu}
-          </dd>
-          <dt className="text-guud-text-muted-2">분야</dt>
-          <dd className="text-foreground">{fieldNames || "미선택"}</dd>
-          <dt className="text-guud-text-muted-2">밸류체인 단계</dt>
-          <dd className="text-foreground">{draft.valueChainStage}</dd>
-          <dt className="text-guud-text-muted-2">미션</dt>
-          <dd className="text-foreground">{draft.missionStatement}</dd>
-          <dt className="text-guud-text-muted-2">신뢰 연결점</dt>
-          <dd className="text-foreground">
-            {draft.trustConnections.length > 0
-              ? draft.trustConnections
-                  .map((tc) => `${tc.type}: ${tc.ref}`)
-                  .join(" / ")
-              : "없음"}
-          </dd>
+      <section className="overflow-hidden rounded-2xl border border-guud-hairline">
+        <div className="bg-muted p-5 sm:p-6">
+          <p className="font-mono text-[0.625rem] tracking-[0.14em] text-guud-text-muted-2 uppercase">
+            [ PROFILE SUMMARY ]
+          </p>
+          <blockquote className="mt-3 flex gap-3 font-heading text-lg leading-8 font-medium text-foreground sm:text-xl">
+            <Quote className="mt-1 size-5 shrink-0 text-primary" />
+            <p>{draft.missionStatement}</p>
+          </blockquote>
+        </div>
+        <dl className="grid gap-px bg-guud-hairline sm:grid-cols-2 lg:grid-cols-4">
+          <div className="bg-background p-4">
+            <dt className="flex items-center gap-2 text-xs text-guud-text-muted-2">
+              <Building2 className="size-3.5 text-primary" /> 조직
+            </dt>
+            <dd className="mt-2 text-sm font-semibold text-foreground">
+              {draft.orgName}
+            </dd>
+            <dd className="mt-1 text-xs text-guud-text-muted-2">
+              {draft.orgType} · {draft.orgRole}
+            </dd>
+          </div>
+          <div className="bg-background p-4">
+            <dt className="flex items-center gap-2 text-xs text-guud-text-muted-2">
+              <MapPin className="size-3.5 text-primary" /> 지역
+            </dt>
+            <dd className="mt-2 text-sm font-semibold text-foreground">
+              {draft.sido} {draft.sigungu}
+            </dd>
+          </div>
+          <div className="bg-background p-4">
+            <dt className="flex items-center gap-2 text-xs text-guud-text-muted-2">
+              <Network className="size-3.5 text-primary" /> 분야·밸류체인
+            </dt>
+            <dd className="mt-2 text-sm font-semibold text-foreground">
+              {fieldNames || "미선택"}
+            </dd>
+            <dd className="mt-1 text-xs text-guud-text-muted-2">
+              {draft.valueChainStage}
+            </dd>
+          </div>
+          <div className="bg-background p-4">
+            <dt className="flex items-center gap-2 text-xs text-guud-text-muted-2">
+              <ShieldCheck className="size-3.5 text-primary" /> 신뢰 연결점
+            </dt>
+            <dd className="mt-2 text-sm leading-5 font-semibold text-foreground">
+              {draft.trustConnections.length > 0
+                ? draft.trustConnections
+                    .map((connection) => connection.ref)
+                    .join(" · ")
+                : "없음"}
+            </dd>
+          </div>
         </dl>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-guud-text-muted-2">
-        운영자가 미리 입력한 프로필이에요. 틀린 부분이 있으면 바로 고쳐주세요.
-      </p>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="space-y-1.5">
-          <Label htmlFor={orgNameId}>조직명</Label>
-          <Input
-            id={orgNameId}
-            value={draft.orgName}
-            onChange={(e) => onChange({ orgName: e.target.value })}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor={orgTypeId}>조직 유형</Label>
-          <Input
-            id={orgTypeId}
-            value={draft.orgType}
-            onChange={(e) => onChange({ orgType: e.target.value })}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor={orgRoleId}>역할(직책)</Label>
-          <Input
-            id={orgRoleId}
-            value={draft.orgRole}
-            onChange={(e) => onChange({ orgRole: e.target.value })}
-          />
-        </div>
+    <div className="space-y-5">
+      <div className="flex items-start gap-3 rounded-2xl bg-secondary/70 p-4 text-sm leading-6 text-foreground">
+        <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+          <Check className="size-3.5" />
+        </span>
+        <p>
+          네트워크가 이미 알고 있는 정보를 정리했어요. 맞는 내용은 그대로 두고,
+          달라진 부분만 고쳐주세요.
+        </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor={sidoId}>시/도</Label>
+      <section className="rounded-2xl border border-guud-hairline p-5">
+        <div className="flex items-center gap-3 border-b border-guud-hairline pb-4">
+          <span className="flex size-9 items-center justify-center rounded-full bg-muted text-primary">
+            <Building2 className="size-4" />
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              조직과 역할
+            </h3>
+            <p className="mt-0.5 text-xs text-guud-text-muted-2">
+              현재 가장 주된 소속을 기준으로 적어주세요.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-3">
+          <div className="space-y-1.5">
+            <Label htmlFor={orgNameId}>조직명</Label>
+            <Input
+              id={orgNameId}
+              value={draft.orgName}
+              onChange={(event) => onChange({ orgName: event.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor={orgTypeId}>조직 유형</Label>
+            <Input
+              id={orgTypeId}
+              value={draft.orgType}
+              onChange={(event) => onChange({ orgType: event.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor={orgRoleId}>역할(직책)</Label>
+            <Input
+              id={orgRoleId}
+              value={draft.orgRole}
+              onChange={(event) => onChange({ orgRole: event.target.value })}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-guud-hairline p-5">
+        <div className="flex items-center gap-3 border-b border-guud-hairline pb-4">
+          <span className="flex size-9 items-center justify-center rounded-full bg-muted text-primary">
+            <MapPin className="size-4" />
+          </span>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              활동 지역과 분야
+            </h3>
+            <p className="mt-0.5 text-xs text-guud-text-muted-2">
+              가까운 지역과 같은 가치사슬의 연결을 찾는 기준이에요.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor={sidoId}>시/도</Label>
+            <Input
+              id={sidoId}
+              value={draft.sido}
+              onChange={(event) => onChange({ sido: event.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor={sigunguId}>시/군/구</Label>
+            <Input
+              id={sigunguId}
+              value={draft.sigungu}
+              onChange={(event) => onChange({ sigungu: event.target.value })}
+            />
+          </div>
+        </div>
+        <fieldset className="mt-5 space-y-2">
+          <legend className="text-sm font-medium text-foreground">분야</legend>
+          <div className="flex flex-wrap gap-2">
+            {fields.map((field) => {
+              const active = draft.fieldTags.includes(field.id);
+              return (
+                <button
+                  key={field.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => toggleField(field.id)}
+                  className={cn(
+                    "inline-flex min-h-11 items-center rounded-full border px-4 py-2 text-xs font-semibold transition-colors",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-guud-hairline bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                  )}
+                >
+                  {field.name}
+                  {field.is_extension && (
+                    <span className="ml-1 text-[10px] opacity-70">확장</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+        <div className="mt-5 space-y-1.5">
+          <Label htmlFor={stageId}>밸류체인 단계</Label>
           <Input
-            id={sidoId}
-            value={draft.sido}
-            onChange={(e) => onChange({ sido: e.target.value })}
+            id={stageId}
+            value={draft.valueChainStage}
+            onChange={(event) =>
+              onChange({ valueChainStage: event.target.value })
+            }
+            placeholder="예: 서비스 제공, 유통, 중간지원"
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor={sigunguId}>시/군/구</Label>
-          <Input
-            id={sigunguId}
-            value={draft.sigungu}
-            onChange={(e) => onChange({ sigungu: e.target.value })}
-          />
-        </div>
-      </div>
+      </section>
 
-      <fieldset className="space-y-1.5">
-        <legend className="text-sm font-medium text-foreground">분야</legend>
-        <div className="flex flex-wrap gap-2">
-          {fields.map((field) => {
-            const active = draft.fieldTags.includes(field.id);
-            return (
-              <button
-                key={field.id}
-                type="button"
-                aria-pressed={active}
-                onClick={() => toggleField(field.id)}
-                className={cn(
-                  // 모드 B 회송: 터치 타깃 44px 미만(26px) — min-h-11 + inline-flex로 확보
-                  // modoomat tab-selected 어휘: 선택=secondary 면, 비선택=투명+muted-fg
-                  "inline-flex min-h-11 items-center rounded-full border px-3 py-1 text-xs font-semibold",
-                  active
-                    ? "border-secondary bg-secondary text-secondary-foreground"
-                    : "border-border bg-transparent text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {field.name}
-                {field.is_extension && (
-                  <span className="ml-1 text-[10px] opacity-70">확장</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
-
-      <div className="space-y-1.5">
-        <Label htmlFor={stageId}>밸류체인 단계</Label>
-        <Input
-          id={stageId}
-          value={draft.valueChainStage}
-          onChange={(e) => onChange({ valueChainStage: e.target.value })}
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor={missionId}>미션 문장</Label>
+      <section className="rounded-2xl bg-foreground p-5 text-background sm:p-6">
+        <Label htmlFor={missionId} className="text-background/70">
+          왜 이 일을 하나요?
+        </Label>
         <Textarea
           id={missionId}
-          rows={2}
+          rows={3}
           value={draft.missionStatement}
-          onChange={(e) => onChange({ missionStatement: e.target.value })}
+          onChange={(event) =>
+            onChange({ missionStatement: event.target.value })
+          }
+          className="mt-2 border-background/20 bg-background/10 font-heading text-base leading-7 text-background placeholder:text-background/35"
+          placeholder="내가 해결하고 싶은 문제와 바라는 변화를 한두 문장으로 적어주세요."
         />
-      </div>
+        <p className="mt-2 text-xs text-background/50">
+          미션 문장은 공개 프로필의 가장 중요한 소개가 됩니다.
+        </p>
+      </section>
 
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-medium text-foreground">
+      <fieldset className="rounded-2xl border border-guud-hairline p-5">
+        <legend className="px-1 text-sm font-semibold text-foreground">
           신뢰 연결점
         </legend>
-        {draft.trustConnections.map((tc, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: 순서 변경 없는 편집 목록이라 인덱스 키로 충분
-          <div key={index} className="flex flex-wrap items-center gap-2">
-            <Select
-              value={tc.type}
-              onValueChange={(value) =>
-                updateTrustConnection(index, {
-                  type: value as TrustConnectionDraft["type"],
-                })
-              }
+        <p className="mt-1 text-xs leading-5 text-guud-text-muted-2">
+          소개자나 이미 아는 회원, 함께 활동하는 모임을 적어주세요.
+        </p>
+        <div className="mt-4 space-y-3">
+          {draft.trustConnections.map((connection, index) => (
+            <div
+              key={connection.draftId}
+              className="flex flex-col gap-2 rounded-xl bg-muted p-3 sm:flex-row sm:items-center"
             >
-              <SelectTrigger size="sm" className="w-auto text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {TRUST_CONNECTION_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              value={tc.ref}
-              onChange={(e) =>
-                updateTrustConnection(index, { ref: e.target.value })
-              }
-              placeholder="예: LH 매입임대 담당"
-              className="max-w-xs"
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={() => removeTrustConnection(index)}
-            >
-              삭제
-            </Button>
-          </div>
-        ))}
+              <Select
+                value={connection.type}
+                onValueChange={(value) =>
+                  updateTrustConnection(index, {
+                    type: value as TrustConnectionDraft["type"],
+                  })
+                }
+              >
+                <SelectTrigger
+                  size="sm"
+                  className="w-full bg-background text-xs sm:w-auto"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TRUST_CONNECTION_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                value={connection.ref}
+                onChange={(event) =>
+                  updateTrustConnection(index, { ref: event.target.value })
+                }
+                placeholder="예: LH 매입임대 담당"
+                className="flex-1 bg-background"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => removeTrustConnection(index)}
+                aria-label={`${connection.ref || "신뢰 연결점"} 삭제`}
+              >
+                <Trash2 className="size-3.5" />
+              </Button>
+            </div>
+          ))}
+        </div>
         <Button
           type="button"
           variant="outline"
           size="sm"
           onClick={addTrustConnection}
+          className="mt-3"
         >
-          + 신뢰 연결점 추가
+          <Plus className="size-4" /> 신뢰 연결점 추가
         </Button>
       </fieldset>
     </div>

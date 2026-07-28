@@ -16,6 +16,7 @@ export interface SupplySelection {
 }
 
 export interface TrustConnectionDraft {
+  draftId: string;
   type: "소개자" | "아는회원" | "소속모임";
   ref: string;
 }
@@ -51,6 +52,7 @@ export interface OnboardingDraft {
   availability: string;
   preferredMode: string;
   readiness: string;
+  participationScope: "" | "개인 자격으로 참여" | "소속 기관을 대표해 참여";
 
   // 스텝6 — AI 후속질문 답변(FR-ON-05/06/11)
   followupAnswers: FollowupAnswer[];
@@ -77,6 +79,7 @@ export const ACTIVITY_OPTIONS = [
   "멘토링하기",
   "취미모임",
   "공동연구",
+  "가벼운 교류",
 ] as const;
 
 export const AVAILABILITY_OPTIONS = [
@@ -119,6 +122,7 @@ export function createEmptyDraft(): OnboardingDraft {
     availability: "",
     preferredMode: "",
     readiness: "",
+    participationScope: "",
     followupAnswers: [],
     followupDone: false,
     visibilityConsent: false,
