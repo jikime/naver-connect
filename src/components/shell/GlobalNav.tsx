@@ -294,8 +294,15 @@ export function GlobalNav() {
   const barRef = useRef<HTMLDivElement | null>(null);
   // 스크롤 시 글래스 강도 전환({opacity.glass} 0.6 → {opacity.glass-strong} 0.7).
   const [scrolled, setScrolled] = useState(false);
+  const visibleNavGroups =
+    user?.role === "운영자"
+      ? NAV_GROUPS.map((group) => ({
+          ...group,
+          items: group.items.filter((item) => item.href !== "/profile"),
+        }))
+      : NAV_GROUPS;
   const groups: NavGroup[] = [
-    ...NAV_GROUPS,
+    ...visibleNavGroups,
     ...(user?.role === "운영자" ? [OPERATOR_NAV_GROUP] : []),
   ];
   const homeHref = isAuthenticated ? "/home" : "/";
