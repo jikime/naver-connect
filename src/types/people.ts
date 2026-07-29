@@ -43,6 +43,25 @@ export interface RoleAssertionV1 {
 }
 
 /**
+ * safe_match_text 승인 영수증 — "user_confirmed" 문자열이나 임의 타임스탬프("x")만으로는
+ * 승인을 신뢰하지 않는다. 누가·어느 개정본을·어떤 문구로 승인했는지와 동의 영수증까지 결속해
+ * 검증 가능한 형태로 남긴다. 검증 규칙은 src/lib/matching/receipt.ts가 단일 구현.
+ * 근거: 재리뷰 REJECT #4, people_match_retrieval_plan.md §5
+ */
+export interface SafeMatchReceipt {
+  /** ISO 8601 승인 시각 — 파싱 실패(예: "x")·범위 밖(1970~2100)이면 무효 */
+  confirmed_at: string;
+  /** 승인자 person id — need.owner.id와 일치해야 유효(제3자 승인 차단) */
+  confirmer_person_id: string;
+  /** 승인 당시 프로필 개정 번호 — need.profile_revision과 일치해야 유효 */
+  source_revision: number;
+  /** 승인 시점 safe_match_text의 sha256 hex — 승인 후 문구 교체를 검출한다 */
+  content_hash: string;
+  /** 근거가 된 ConsentRecordV1.id — 빈 값이면 무효 */
+  consent_receipt_id: string;
+}
+
+/**
  * 방향성 query — "지금 함께 풀고 싶은 것". 민감층(본인·운영자·엔진만).
  * detail_quote는 온보딩 원문 그대로(BR-02), 임베딩 입력은 safe_match_text(사용자 승인)만.
  */
@@ -55,8 +74,11 @@ export interface NeedIntentV1 {
   /** PII 제거 + 사용자 승인을 거친 매칭·소개용 요약문. draft 상태면 임베딩 금지 */
   safe_match_text?: string;
   safe_match_status: "draft" | "user_confirmed";
-  /** 승인 provenance — user_confirmed의 필수 동반. 없으면 mapper가 텍스트를 사용하지 않는다(재리뷰 #5) */
-  safe_match_confirmed_at?: string;
+  /**
+   * 승인 영수증 — user_confirmed의 필수 동반. verifySafeMatchReceipt()가 전부 통과할 때만
+   * mapper가 safe_match_text를 엔진에 넘긴다(재리뷰 REJECT #4).
+   */
+  safe_match_receipt?: SafeMatchReceipt;
   priority: "primary" | "normal";
   urgency: "exploring" | "active" | "time_sensitive";
   constraints: ConstraintV1[];

@@ -55,6 +55,14 @@ CREATE TABLE IF NOT EXISTS nvc_need_intents (
   detail_quote      TEXT NOT NULL,          -- 원문 — RLS로 본인·운영자만
   safe_match_text   TEXT,                   -- PII 제거 + 사용자 승인분만 임베딩 입력
   safe_match_status TEXT DEFAULT 'draft' CHECK (safe_match_status IN ('draft','user_confirmed')),
+  -- 승인 영수증 5컬럼: user_confirmed면 5컬럼 전부 NOT NULL 계약(재리뷰 REJECT #4).
+  -- 검증은 src/lib/matching/receipt.ts verifySafeMatchReceipt()와 동일 규칙:
+  -- confirmer=owner_id, source_revision=profile_revision, content_hash=sha256(safe_match_text).
+  safe_match_confirmed_at        TIMESTAMPTZ,
+  safe_match_confirmer           TEXT,
+  safe_match_source_revision     INTEGER,
+  safe_match_content_hash        TEXT,
+  safe_match_consent_receipt_id  TEXT,
   priority          TEXT CHECK (priority IN ('primary','normal')),
   urgency           TEXT CHECK (urgency IN ('exploring','active','time_sensitive')),
   constraints       JSONB DEFAULT '[]',
@@ -62,7 +70,17 @@ CREATE TABLE IF NOT EXISTS nvc_need_intents (
   valid_until       TIMESTAMPTZ,
   source            TEXT,
   profile_revision  INTEGER NOT NULL,
-  created_at        TIMESTAMPTZ DEFAULT NOW()
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT nvc_need_intents_safe_match_receipt CHECK (
+    safe_match_status <> 'user_confirmed'
+    OR (
+      safe_match_confirmed_at IS NOT NULL
+      AND safe_match_confirmer IS NOT NULL
+      AND safe_match_source_revision IS NOT NULL
+      AND safe_match_content_hash IS NOT NULL
+      AND safe_match_consent_receipt_id IS NOT NULL
+    )
+  )
 );
 
 -- 방향성 candidate — 공개층
