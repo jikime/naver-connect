@@ -1,5 +1,4 @@
-// 모둠 임시 세션 — 회원 개설, 실제 참여, 온라인 첫 미팅 가능 시간 공유.
-// 백엔드 연결 전 프로토타입용이며 새로고침하면 초기화된다.
+// 모둠 상호작용의 화면 반응용 캐시. 정본은 ax_private.user_runtime_states에 저장한다.
 
 import { create } from "zustand";
 import type { Meetup, MeetupAvailability, MeetupChatMessage } from "@/types";
@@ -14,16 +13,19 @@ interface MeetupSessionStore {
   leaveMeetup: (meetupId: string, memberId: string) => void;
   shareAvailability: (availability: MeetupAvailability) => void;
   sendChatMessage: (message: MeetupChatMessage) => void;
+  hydrate: (state: Partial<MeetupSessionSnapshot>) => void;
   reset: () => void;
 }
 
-const INITIAL_STATE: Pick<
+export type MeetupSessionSnapshot = Pick<
   MeetupSessionStore,
   | "createdMeetups"
   | "joinedMemberIdsByMeetup"
   | "availabilityByMeetup"
   | "chatMessagesByMeetup"
-> = {
+>;
+
+const INITIAL_STATE: MeetupSessionSnapshot = {
   createdMeetups: [],
   joinedMemberIdsByMeetup: {},
   availabilityByMeetup: {},
@@ -86,5 +88,6 @@ export const useMeetupSessionStore = create<MeetupSessionStore>((set) => ({
         ],
       },
     })),
+  hydrate: (state) => set({ ...INITIAL_STATE, ...state }),
   reset: () => set(INITIAL_STATE),
 }));

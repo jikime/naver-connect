@@ -15,12 +15,16 @@ import { SupplierView } from "@/components/backoffice/SupplierView";
 import { GovernancePrincipleBanner } from "@/components/shared/GovernancePrincipleBanner";
 import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
 import { getExpertServices } from "@/lib/dal";
+import { getServerDataset } from "@/lib/dal/server-datasets";
 
 export default async function BackOfficePage() {
-  const { services, groupBuys } = await getExpertServices({
-    role: "기업가",
-    personaId: "M-001",
-  });
+  const { services, groupBuys } = await getExpertServices(
+    {
+      role: "기업가",
+      personaId: "M-001",
+    },
+    getServerDataset,
+  );
 
   return (
     <div className="flex flex-1 flex-col">

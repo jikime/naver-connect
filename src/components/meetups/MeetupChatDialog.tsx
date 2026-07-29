@@ -18,8 +18,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { saveMeetupChatMessage } from "@/lib/dal/meetup-state";
 import { cn } from "@/lib/utils";
-import { useMeetupSessionStore } from "@/stores/meetup-session";
 import type { Meetup, MeetupChatMessage } from "@/types";
 
 function readableTime(value: string): string {
@@ -52,9 +52,6 @@ export function MeetupChatDialog({
   participants: { id: string; name: string }[];
   messages: MeetupChatMessage[];
 }) {
-  const sendChatMessage = useMeetupSessionStore(
-    (state) => state.sendChatMessage,
-  );
   const [open, setOpen] = useState(false);
   const [messageBody, setMessageBody] = useState("");
   const messageLogRef = useRef<HTMLDivElement>(null);
@@ -65,10 +62,10 @@ export function MeetupChatDialog({
     messageLogRef.current.scrollTop = messageLogRef.current.scrollHeight;
   }, [messages.length, open]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!enabled || !trimmedMessage) return;
-    sendChatMessage({
+    await saveMeetupChatMessage({
       id: createMessageId(),
       meetup_id: meetup.id,
       sender_id: viewerId,

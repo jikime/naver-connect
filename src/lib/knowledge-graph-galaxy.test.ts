@@ -2,8 +2,10 @@
 // connect-ontology galaxy-canvas.test 취지(결정적·공개 데이터)를 우리 어댑터로 이식.
 
 import { describe, expect, it } from "vitest";
+import fieldsSeed from "@/data/fields.json";
 // BR-01 비유출 검증: 민감 시드를 ground truth로 직접 읽는다 — 테스트 파일은 eslint 전역 예외(번들 미포함).
 import recommendationsSeed from "@/data/private/recommendations.json";
+import type { Field } from "@/types";
 import { getKnowledgeGraph } from "./dal";
 import {
   toEntityDetail,
@@ -14,11 +16,12 @@ import {
 } from "./knowledge-graph-galaxy";
 
 const VIEWER = { role: "기업가", personaId: "M-001" } as const;
+const FIELDS = fieldsSeed as Field[];
 
 describe("toGalaxyGraph", () => {
   it("분야를 항성(field)으로 합성하고 회원·조직에 fieldId를 부여한다", async () => {
     const graph = await getKnowledgeGraph(VIEWER);
-    const g = toGalaxyGraph(graph);
+    const g = toGalaxyGraph(graph, FIELDS);
     const suns = g.nodes.filter((n) => n.classKey === "field");
     expect(suns.length).toBeGreaterThan(0);
     for (const s of suns) expect(s.id.startsWith("field-")).toBe(true);
@@ -35,7 +38,7 @@ describe("toGalaxyGraph", () => {
 describe("toEntityDetail", () => {
   it("실제 노드의 관계망을 만들고 masked=false·비공개 없음(BR-01)", async () => {
     const graph = await getKnowledgeGraph(VIEWER);
-    const d = toEntityDetail(graph, "M-001");
+    const d = toEntityDetail(graph, "M-001", FIELDS);
     expect(d).not.toBeNull();
     expect(d?.classKey).toBe("member");
     expect(d?.masked).toBe(false);
@@ -46,7 +49,7 @@ describe("toEntityDetail", () => {
   it("항성(field-*) 클릭 시 소속 천체 관계를 반환한다", async () => {
     const graph = await getKnowledgeGraph(VIEWER);
     // 돌봄(2)에 소속된 노드가 있으므로 field-2 상세가 생성된다.
-    const d = toEntityDetail(graph, "field-2");
+    const d = toEntityDetail(graph, "field-2", FIELDS);
     expect(d?.classKey).toBe("field");
     expect(d?.relations.length ?? 0).toBeGreaterThan(0);
   });
@@ -54,11 +57,11 @@ describe("toEntityDetail", () => {
   it("BR-01: 추천 원문/최소노출 문구가 어댑터 산출물에 실리지 않는다", async () => {
     const graph = await getKnowledgeGraph(VIEWER);
     const blob = JSON.stringify({
-      graph: toGalaxyGraph(graph),
+      graph: toGalaxyGraph(graph, FIELDS),
       stats: toGalaxyStats(graph),
       schema: toGalaxySchema(graph),
       search: toSearchEntities(graph),
-      details: graph.nodes.map((n) => toEntityDetail(graph, n.id)),
+      details: graph.nodes.map((n) => toEntityDetail(graph, n.id, FIELDS)),
     });
     for (const rec of recommendationsSeed as Array<{
       message: { contact_point: string };

@@ -7,16 +7,11 @@ import { GateStatusBadge } from "@/components/shared/GateStatusBadge";
 import { HotLeadBadge } from "@/components/shared/HotLeadBadge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import membersSeed from "@/data/members.json";
-import organizationsSeed from "@/data/organizations.json";
 import { cn } from "@/lib/utils";
 import type { DealRoom } from "@/types";
 
 type OrgSeed = { id: string; name: string; member_id: string | null };
 type MemberSeed = { id: string; name: string };
-
-const organizations = organizationsSeed as OrgSeed[];
-const members = membersSeed as MemberSeed[];
 
 const SOURCE_TYPE_LABEL: Record<DealRoom["source_type"], string> = {
   핫리드: "핫리드 진입",
@@ -28,14 +23,21 @@ const SOURCE_TYPE_LABEL: Record<DealRoom["source_type"], string> = {
 };
 
 /** participating_orgs로 조직명을 붙인다. organizations.json은 비민감 시드라 직접 참조 가능(ADR-03 대상 밖). */
-function resolveOrgNames(orgIds: string[]): string[] {
+function resolveOrgNames(
+  organizations: readonly OrgSeed[],
+  orgIds: string[],
+): string[] {
   return orgIds
     .map((id) => organizations.find((org) => org.id === id)?.name)
     .filter((name): name is string => Boolean(name));
 }
 
 /** source_type이 핫리드일 때 참여 조직의 소속 회원을 역추적해 "누구의 씨앗"인지 밝힌다(층 연결). */
-function resolveHotLeadMemberName(orgIds: string[]): string | null {
+function resolveHotLeadMemberName(
+  organizations: readonly OrgSeed[],
+  members: readonly MemberSeed[],
+  orgIds: string[],
+): string | null {
   for (const orgId of orgIds) {
     const org = organizations.find((o) => o.id === orgId);
     if (org?.member_id) {
@@ -49,15 +51,23 @@ function resolveHotLeadMemberName(orgIds: string[]): string | null {
 export function DealRoomCard({
   room,
   viewerPersonaId,
+  organizations,
+  members,
 }: {
   room: DealRoom;
   /** v1.1 FR-DR-05: "내가 제안·진행하는 딜" 뱃지 판별용. 미지정 시 뱃지 없음(기존 정적 스텁 화면 호환). */
   viewerPersonaId?: string;
+  organizations: readonly OrgSeed[];
+  members: readonly MemberSeed[];
 }) {
-  const orgNames = resolveOrgNames(room.participating_orgs);
+  const orgNames = resolveOrgNames(organizations, room.participating_orgs);
   const hotLeadMemberName =
     room.source_type === "핫리드"
-      ? resolveHotLeadMemberName(room.participating_orgs)
+      ? resolveHotLeadMemberName(
+          organizations,
+          members,
+          room.participating_orgs,
+        )
       : null;
   const isOwner =
     viewerPersonaId !== undefined && room.owner_member_id === viewerPersonaId;

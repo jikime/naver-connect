@@ -2,7 +2,7 @@
 
 import { ChevronDown, LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,18 +12,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthSessionStore } from "@/stores/auth-session";
+import { clearDatasetCache, clearRuntimeStateCache } from "@/lib/dal";
 
 export function UserMenu() {
-  const router = useRouter();
-  const user = useAuthSessionStore((state) => state.user);
-  const signOut = useAuthSessionStore((state) => state.signOut);
-
+  const { data: session } = useSession();
+  const user = session?.user;
   if (!user) return null;
 
   function handleSignOut() {
-    signOut();
-    router.replace("/");
+    clearDatasetCache();
+    clearRuntimeStateCache();
+    void signOut({ redirectTo: "/" });
   }
 
   return (
@@ -31,7 +30,7 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-11 gap-2 px-2.5">
           <span className="flex size-8 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
-            {user.name.slice(0, 1)}
+            {user.name?.slice(0, 1) ?? "회"}
           </span>
           <span className="hidden max-w-24 truncate sm:inline">
             {user.name}

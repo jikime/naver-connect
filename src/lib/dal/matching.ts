@@ -6,6 +6,10 @@
 // 근거: codex final-rereview-reject #1(C3), people_match_retrieval_plan.md §6
 
 import { ForbiddenError } from "@/lib/dal/errors";
+import {
+  hydrateRuntimeState,
+  setRuntimeStateValue,
+} from "@/lib/dal/runtime-state";
 import type {
   MatchingBundle,
   MatchingRequest,
@@ -45,7 +49,7 @@ export function parseEngineRecId(
   return recipient && other ? { recipient, other } : null;
 }
 
-/** 현재 브라우저 세션 상태 스냅샷 — 서버는 상태가 없으므로 요청에 동봉한다(mock auth 전제). */
+/** 화면 반응용 캐시 스냅샷. 서버 매칭은 이 값을 신뢰하지 않고 DB 상태를 다시 읽는다. */
 export function snapshotSessionState(): MatchingSessionState {
   const s = useSessionInteractionStore.getState();
   return {
@@ -67,6 +71,7 @@ export function setMatchingTransport(t: MatchingTransport | null): void {
 }
 
 async function callMatching(vc: ViewerContext): Promise<MatchingBundle> {
+  await hydrateRuntimeState();
   const req: MatchingRequest = {
     personaId: vc.personaId,
     role: vc.role,
@@ -76,7 +81,7 @@ async function callMatching(vc: ViewerContext): Promise<MatchingBundle> {
   const res = await fetch("/api/matching", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(req),
+    body: JSON.stringify({ personaId: req.personaId }),
   });
   if (!res.ok) {
     // silent fallback 금지 — 매칭 서비스 오류는 그대로 드러낸다.
@@ -104,6 +109,7 @@ export async function confirmSafeTexts(
   personaId: string,
   approvals: SafeTextApproval[],
 ): Promise<SafeTextConfirmResult[]> {
+  await hydrateRuntimeState();
   const req: SafeTextConfirmRequest = {
     personaId,
     approvals,
@@ -150,7 +156,7 @@ export async function getMatchScores(
 
 /**
  * 관리자 가중치 편집(FR-RL-02) + 재산출(FR-RL-03). 운영자가 아니면 403 시뮬레이션.
- * 브라우저 데모 스토어만 갱신(NFR-02) — 실서비스에서는 서버 세션/RLS로 교체한다.
+ * 운영자 전용 서버 상태를 갱신하고 저장된 가중치로 다시 산출한다.
  */
 export async function setRuleWeights(
   vc: ViewerContext,
@@ -159,6 +165,6 @@ export async function setRuleWeights(
   if (vc.role !== "운영자") {
     throw new ForbiddenError();
   }
-  useSessionInteractionStore.getState().setRuleWeightOverrides(weights);
+  await setRuntimeStateValue("ruleWeightOverrides", weights);
   return getMatchScores(vc);
 }

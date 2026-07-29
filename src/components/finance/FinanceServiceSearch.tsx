@@ -6,10 +6,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { FinancialProductCard } from "@/components/finance/FinancialProductCard";
 import { Input } from "@/components/ui/input";
-import { getFinancialProducts } from "@/lib/dal";
+import { getFields, getFinancialProducts } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import { useViewerContext } from "@/stores/viewer-context";
-import type { FinancialProduct } from "@/types";
+import type { Field, FinancialProduct } from "@/types";
 
 const ALL = "전체";
 
@@ -46,14 +46,18 @@ export function FinanceServiceSearch() {
   const [type, setType] = useState<string>(ALL);
   const [region, setRegion] = useState<string>(ALL);
   const [all, setAll] = useState<FinancialProduct[] | null>(null);
+  const [fields, setFields] = useState<Field[]>([]);
 
   useEffect(() => {
     let cancelled = false;
-    getFinancialProducts(vc).then((result) => {
-      if (!cancelled) {
-        setAll(result);
-      }
-    });
+    Promise.all([getFinancialProducts(vc), getFields()]).then(
+      ([result, fieldResult]) => {
+        if (!cancelled) {
+          setAll(result);
+          setFields(fieldResult);
+        }
+      },
+    );
     return () => {
       cancelled = true;
     };
@@ -85,6 +89,10 @@ export function FinanceServiceSearch() {
     }
     return true;
   });
+  const fieldNamesById = useMemo(
+    () => new Map(fields.map((field) => [field.id, field.name])),
+    [fields],
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -136,7 +144,11 @@ export function FinanceServiceSearch() {
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((product) => (
-            <FinancialProductCard key={product.id} product={product} />
+            <FinancialProductCard
+              key={product.id}
+              product={product}
+              fieldNamesById={fieldNamesById}
+            />
           ))}
         </div>
       )}

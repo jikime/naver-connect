@@ -3,11 +3,10 @@
 // 근거: ARCHITECTURE.md §4.3(시드 실채움)·§5.2(DAL 계약)·§7 ADR-03, FR-DA-01/02, FR-GL-02/03
 // 이 파일이 members-private.json을 import하는 유일한 지점이어야 한다(ADR-03, T-005 린트 차단).
 
-import membersPublicSeed from "@/data/members.json";
-// P1-1(legacy 포함 0건 기준): 클라이언트 번들에는 원문이 공백화된 redacted twin만 싣는다.
-// 원본(원문 포함) members-private.json은 서버/스크립트 전용 경로로만 사용한다.
-import membersPrivateSeed from "@/data/people/derived/members-private.redacted.json";
 import { visibilityMask } from "@/lib/access/visibility-mask";
+import type { DatasetLoader } from "@/lib/dal/datasets";
+import { getDataset } from "@/lib/dal/datasets";
+import { hydrateRuntimeState } from "@/lib/dal/runtime-state";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
   ExpertSubtype,
@@ -17,22 +16,12 @@ import type {
   ViewerContext,
 } from "@/types";
 
-const publicSeed = membersPublicSeed as MemberPublicSeed[];
-const privateSeed = membersPrivateSeed as { member_id: string }[];
-
-const privateByMemberId = new Map<string, { member_id: string }>(
-  privateSeed.map((entry) => [entry.member_id, entry]),
-);
-
 /** 공개+비공개 시드를 member_id로 결합해 논리적 Member로 재조립한다. */
-function reassemble(pub: MemberPublicSeed): Member {
-  const priv = privateByMemberId.get(pub.id);
-  if (!priv) {
-    // 8인 전원이 양쪽 시드에 커버돼야 한다(T-002 Self-check).
-    throw new Error(
-      `members-private.json에 member_id="${pub.id}"의 비공개층이 없습니다.`,
-    );
-  }
+function reassemble(
+  pub: MemberPublicSeed,
+  privateByMemberId: ReadonlyMap<string, { member_id: string }>,
+): Member {
+  void privateByMemberId;
   return {
     ...pub,
     visibility: {
@@ -53,7 +42,7 @@ function reassemble(pub: MemberPublicSeed): Member {
  * C2(재리뷰 REJECT #5): 온보딩 확정 스냅샷을 시드 위에 겹친다.
  * 온보딩 스텝1~4에서 사용자가 고친 조직·지역·분야·미션·공개층 값이 회원 조회에도 즉시
  * 반영되게 한다 — 지금까지는 스냅샷이 store에만 남고 프로필/추천은 옛 시드로 돌았다.
- * 세션 한정(NFR-02·A6)이라 새로고침하면 시드 원본으로 리셋된다.
+ * 서버에서 수화한 사용자 상태이므로 새로고침과 재로그인 뒤에도 동일하게 적용된다.
  */
 function applySessionOverlay(member: Member): Member {
   const snapshot =
@@ -86,13 +75,42 @@ function applySessionOverlay(member: Member): Member {
 }
 
 /** 재조립 + 세션 overlay — 모든 read 함수가 반드시 이 경로를 거친다. */
-function resolveMember(pub: MemberPublicSeed): Member {
-  return applySessionOverlay(reassemble(pub));
+function resolveMember(
+  pub: MemberPublicSeed,
+  privateByMemberId: ReadonlyMap<string, { member_id: string }>,
+): Member {
+  return applySessionOverlay(reassemble(pub, privateByMemberId));
+}
+
+async function getMemberDocuments(
+  loadDataset: DatasetLoader = getDataset,
+): Promise<{
+  publicMembers: MemberPublicSeed[];
+  privateByMemberId: Map<string, { member_id: string }>;
+}> {
+  const [publicMembers, privateMembers] = await Promise.all([
+    loadDataset<MemberPublicSeed[]>("members"),
+    loadDataset<{ member_id: string }[]>("members-private-redacted"),
+  ]);
+  return {
+    publicMembers,
+    privateByMemberId: new Map(
+      privateMembers.map((entry) => [entry.member_id, entry]),
+    ),
+  };
 }
 
 /** 전 회원 목록(마스킹 적용). FR-EM-01 필터·FR-GL-02 전체 열람의 기반. */
-export async function getMembers(vc: ViewerContext): Promise<MaskedMember[]> {
-  return publicSeed.map((pub) => visibilityMask(resolveMember(pub), vc));
+export async function getMembers(
+  vc: ViewerContext,
+  loadDataset: DatasetLoader = getDataset,
+): Promise<MaskedMember[]> {
+  if (loadDataset === getDataset) await hydrateRuntimeState();
+  const { publicMembers, privateByMemberId } =
+    await getMemberDocuments(loadDataset);
+  return publicMembers.map((member) =>
+    visibilityMask(resolveMember(member, privateByMemberId), vc),
+  );
 }
 
 /** 단건 회원(마스킹 적용). 없으면 reject. */
@@ -100,19 +118,24 @@ export async function getMember(
   vc: ViewerContext,
   id: string,
 ): Promise<MaskedMember> {
-  const pub = publicSeed.find((m) => m.id === id);
+  await hydrateRuntimeState();
+  const { publicMembers, privateByMemberId } = await getMemberDocuments();
+  const pub = publicMembers.find((member) => member.id === id);
   if (!pub) {
     throw new Error(`Member not found: ${id}`);
   }
-  return visibilityMask(resolveMember(pub), vc);
+  return visibilityMask(resolveMember(pub, privateByMemberId), vc);
 }
 
 /**
  * expert_subtype 단건 조회(마스킹 불필요 — 공개 시드 최상위 필드).
  * recommendations.ts(T-003)의 공공중간지원 분기(FR-RC-08)가 사용한다.
  */
-export function getExpertSubtype(memberId: string): ExpertSubtype | undefined {
-  return publicSeed.find((m) => m.id === memberId)?.expert_subtype;
+export async function getExpertSubtype(
+  memberId: string,
+): Promise<ExpertSubtype | undefined> {
+  const members = await getDataset<MemberPublicSeed[]>("members");
+  return members.find((member) => member.id === memberId)?.expert_subtype;
 }
 
 /**
@@ -127,18 +150,22 @@ export async function searchMembers(
   query: string,
   fieldId?: number,
 ): Promise<MaskedMember[]> {
+  await hydrateRuntimeState();
+  const { publicMembers, privateByMemberId } = await getMemberDocuments();
   const q = query.trim().toLowerCase();
-  const matches = publicSeed.map(resolveMember).filter((member) => {
-    if (fieldId !== undefined && !member.field_tags.includes(fieldId)) {
-      return false;
-    }
-    if (q.length === 0) return true;
-    const supplyText = member.visibility.public.supply_tags
-      .map((t) => t.detail)
-      .join(" ");
-    const haystack =
-      `${member.name} ${member.org.name} ${member.keyword_set.join(" ")} ${supplyText}`.toLowerCase();
-    return haystack.includes(q);
-  });
+  const matches = publicMembers
+    .map((member) => resolveMember(member, privateByMemberId))
+    .filter((member) => {
+      if (fieldId !== undefined && !member.field_tags.includes(fieldId)) {
+        return false;
+      }
+      if (q.length === 0) return true;
+      const supplyText = member.visibility.public.supply_tags
+        .map((t) => t.detail)
+        .join(" ");
+      const haystack =
+        `${member.name} ${member.org.name} ${member.keyword_set.join(" ")} ${supplyText}`.toLowerCase();
+      return haystack.includes(q);
+    });
   return matches.map((member) => visibilityMask(member, vc));
 }

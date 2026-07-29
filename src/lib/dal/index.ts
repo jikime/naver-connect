@@ -3,10 +3,10 @@
 // 컴포넌트는 이 배럴(또는 각 모듈)만 import한다. 시드는 여기서만 읽는다(FR-DA-01).
 
 export * from "./collaboration";
+export * from "./datasets";
 // collaboration-server는 server-only이므로 barrel에서 제외 (Client에서 import 금지)
 export * from "./deal";
 export * from "./ecosystem";
-export * from "./embedding";
 export * from "./errors";
 export * from "./fields";
 export * from "./gap-report";
@@ -16,9 +16,11 @@ export * from "./matching";
 export * from "./meetups";
 export * from "./members";
 export * from "./onboarding";
+export * from "./profile";
 // people·people-engine은 민감 시드(needs/consents 원문)를 import하므로 배럴에서 제외한다 —
 // 배럴 경유로 Client bundle에 원문이 실리는 것을 차단(P1-1). 서버/스크립트/테스트만 직접 import.
 export * from "./recommendations";
 export * from "./resources";
 export * from "./review";
+export * from "./runtime-state";
 export * from "./writes";

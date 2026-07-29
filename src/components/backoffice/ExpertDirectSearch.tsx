@@ -5,7 +5,7 @@
 // 연락 CTA는 백엔드가 없는 목업이라 실제 발송 없이 연락 시트(Sheet) + mailto: 링크로만
 // 동작한다(NFR-02) — members.json(비민감)에서 전문가 이름만 조회해 붙인다.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ExpertServiceCard } from "@/components/backoffice/ExpertServiceCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,16 +17,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import membersSeed from "@/data/members.json";
+import { getDataset } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import type { ExpertService } from "@/types";
 
 const ALL = "전체";
 
 type MemberSeed = { id: string; name: string };
-const members = membersSeed as MemberSeed[];
-
-function ExpertContactAction({ service }: { service: ExpertService }) {
+function ExpertContactAction({
+  service,
+  members,
+}: {
+  service: ExpertService;
+  members: readonly MemberSeed[];
+}) {
   const name =
     members.find((m) => m.id === service.expert_id)?.name ?? service.expert_id;
   const mockEmail = `${service.expert_id.toLowerCase()}@sen-ax-network.example`;
@@ -73,6 +77,17 @@ export function ExpertDirectSearch({
 }) {
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState<string>(ALL);
+  const [members, setMembers] = useState<MemberSeed[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getDataset<MemberSeed[]>("members").then((result) => {
+      if (!cancelled) setMembers(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const categories = [
     ALL,
@@ -138,7 +153,7 @@ export function ExpertDirectSearch({
           {filtered.map((service) => (
             <div key={service.expert_id} className="flex flex-col gap-2">
               <ExpertServiceCard service={service} />
-              <ExpertContactAction service={service} />
+              <ExpertContactAction service={service} members={members} />
             </div>
           ))}
         </div>

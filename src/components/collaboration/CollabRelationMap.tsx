@@ -11,16 +11,12 @@
 //  - 레이블 위치 개선 (노드 아래 고정, 배경 rect)
 
 import { useMemo, useState } from "react";
-import organizationsSeedFallback from "@/data/organizations.json";
-import subgroupMapSeed from "@/data/subgroup_map.json";
-import { resolveDisplayLabel } from "@/lib/vocabulary";
 import type { CollabRelation, Organization, SubgroupMapEntry } from "@/types";
 
-const subgroupMap = subgroupMapSeed as SubgroupMapEntry[];
 const LAYER_LABEL = {
-  A: resolveDisplayLabel("nvc.role.activist"),
-  B: resolveDisplayLabel("nvc.role.supporter"),
-  C: resolveDisplayLabel("nvc.role.ally"),
+  A: "사회혁신활동가",
+  B: "사회혁신지원가",
+  C: "일반기업",
 } as const;
 
 // ── 레이아웃 상수 ─────────────────────────────────────────
@@ -139,6 +135,7 @@ const DEFAULT_FILTER: MapFilter = {
 function buildLayout(
   relations: CollabRelation[],
   filter: MapFilter,
+  subgroupMap: readonly SubgroupMapEntry[],
 ): { nodes: NodePos[]; groups: GroupBox[]; viewH: number } {
   const codeOf = (id: string) =>
     subgroupMap.find((e) => e.org_id === id)?.subgroup_code ?? "A1";
@@ -178,8 +175,9 @@ function buildLayout(
   const byGroup = new Map<string, string[]>();
   for (const id of visibleOrgs) {
     const c = codeOf(id);
-    if (!byGroup.has(c)) byGroup.set(c, []);
-    byGroup.get(c)!.push(id);
+    const group = byGroup.get(c);
+    if (group) group.push(id);
+    else byGroup.set(c, [id]);
   }
 
   // 레이어별 배치
@@ -242,11 +240,13 @@ function NodeDetail({
   nodeId,
   orgs,
   relations,
+  subgroupMap,
   onClose,
 }: {
   nodeId: string;
   orgs: Organization[];
   relations: CollabRelation[];
+  subgroupMap: readonly SubgroupMapEntry[];
   onClose: () => void;
 }) {
   const org = orgs.find((o) => o.id === nodeId);
@@ -407,16 +407,15 @@ function EdgeDetail({
 export function CollabRelationMap({
   relations,
   orgs,
+  subgroupMap,
   onSelectRelation,
 }: {
   relations: CollabRelation[];
-  orgs?: Organization[];
+  orgs: Organization[];
+  subgroupMap: SubgroupMapEntry[];
   onSelectRelation?: (rel: CollabRelation | null) => void;
 }) {
-  const resolvedOrgs =
-    (orgs?.length ?? 0) > 0
-      ? (orgs as Organization[])
-      : (organizationsSeedFallback as Organization[]);
+  const resolvedOrgs = orgs;
 
   const [filter, setFilter] = useState<MapFilter>(DEFAULT_FILTER);
   const [selectedNodeId, setSelNode] = useState<string | null>(null);
@@ -436,8 +435,8 @@ export function CollabRelationMap({
   );
 
   const { nodes, groups, viewH } = useMemo(
-    () => buildLayout(filteredRels, filter),
-    [filteredRels, filter],
+    () => buildLayout(filteredRels, filter, subgroupMap),
+    [filteredRels, filter, subgroupMap],
   );
 
   const posMap = useMemo(() => {
@@ -864,7 +863,7 @@ export function CollabRelationMap({
               const r = isSel || isHov ? n.r + 2 : n.r;
               const label = orgName(n.id);
               const display =
-                label.length > 12 ? label.slice(0, 11) + "…" : label;
+                label.length > 12 ? `${label.slice(0, 11)}…` : label;
               const labelW = display.length * 5.4 + 4;
 
               return (
@@ -963,6 +962,7 @@ export function CollabRelationMap({
             nodeId={selectedNodeId}
             orgs={resolvedOrgs}
             relations={relations}
+            subgroupMap={subgroupMap}
             onClose={() => setSelNode(null)}
           />
         )}

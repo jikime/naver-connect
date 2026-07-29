@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { AppAccessGate } from "@/components/auth/AppAccessGate";
+import { AuthSessionProvider } from "@/components/auth/AuthSessionProvider";
 import { GlobalNav } from "@/components/shell/GlobalNav";
 import { MotionProvider } from "@/components/shell/MotionProvider";
 import { cn } from "@/lib/utils";
@@ -51,16 +52,18 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <MotionProvider>
-          {/* modoomat 풀폭 글래스 바 — sticky는 header에 둔다(짧은 래퍼 안에 sticky를 두면
+        <AuthSessionProvider>
+          <MotionProvider>
+            {/* modoomat 풀폭 글래스 바 — sticky는 header에 둔다(짧은 래퍼 안에 sticky를 두면
               갇혀 스크롤 이동이 안 되므로 body 기준으로 고정되도록 header를 sticky로). */}
-          <header className="sticky top-0 z-[100]">
-            <GlobalNav />
-          </header>
-          <main className="flex flex-1 flex-col">
-            <AppAccessGate>{children}</AppAccessGate>
-          </main>
-        </MotionProvider>
+            <header className="sticky top-0 z-[100]">
+              <GlobalNav />
+            </header>
+            <main className="flex flex-1 flex-col">
+              <AppAccessGate>{children}</AppAccessGate>
+            </main>
+          </MotionProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

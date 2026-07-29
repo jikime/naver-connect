@@ -29,7 +29,7 @@ import {
   toSearchEntities,
 } from "@/lib/knowledge-graph-galaxy";
 import { cn } from "@/lib/utils";
-import type { KnowledgeGraph } from "@/types";
+import type { Field, KnowledgeGraph } from "@/types";
 import { buildStory } from "../story";
 import { EcosystemHUD } from "./EcosystemHUD";
 import { EntityDetailPanel } from "./EntityDetailPanel";
@@ -41,7 +41,13 @@ import { addRecentNode } from "./recent-nodes";
 const SPEEDS = [0.5, 1, 2] as const;
 const STEP_MS = 5500;
 
-export function GalaxyView({ graph }: { graph: KnowledgeGraph }) {
+export function GalaxyView({
+  graph,
+  fields,
+}: {
+  graph: KnowledgeGraph;
+  fields: Field[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -53,7 +59,7 @@ export function GalaxyView({ graph }: { graph: KnowledgeGraph }) {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
 
-  const galaxy = useMemo(() => toGalaxyGraph(graph), [graph]);
+  const galaxy = useMemo(() => toGalaxyGraph(graph, fields), [graph, fields]);
   const stats = useMemo(() => toGalaxyStats(graph), [graph]);
   const schema = useMemo(() => toGalaxySchema(graph), [graph]);
   const entities = useMemo(() => toSearchEntities(graph), [graph]);
@@ -63,14 +69,15 @@ export function GalaxyView({ graph }: { graph: KnowledgeGraph }) {
   const lastStep = frames.length - 1;
 
   const entityDetail = useMemo(
-    () => (selectedNodeId ? toEntityDetail(graph, selectedNodeId) : null),
-    [graph, selectedNodeId],
+    () =>
+      selectedNodeId ? toEntityDetail(graph, selectedNodeId, fields) : null,
+    [graph, selectedNodeId, fields],
   );
 
-  // 열람한 엔티티를 최근 목록(localStorage)에 기록.
+  // 열람한 엔티티를 사용자별 Supabase 최근 목록에 기록.
   useEffect(() => {
     if (entityDetail) {
-      addRecentNode({
+      void addRecentNode({
         id: entityDetail.id,
         label: entityDetail.label,
         classKey: entityDetail.classKey,

@@ -1,9 +1,7 @@
 // writes DAL 유닛 — 거절/후기 세션 반영(FR-FB-*), 타인 추천 조작 방지 회귀 방지.
 // 근거: TASKS.md T-003 Verification/Acceptance
 
-import { beforeEach, describe, expect, it } from "vitest";
-import { snapshotSessionState } from "@/lib/dal/matching";
-import { runMatchingEngine } from "@/lib/server/matching-service";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import { getRecommendation } from "./recommendations";
 import {
@@ -57,7 +55,7 @@ describe("submitMeetingOutcome", () => {
   });
 });
 
-describe("finalizeOnboarding — safe_match_text 승인 흐름(M2 P1-1)", () => {
+describe("finalizeOnboarding — 서버 영속화 경계", () => {
   const baseInput = {
     organization: { name: "테스트 조합", type: "사회적기업", role: "이사" },
     region: { sido: "전북", sigungu: "전주시" },
@@ -73,91 +71,63 @@ describe("finalizeOnboarding — safe_match_text 승인 흐름(M2 P1-1)", () => 
     readiness: "관심있는 협업이면 환영해요",
     trust_connections: [],
     visibility_consent: true,
+    demand_tags: [
+      {
+        tagId: 4,
+        priority: true,
+        detail_quote: "데이터 분석 파트너가 필요해요",
+      },
+    ],
+    consents: {
+      publish_profile: true,
+      use_private_needs_for_matching: true,
+      quote_in_intro: false,
+    },
   };
 
-  it("승인 의사 + 매칭 동의(B)면 서버 영수증으로 user_confirmed 승격되고 엔진 텍스트에 실린다", async () => {
-    const vc = { role: "기업가" as const, personaId: "M-001" };
-    await finalizeOnboarding(vc, {
-      ...baseInput,
-      demand_tags: [
-        {
-          tagId: 4,
-          priority: true,
-          detail_quote: "데이터 분석 파트너가 필요해요",
-          safe_match: {
-            approved: true,
-            text: "데이터 분석 협업 파트너 찾는 중",
-          },
-        },
-      ],
-      consents: {
-        publish_profile: true,
-        use_private_needs_for_matching: true,
-        quote_in_intro: false,
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("클라이언트 persona를 신뢰하지 않고 입력 본문만 서버 API에 전달한다", async () => {
+    const fetchMock = vi.fn(
+      async (_input: RequestInfo | URL, init?: RequestInit) => {
+        expect(init?.method).toBe("POST");
+        expect(JSON.parse(String(init?.body))).toEqual(baseInput);
+        return new Response(
+          JSON.stringify({
+            member: { id: "server-user-id", name: "테스트 회원" },
+            firstRecommendations: [],
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
       },
-    });
-    const stored =
-      useSessionInteractionStore.getState().onboardingResults["M-001"];
-    const need = stored.needs[0];
-    expect(need.safe_match_status).toBe("user_confirmed");
-    expect(need.safe_match_text).toBe("데이터 분석 협업 파트너 찾는 중");
-    expect(need.safe_match_receipt?.confirmer_person_id).toBe("M-001");
-    expect(need.safe_match_receipt?.consent_receipt_id).toContain(
-      "consent-session-M-001",
     );
-    expect(
-      useSessionInteractionStore.getState().memberEmbeddingShadows["M-001"]
-        ?.model.id,
-    ).toBe("nlpai-lab/KURE-v1");
-    const { input } = runMatchingEngine(snapshotSessionState());
-    expect(input.needs.find((n) => n.id === need.id)?.match_text).toBe(
-      "데이터 분석 협업 파트너 찾는 중",
+    vi.stubGlobal("fetch", fetchMock);
+
+    const vc = { role: "기업가" as const, personaId: "M-001" };
+    const result = await finalizeOnboarding(vc, baseInput);
+    expect(result.member.id).toBe("server-user-id");
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/onboarding/finalize",
+      expect.objectContaining({ method: "POST" }),
     );
   });
 
-  it("승인 없으면 draft 유지 + 엔진 텍스트는 빈 값(fail-closed)", async () => {
+  it("서버 저장 오류를 사용자 메시지로 전달한다", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ error: "저장할 수 없습니다." }), {
+            status: 500,
+            headers: { "content-type": "application/json" },
+          }),
+      ),
+    );
     const vc = { role: "기업가" as const, personaId: "M-001" };
-    await finalizeOnboarding(vc, {
-      ...baseInput,
-      demand_tags: [
-        { tagId: 4, priority: true, detail_quote: "원문만 있는 수요" },
-      ],
-      consents: {
-        publish_profile: true,
-        use_private_needs_for_matching: true,
-        quote_in_intro: false,
-      },
-    });
-    const stored =
-      useSessionInteractionStore.getState().onboardingResults["M-001"];
-    expect(stored.needs[0].safe_match_status).toBe("draft");
-    const { input } = runMatchingEngine(snapshotSessionState());
-    expect(
-      input.needs.find((n) => n.id === stored.needs[0].id)?.match_text,
-    ).toBe("");
-  });
-
-  it("매칭 동의(B) 없이 승인 의사만 있으면 영수증 발급 없이 draft 유지", async () => {
-    const vc = { role: "기업가" as const, personaId: "M-001" };
-    await finalizeOnboarding(vc, {
-      ...baseInput,
-      demand_tags: [
-        {
-          tagId: 4,
-          priority: true,
-          detail_quote: "원문",
-          safe_match: { approved: true, text: "승인 문구" },
-        },
-      ],
-      consents: {
-        publish_profile: true,
-        use_private_needs_for_matching: false,
-        quote_in_intro: false,
-      },
-    });
-    const stored =
-      useSessionInteractionStore.getState().onboardingResults["M-001"];
-    expect(stored.needs[0].safe_match_status).toBe("draft");
-    expect(stored.needs[0].safe_match_receipt).toBeUndefined();
+    await expect(finalizeOnboarding(vc, baseInput)).rejects.toThrow(
+      "저장할 수 없습니다.",
+    );
   });
 });

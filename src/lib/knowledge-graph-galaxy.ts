@@ -12,12 +12,10 @@ import type {
   GalaxySearchEntity,
   GalaxyStats,
 } from "@/components/knowledge-graph/galaxy2/types";
-import fieldsSeed from "@/data/fields.json";
 import type { Field, KGNode, KGNodeType, KnowledgeGraph } from "@/types";
 
-const fields = fieldsSeed as Field[];
-const fieldName = (id: number) =>
-  fields.find((f) => f.id === id)?.name ?? `분야 ${id}`;
+const fieldName = (fields: readonly Field[], id: number) =>
+  fields.find((field) => field.id === id)?.name ?? `분야 ${id}`;
 
 const CLASS_KEY: Record<KGNodeType, string> = {
   member: "member",
@@ -54,7 +52,10 @@ export interface GalaxyGraph {
   edges: GalaxyGraphEdge[];
 }
 
-export function toGalaxyGraph(graph: KnowledgeGraph): GalaxyGraph {
+export function toGalaxyGraph(
+  graph: KnowledgeGraph,
+  fields: readonly Field[],
+): GalaxyGraph {
   const fieldCount = new Map<number, number>();
   for (const n of graph.nodes) {
     if (n.field != null)
@@ -65,7 +66,7 @@ export function toGalaxyGraph(graph: KnowledgeGraph): GalaxyGraph {
     .map((fid) => ({
       id: `field-${fid}`,
       classKey: "field",
-      label: fieldName(fid),
+      label: fieldName(fields, fid),
       degree: fieldCount.get(fid) ?? 1,
       fieldId: fid,
     }));
@@ -155,6 +156,7 @@ export function toSearchEntities(graph: KnowledgeGraph): GalaxySearchEntity[] {
 export function toEntityDetail(
   graph: KnowledgeGraph,
   id: string,
+  fields: readonly Field[],
 ): EntityDetail | null {
   const byId = new Map(graph.nodes.map((n) => [n.id, n]));
 
@@ -167,7 +169,7 @@ export function toEntityDetail(
       id,
       classKey: "field",
       classLabel: "분야(항성)",
-      label: fieldName(fid),
+      label: fieldName(fields, fid),
       summary: `${members.length}개 회원·조직이 이 분야에 속합니다.`,
       properties: { "소속 천체": String(members.length) },
       masked: false,

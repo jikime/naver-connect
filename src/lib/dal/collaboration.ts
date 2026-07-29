@@ -1,15 +1,15 @@
 // DAL: 협업사례 + 프로젝트 제안·트래킹 + 협업관계 그래프 read/write (v1.3).
 // 근거: ARCHITECTURE.md §5.2/§5.3, FR-CS-01/02, FR-PP-01/02, FR-GR-09/10
-// 쓰기(inputCollabCase·trackProposal)는 세션 스토어 한정(C-3·A8) — 새로고침 시 시드로 리셋.
+// 쓰기(inputCollabCase·trackProposal)는 로그인 사용자의 비공개 서버 상태에 저장한다.
 // v1.2 추가: CollabRelation 그래프, 하위그룹 코드 매핑, simulateCollab 강화.
 // v1.3 추가: Supabase async DB 함수 (getCollabCasesFromDB 등) — Server Component 전용.
 
-import collabCasesSeed from "@/data/collab_cases.json";
-import collabRelationsSeed from "@/data/collab_relations.json";
-import organizationsSeed from "@/data/organizations.json";
-import projectProposalsSeed from "@/data/project_proposals.json";
-import subgroupMapSeed from "@/data/subgroup_map.json";
-import { resolveDisplayLabel } from "@/lib/vocabulary";
+import type { DatasetLoader } from "@/lib/dal/datasets";
+import { getDataset } from "@/lib/dal/datasets";
+import {
+  hydrateRuntimeState,
+  setRuntimeStateValue,
+} from "@/lib/dal/runtime-state";
 import { useBusinessRelationSessionStore } from "@/stores/business-relation-session";
 import type {
   CollabCase,
@@ -20,12 +20,6 @@ import type {
   SubgroupMapEntry,
   ViewerContext,
 } from "@/types";
-
-const collabCasesBase = collabCasesSeed as CollabCase[];
-const collabRelationsBase = collabRelationsSeed as CollabRelation[];
-const organizations = organizationsSeed as Organization[];
-const proposalsBase = projectProposalsSeed as ProjectProposal[];
-const subgroupMap = subgroupMapSeed as SubgroupMapEntry[];
 
 // ──────────────────────────────────────────────
 // 하위그룹 시각화 상수 (단일 소스 — 그래프·패턴패널·사례뷰가 공유)
@@ -51,12 +45,12 @@ export const SUBGROUP_KIND_COLOR: Record<SubgroupKindOrLetter, string> = {
 
 /** 층(kind)별 한글 라벨. */
 export const SUBGROUP_KIND_LABEL: Record<SubgroupKindOrLetter, string> = {
-  "non-social": resolveDisplayLabel("nvc.role.ally"),
-  supporter: resolveDisplayLabel("nvc.role.supporter"),
-  activist: resolveDisplayLabel("nvc.role.activist"),
-  C: resolveDisplayLabel("nvc.role.ally"),
-  B: resolveDisplayLabel("nvc.role.supporter"),
-  A: resolveDisplayLabel("nvc.role.activist"),
+  "non-social": "일반기업",
+  supporter: "사회혁신지원가",
+  activist: "사회혁신활동가",
+  C: "일반기업",
+  B: "사회혁신지원가",
+  A: "사회혁신활동가",
 };
 
 // ──────────────────────────────────────────────
@@ -67,7 +61,10 @@ export const SUBGROUP_KIND_LABEL: Record<SubgroupKindOrLetter, string> = {
  * 조직 ID → 14개 하위그룹 코드.
  * subgroup_map.json에 없는 조직은 undefined 반환(N-8 회피).
  */
-export function getSubgroupCode(orgId: string): SubgroupCode | undefined {
+export function getSubgroupCode(
+  orgId: string,
+  subgroupMap: readonly SubgroupMapEntry[],
+): SubgroupCode | undefined {
   return subgroupMap.find((e) => e.org_id === orgId)?.subgroup_code;
 }
 
@@ -92,8 +89,11 @@ export function getSubgroupLayerLetter(code: SubgroupCode): "A" | "B" | "C" {
  * 조직에 하위그룹 코드를 조인해 반환.
  * 원본 organizations 배열을 변경하지 않고 새 객체를 반환한다.
  */
-export function withSubgroupCode(org: Organization): Organization {
-  const code = getSubgroupCode(org.id);
+export function withSubgroupCode(
+  org: Organization,
+  subgroupMap: readonly SubgroupMapEntry[],
+): Organization {
+  const code = getSubgroupCode(org.id, subgroupMap);
   if (!code || org.subgroup_code === code) return org;
   return { ...org, subgroup_code: code };
 }
@@ -107,6 +107,8 @@ export async function getCollabCases(
   _vc: ViewerContext,
   filter?: { fieldId?: number; orgId?: string },
 ): Promise<CollabCase[]> {
+  await hydrateRuntimeState();
+  const collabCasesBase = await getDataset<CollabCase[]>("collab-cases");
   const all = [
     ...collabCasesBase,
     ...useBusinessRelationSessionStore.getState().addedCollabCases,
@@ -122,17 +124,21 @@ export async function getCollabCases(
   });
 }
 
-/** 협업 사례 입력(FR-CS-01). 세션 스토어에만 반영, 새로고침 시 리셋(A6/C-3). */
+/** 협업 사례 입력(FR-CS-01). 로그인 사용자의 비공개 서버 상태에 저장한다. */
 export async function inputCollabCase(
   vc: ViewerContext,
   input: Omit<CollabCase, "id" | "input_by">,
 ): Promise<CollabCase> {
+  const state = await hydrateRuntimeState();
   const newCase: CollabCase = {
     id: `CC-USER-${Date.now()}`,
     input_by: vc.role === "운영자" ? "운영자" : "회원",
     ...input,
   };
-  useBusinessRelationSessionStore.getState().addCollabCase(newCase);
+  await setRuntimeStateValue("addedCollabCases", [
+    ...state.addedCollabCases,
+    newCase,
+  ]);
   return newCase;
 }
 
@@ -155,6 +161,8 @@ export async function getCollabRelations(
     minStrength?: number;
   },
 ): Promise<CollabRelation[]> {
+  const collabRelationsBase =
+    await getDataset<CollabRelation[]>("collab-relations");
   return collabRelationsBase.filter((r) => {
     if (filter?.onlyActual && !r.is_actual) return false;
     if (
@@ -196,6 +204,8 @@ export async function getCollabPatterns(
     relation_types: string[];
   }[]
 > {
+  const collabRelationsBase =
+    await getDataset<CollabRelation[]>("collab-relations");
   const relations = onlyActual
     ? collabRelationsBase.filter((r) => r.is_actual)
     : collabRelationsBase;
@@ -311,12 +321,20 @@ export async function simulateCollab(
   similarCases: CollabCase[];
   baseSubgroupCode: SubgroupCode | undefined;
 }> {
+  await hydrateRuntimeState();
+  const [organizations, subgroupMap, collabCasesBase, collabRelationsBase] =
+    await Promise.all([
+      getDataset<Organization[]>("organizations"),
+      getDataset<SubgroupMapEntry[]>("subgroup-map"),
+      getDataset<CollabCase[]>("collab-cases"),
+      getDataset<CollabRelation[]>("collab-relations"),
+    ]);
   const baseOrg = organizations.find((o) => o.id === orgId);
   if (!baseOrg) {
     throw new Error(`Organization not found: ${orgId}`);
   }
 
-  const baseSubgroupCode = getSubgroupCode(orgId);
+  const baseSubgroupCode = getSubgroupCode(orgId, subgroupMap);
 
   const allCases = [
     ...collabCasesBase,
@@ -339,7 +357,7 @@ export async function simulateCollab(
         baseOrg.field_tags.includes(tag),
       );
 
-      const candidateSubgroupCode = getSubgroupCode(org.id);
+      const candidateSubgroupCode = getSubgroupCode(org.id, subgroupMap);
       const affinity =
         baseSubgroupCode && candidateSubgroupCode
           ? subgroupAffinityScore(baseSubgroupCode, candidateSubgroupCode)
@@ -404,7 +422,11 @@ export async function simulateCollab(
 /** 프로젝트 제안 조회(FR-PP-01, FR-GR-10). 세션 중 상태 변경분(trackProposal)을 반영한다. */
 export async function getProposals(
   _vc: ViewerContext,
+  loadDataset: DatasetLoader = getDataset,
 ): Promise<ProjectProposal[]> {
+  if (loadDataset === getDataset) await hydrateRuntimeState();
+  const proposalsBase =
+    await loadDataset<ProjectProposal[]>("project-proposals");
   const overrides =
     useBusinessRelationSessionStore.getState().proposalStatusOverrides;
   return proposalsBase.map((p) =>
@@ -412,17 +434,23 @@ export async function getProposals(
   );
 }
 
-/** 제안 상태 전이(FR-PP-02): 제안됨→검토→성사/중단. 세션 스토어만 갱신. */
+/** 제안 상태 전이(FR-PP-02): 제안됨→검토→성사/중단. 서버에 영속 저장한다. */
 export async function trackProposal(
   _vc: ViewerContext,
   id: string,
   status: ProjectProposal["track_status"],
 ): Promise<ProjectProposal> {
+  const state = await hydrateRuntimeState();
+  const proposalsBase =
+    await getDataset<ProjectProposal[]>("project-proposals");
   const base = proposalsBase.find((p) => p.id === id);
   if (!base) {
     throw new Error(`Proposal not found: ${id}`);
   }
-  useBusinessRelationSessionStore.getState().setProposalStatus(id, status);
+  await setRuntimeStateValue("proposalStatusOverrides", {
+    ...state.proposalStatusOverrides,
+    [id]: status,
+  });
   return { ...base, track_status: status };
 }
 

@@ -5,7 +5,6 @@
 import { AssumptionBadge } from "@/components/shared/AssumptionBadge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getFieldName } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import type { FinancialProduct } from "@/types";
 
@@ -20,11 +19,13 @@ const LEGAL_STATUS_STYLE: Record<
 
 export function FinancialProductCard({
   product,
+  fieldNamesById,
 }: {
   product: FinancialProduct;
+  fieldNamesById: ReadonlyMap<number, string>;
 }) {
   const fieldNames = product.field_tags
-    .map((id) => getFieldName(id))
+    .map((id) => fieldNamesById.get(id))
     .filter((name): name is string => Boolean(name));
 
   return (

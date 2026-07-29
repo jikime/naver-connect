@@ -15,7 +15,7 @@ export interface MatchScore {
   axis: "공통점" | "차이점";
 }
 
-/** FR-RL-02 관리자 가중치 편집(세션 한정) */
+/** FR-RL-02 관리자 가중치 편집(운영자별 서버 상태에 저장) */
 export interface RuleWeight {
   keyword: string;
   weight: number;

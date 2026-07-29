@@ -2,7 +2,7 @@
 // 근거: ARCHITECTURE.md ADR-02, TASKS.md T-018
 // ConnectionMap의 선택 상태를 그대로 받아 렌더만 하는 순수 표시 컴포넌트.
 
-import type { Organization, Region } from "@/types";
+import type { Organization, Region, VCStage } from "@/types";
 import { stageLabel } from "./lookups";
 import type { MapNode } from "./map-topology";
 
@@ -10,10 +10,12 @@ export function NodeDetailPanel({
   node,
   region,
   orgs,
+  vcStages,
 }: {
   node: MapNode | null;
   region: Region;
   orgs: Organization[];
+  vcStages: VCStage[];
 }) {
   if (!node) {
     return (
@@ -44,7 +46,8 @@ export function NodeDetailPanel({
 
       {node.stageIds.length > 0 ? (
         <p className="mt-2 text-xs text-guud-text-muted-2">
-          밸류체인 단계: {node.stageIds.map((id) => stageLabel(id)).join(", ")}
+          밸류체인 단계:{" "}
+          {node.stageIds.map((id) => stageLabel(vcStages, id)).join(", ")}
         </p>
       ) : (
         <p className="mt-2 text-xs text-guud-text-muted-2">

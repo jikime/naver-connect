@@ -215,7 +215,7 @@
 }
 
 /*
- * .galaxy-dark — /knowledge-graph/galaxy 전용 다크 스테이지 팔레트(#36 대비 수정).
+ * .galaxy-dark — /knowledge-graph/galaxy의 그래프 영역 전용 다크 팔레트(#36 대비 수정).
  * connect-ontology 원본은 전역 다크 우주 테마였다(index.css). 우리 앱은 라이트라
  * 이식된 오버레이(범례·HUD·검색·상세·시네마·내레이션·타이틀)가 다크 배경 위에서
  * 어두운 텍스트로 렌더돼 안 보였다. 이 스코프에서 토큰만 원본 다크값으로 재정의해
@@ -242,7 +242,7 @@
   --border: hsl(217 30% 26%);
   --input: hsl(217 30% 26%);
   --ring: hsl(217 92% 66%);
-  /* 페이지 헤더가 쓰는 guud 커스텀 토큰도 다크로 */
+  /* 그래프 오버레이가 쓰는 guud 커스텀 토큰도 다크로 */
   --guud-hairline: hsl(217 30% 24%);
   --guud-text-strong: hsl(210 40% 96%);
   --guud-text-muted-2: hsl(214 22% 74%);

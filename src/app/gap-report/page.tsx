@@ -16,6 +16,11 @@ import { GapEcosystemMapToggle } from "@/components/gap-report/GapEcosystemMapTo
 import { RegionStatusTable } from "@/components/gap-report/RegionStatusTable";
 import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
 import { getGapReport, getMembers, getProposals } from "@/lib/dal";
+import {
+  getDatasetDocument,
+  getServerDataset,
+} from "@/lib/dal/server-datasets";
+import type { Opportunity, Resource, VCStage } from "@/types";
 
 const PLACEHOLDER_VIEWER = { role: "기업가", personaId: "M-001" } as const;
 const REGION_ID = "R-HANBIT";
@@ -25,10 +30,16 @@ export default async function GapReportPage() {
     { region, stageLinks, orgs, gapCards, collabCases },
     members,
     proposals,
+    vcStages,
+    resources,
+    opportunities,
   ] = await Promise.all([
-    getGapReport(PLACEHOLDER_VIEWER, REGION_ID),
-    getMembers(PLACEHOLDER_VIEWER),
-    getProposals(PLACEHOLDER_VIEWER),
+    getGapReport(PLACEHOLDER_VIEWER, REGION_ID, getServerDataset),
+    getMembers(PLACEHOLDER_VIEWER, getServerDataset),
+    getProposals(PLACEHOLDER_VIEWER, getServerDataset),
+    getDatasetDocument<VCStage[]>("vc-stages"),
+    getDatasetDocument<Resource[]>("resources"),
+    getDatasetDocument<Opportunity[]>("opportunities"),
   ]);
 
   // name은 마스킹 대상이 아닌 공개 최상위 필드다 — id+name만 뽑아 내려 private 레이어
@@ -37,23 +48,27 @@ export default async function GapReportPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* ④ 밴드 A(canvas): 헤더 eyebrow + headline 1점 강조 + 지역 현황 테이블 */}
-      <section className="bg-background py-16 sm:py-20">
-        <div className="mx-auto w-full max-w-7xl space-y-10 px-6 sm:px-10 lg:px-16">
-          <header className="max-w-2xl space-y-3">
+      <header className="border-b border-guud-hairline bg-guud-header-band">
+        <div className="mx-auto w-full max-w-7xl space-y-3 px-6 py-14 sm:px-10 lg:px-16">
+          <div className="max-w-2xl space-y-3">
             <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
               [ STAGE 02 · OPPORTUNITY DISCOVERY ]
             </p>
-            <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground">
+            <h1 className="font-heading text-3xl font-light tracking-tight text-foreground sm:text-4xl">
               {region.name} <span className="text-primary">사업기회</span> 발굴
             </h1>
-            <p className="text-sm text-guud-text-muted-2">
+            <p className="text-sm leading-relaxed text-guud-text-muted-2">
               지역 주체 유형별 규모, 연결 커버리지·buying power(구매력), 완전
               공백 축, 과거·진행 중 협업 사례, 그리고 그 공백을 메울 기회 카드를
               한 화면에서 봅니다.
             </p>
-          </header>
+          </div>
+        </div>
+      </header>
 
+      {/* ④ 밴드 A(canvas): 지역 현황 테이블 */}
+      <section className="bg-background py-14">
+        <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-16">
           <section
             className="space-y-4"
             aria-labelledby="region-status-heading"
@@ -110,6 +125,7 @@ export default async function GapReportPage() {
             region={region}
             stageLinks={stageLinks}
             orgs={orgs}
+            vcStages={vcStages.data}
           />
         </div>
       </section>
@@ -136,6 +152,9 @@ export default async function GapReportPage() {
             orgs={orgs}
             collabCases={collabCases}
             proposals={proposals}
+            vcStages={vcStages.data}
+            resources={resources.data}
+            opportunities={opportunities.data}
           />
         </div>
       </section>

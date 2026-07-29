@@ -8,9 +8,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { EcosystemMapV2 } from "@/components/ecosystem/EcosystemMapV2";
 import { getEcosystemMap } from "@/lib/dal";
+import {
+  getDatasetDocument,
+  getServerDataset,
+} from "@/lib/dal/server-datasets";
+import type { Field } from "@/types";
 
 export const metadata: Metadata = {
-  title: "생태계맵 | 사회혁신기업가네트워크 AX 플랫폼 (목업)",
+  title: "생태계맵 | 사회혁신기업가네트워크 AX 플랫폼",
 };
 
 // getEcosystemMap 응답(밸류체인·5-force·단체)은 역할·페르소나에 무관한 비민감 공개
@@ -20,8 +25,10 @@ export const metadata: Metadata = {
 const PLACEHOLDER_VIEWER = { role: "기업가", personaId: "M-001" } as const;
 
 export default async function EcosystemPage() {
-  const { stages, forces, orgs, stageLinks } =
-    await getEcosystemMap(PLACEHOLDER_VIEWER);
+  const [{ stages, forces, orgs, stageLinks }, fields] = await Promise.all([
+    getEcosystemMap(PLACEHOLDER_VIEWER, undefined, undefined, getServerDataset),
+    getDatasetDocument<Field[]>("fields"),
+  ]);
   const fieldCount = new Set(stages.map((stage) => stage.field_id)).size;
   const regionCount = new Set(orgs.map((org) => org.region.sido)).size;
   const verifiedOrgCount = orgs.filter(
@@ -138,6 +145,7 @@ export default async function EcosystemPage() {
             forces={forces}
             orgs={orgs}
             stageLinks={stageLinks}
+            fields={fields.data}
           />
         </section>
       </div>

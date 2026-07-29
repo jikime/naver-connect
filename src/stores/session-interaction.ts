@@ -1,12 +1,9 @@
-// SessionInteraction 스토어 — 추천 수락/거절/후기, 검수 승인, 온보딩 완료 플래그.
-// 브라우저 localStorage에 데모 상태를 보존하며 서버 호출이 없다(NFR-02). DAL 쓰기 함수(T-003)가
-// 이 스토어를 갱신하는 방식으로 "쓰기"를 시뮬레이션한다.
+// SessionInteraction 스토어 — 서버에서 읽은 추천·딜·온보딩 상태의 화면 반응용 캐시.
+// 정본은 ax_private.user_runtime_states이며 localStorage에는 저장하지 않는다.
 // 근거: ARCHITECTURE.md §3(L4)·§7 ADR-01, §5.3 DAL 쓰기 계약, TASKS.md T-006
-// 온보딩 완료 플래그만 auth-session에 남고 실제 Need/Offer/Consent가 사라지면 추천이 0건이 되는
-// 분리 상태를 막기 위해 상호작용 스냅샷도 함께 보존한다. 실서비스에서는 서버 세션/RLS로 교체한다.
+// 온보딩 결과와 상호작용은 서버가 인증 사용자별 DB 상태에서 읽어 내려준다.
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type {
   CapabilityOfferV1,
   DealRoom,
@@ -31,7 +28,7 @@ export interface OnboardingResult {
   consents: { publish: boolean; matching: boolean; quote: boolean };
 }
 
-/** 추천 1건에 대한 세션 오버라이드. DAL read 함수가 시드 위에 겹쳐 반환한다. */
+/** 추천 1건에 대한 사용자 오버라이드. DAL read 함수가 기본 데이터 위에 겹쳐 반환한다. */
 export interface RecommendationOverride {
   status?: RecStatus;
   decline_reason?: DeclineReasonCode;
@@ -39,14 +36,14 @@ export interface RecommendationOverride {
   meeting_outcome?: { met: boolean; will_meet_again: boolean; note: string };
 }
 
-interface SessionInteractionStore {
-  /** recId → 세션 중 발생한 상태 변경(거절/후기/승인). */
+export interface SessionInteractionStore {
+  /** recId → 저장된 상태 변경(거절/후기/승인). */
   recommendationOverrides: Record<string, RecommendationOverride>;
-  /** personaId → 온보딩 완료 여부(목업 finalizeOnboarding 플래그, FR-ON-09). */
+  /** personaId → 온보딩 완료 여부(FR-ON-09). */
   onboardingFinalized: Record<string, boolean>;
-  /** v1.1 FR-RL-02/03: 관리자가 편집한 키워드 가중치(세션 한정). null이면 시드 rule_weights 그대로. */
+  /** 관리자가 편집해 저장한 키워드 가중치. null이면 기본 rule_weights를 사용한다. */
   ruleWeightOverrides: RuleWeight[] | null;
-  /** v1.1 FR-DS-01: 딜소싱 폼으로 등록된 딜(세션 한정). getDealRooms(FR-DR-05)가 시드에 겹쳐 반환한다. */
+  /** 딜소싱 폼으로 등록해 사용자 상태에 저장한 딜(FR-DS-01). */
   registeredDeals: DealRoom[];
   /** M1: personaId → 온보딩 확정 산출물(Need/Offer/매칭동의). 매칭엔진이 시드 위에 겹쳐 읽는다. */
   onboardingResults: Record<string, OnboardingResult>;
@@ -65,10 +62,11 @@ interface SessionInteractionStore {
   ) => void;
   setRuleWeightOverrides: (weights: RuleWeight[]) => void;
   addRegisteredDeal: (deal: DealRoom) => void;
+  hydrate: (state: Partial<SessionInteractionSnapshot>) => void;
   reset: () => void;
 }
 
-const INITIAL_STATE: Pick<
+export type SessionInteractionSnapshot = Pick<
   SessionInteractionStore,
   | "recommendationOverrides"
   | "onboardingFinalized"
@@ -76,7 +74,9 @@ const INITIAL_STATE: Pick<
   | "registeredDeals"
   | "onboardingResults"
   | "memberEmbeddingShadows"
-> = {
+>;
+
+const INITIAL_STATE: SessionInteractionSnapshot = {
   recommendationOverrides: {},
   onboardingFinalized: {},
   ruleWeightOverrides: null,
@@ -86,54 +86,40 @@ const INITIAL_STATE: Pick<
 };
 
 export const useSessionInteractionStore = create<SessionInteractionStore>()(
-  persist(
-    (set) => ({
-      ...INITIAL_STATE,
-      setRecommendationOverride: (recId, patch) =>
-        set((state) => ({
-          recommendationOverrides: {
-            ...state.recommendationOverrides,
-            [recId]: { ...state.recommendationOverrides[recId], ...patch },
-          },
-        })),
-      finalizeOnboardingFor: (personaId) =>
-        set((state) => ({
-          onboardingFinalized: {
-            ...state.onboardingFinalized,
-            [personaId]: true,
-          },
-        })),
-      storeOnboardingResult: (personaId, result) =>
-        set((state) => ({
-          onboardingResults: {
-            ...state.onboardingResults,
-            [personaId]: result,
-          },
-        })),
-      setMemberEmbeddingShadow: (personaId, shadow) =>
-        set((state) => ({
-          memberEmbeddingShadows: {
-            ...state.memberEmbeddingShadows,
-            [personaId]: shadow,
-          },
-        })),
-      setRuleWeightOverrides: (weights) =>
-        set({ ruleWeightOverrides: weights }),
-      addRegisteredDeal: (deal) =>
-        set((state) => ({ registeredDeals: [...state.registeredDeals, deal] })),
-      reset: () => set(INITIAL_STATE),
-    }),
-    {
-      name: "ax-session-interaction-v2",
-      version: 2,
-      partialize: (state) => ({
-        recommendationOverrides: state.recommendationOverrides,
-        onboardingFinalized: state.onboardingFinalized,
-        ruleWeightOverrides: state.ruleWeightOverrides,
-        registeredDeals: state.registeredDeals,
-        onboardingResults: state.onboardingResults,
-        memberEmbeddingShadows: state.memberEmbeddingShadows,
-      }),
-    },
-  ),
+  (set) => ({
+    ...INITIAL_STATE,
+    setRecommendationOverride: (recId, patch) =>
+      set((state) => ({
+        recommendationOverrides: {
+          ...state.recommendationOverrides,
+          [recId]: { ...state.recommendationOverrides[recId], ...patch },
+        },
+      })),
+    finalizeOnboardingFor: (personaId) =>
+      set((state) => ({
+        onboardingFinalized: {
+          ...state.onboardingFinalized,
+          [personaId]: true,
+        },
+      })),
+    storeOnboardingResult: (personaId, result) =>
+      set((state) => ({
+        onboardingResults: {
+          ...state.onboardingResults,
+          [personaId]: result,
+        },
+      })),
+    setMemberEmbeddingShadow: (personaId, shadow) =>
+      set((state) => ({
+        memberEmbeddingShadows: {
+          ...state.memberEmbeddingShadows,
+          [personaId]: shadow,
+        },
+      })),
+    setRuleWeightOverrides: (weights) => set({ ruleWeightOverrides: weights }),
+    addRegisteredDeal: (deal) =>
+      set((state) => ({ registeredDeals: [...state.registeredDeals, deal] })),
+    hydrate: (state) => set({ ...INITIAL_STATE, ...state }),
+    reset: () => set(INITIAL_STATE),
+  }),
 );

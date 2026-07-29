@@ -1,6 +1,6 @@
 // 딜룸 파이프라인 보드 라우트(FR-DR-01~05). v1.0 상세 편집·드래그는 여전히 없다(FR-DR-04).
 // 근거: ARCHITECTURE.md §3(L2 DealBoard) · FR-DR-05("내 딜 현황" 관점, 세션 반영)
-// 보드가 세션 스토어(딜소싱 등록분)를 반영해야 해 Client Component로 데이터를 가져온다(ADR-04) —
+// 보드가 사용자별 DB 상태(딜소싱 등록분)를 반영해야 해 Client Component로 데이터를 가져온다(ADR-04) —
 // 이 셸은 정적 헤더만 Server Component로 두고 DealRoomBoard에 위임한다.
 
 import Link from "next/link";

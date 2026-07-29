@@ -1,75 +1,70 @@
 "use client";
 
-import { Building2, Check, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { Building2, Check, ShieldCheck, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { type FormEvent, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { getDemoAccount, useAuthSessionStore } from "@/stores/auth-session";
-import type { ViewerContext } from "@/types";
+import { REVIEW_ACCOUNTS } from "@/lib/auth/review-accounts";
+import type { UserRole } from "@/lib/auth/types";
 
-const MEMBER_ROLES = [
-  {
-    role: "기업가" as const,
-    label: "기업가",
-    description: "협업 파트너와 사업 기회를 찾습니다",
+const REVIEW_ROLE_META: Record<
+  UserRole,
+  { description: string; icon: typeof Building2 }
+> = {
+  기업가: {
+    description: "추천과 사업 기회를 확인합니다",
     icon: Building2,
   },
-  {
-    role: "전문가" as const,
-    label: "전문가",
-    description: "전문성을 필요한 현장과 연결합니다",
+  전문가: {
+    description: "전문 서비스와 협업 요청을 확인합니다",
     icon: Users,
   },
-];
+  운영자: {
+    description: "검토 대기열과 운영 화면을 확인합니다",
+    icon: ShieldCheck,
+  },
+};
 
-export function LoginPanel() {
+interface LoginPanelProps {
+  showReviewAccounts?: boolean;
+}
+
+export function LoginPanel({ showReviewAccounts = false }: LoginPanelProps) {
   const router = useRouter();
   const emailId = useId();
   const passwordId = useId();
-  const signIn = useAuthSessionStore((state) => state.signIn);
-  const [role, setRole] = useState<ViewerContext["role"]>("기업가");
-  const initialAccount = getDemoAccount("기업가");
-  const [email, setEmail] = useState(initialAccount.email);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function selectRole(nextRole: ViewerContext["role"]) {
-    const account = getDemoAccount(nextRole);
-    setRole(nextRole);
-    setEmail(account.email);
-    setPassword("");
-    setError(null);
-  }
-
-  function finishLogin(nextRole: ViewerContext["role"]) {
-    const account = getDemoAccount(nextRole);
-    signIn(account.user);
-    router.push(
-      account.user.role === "운영자" || account.user.onboardingComplete
-        ? "/home"
-        : "/onboarding",
-    );
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const account = getDemoAccount(role);
-    if (
-      email.trim().toLowerCase() !== account.email ||
-      password !== account.password
-    ) {
-      setError("이메일 또는 비밀번호를 확인해주세요.");
-      return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await signIn("credentials", {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
+      });
+      if (!result.ok) {
+        setError("이메일 또는 비밀번호를 확인해주세요.");
+        return;
+      }
+      router.replace("/home");
+      router.refresh();
+    } catch {
+      setError("로그인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setSubmitting(false);
     }
-    finishLogin(role);
   }
-
-  const activeAccount = getDemoAccount(role);
 
   return (
     <div className="grid overflow-hidden rounded-3xl border border-guud-hairline bg-card lg:grid-cols-[0.88fr_1.12fr]">
@@ -84,8 +79,8 @@ export function LoginPanel() {
             시작해볼까요?
           </h1>
           <p className="max-w-sm text-sm leading-6 text-background/70">
-            역할에 맞는 계정으로 로그인하면 기존 프로필과 추천, 협업 현황을
-            이어서 확인할 수 있어요.
+            가입한 이메일로 로그인하면 프로필과 협업 활동을 안전하게 이어서
+            확인할 수 있어요.
           </p>
         </div>
         <figure className="mt-8 overflow-hidden rounded-2xl border border-background/15 bg-background/5 p-1.5">
@@ -100,9 +95,9 @@ export function LoginPanel() {
         </figure>
         <ul className="mt-8 space-y-3 text-sm text-background/80">
           {[
-            "개인화된 주간 추천",
-            "기회·사업 실행 메뉴",
-            "역할에 맞는 정보 공개 범위",
+            "암호화된 로그인 세션",
+            "역할별 접근 권한",
+            "안전하게 보관되는 프로필",
           ].map((item) => (
             <li key={item} className="flex items-center gap-2">
               <Check className="size-4 text-primary" />
@@ -119,61 +114,15 @@ export function LoginPanel() {
               로그인
             </h2>
             <p className="text-sm text-guud-text-muted-2">
-              회원 유형을 선택하고 계정 정보를 입력해주세요.
+              가입할 때 사용한 이메일과 비밀번호를 입력해주세요.
             </p>
           </div>
 
-          <fieldset className="space-y-3">
-            <legend className="text-sm font-medium text-foreground">
-              회원 유형
-            </legend>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {MEMBER_ROLES.map((item) => {
-                const Icon = item.icon;
-                const active = role === item.role;
-                return (
-                  <button
-                    key={item.role}
-                    type="button"
-                    aria-pressed={active}
-                    onClick={() => selectRole(item.role)}
-                    className={cn(
-                      "flex min-h-24 items-start gap-3 rounded-2xl border p-4 text-left transition-colors",
-                      active
-                        ? "border-primary bg-accent text-foreground"
-                        : "border-guud-hairline hover:bg-muted",
-                    )}
-                  >
-                    <Icon className="mt-0.5 size-5 shrink-0 text-primary" />
-                    <span>
-                      <span className="block text-sm font-semibold">
-                        {item.label}
-                      </span>
-                      <span className="mt-1 block text-xs leading-5 text-guud-text-muted-2">
-                        {item.description}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <button
-              type="button"
-              aria-pressed={role === "운영자"}
-              onClick={() => selectRole("운영자")}
-              className={cn(
-                "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-dashed px-4 text-sm font-medium",
-                role === "운영자"
-                  ? "border-primary bg-accent text-foreground"
-                  : "border-guud-hairline text-guud-text-muted-2 hover:text-foreground",
-              )}
-            >
-              <ShieldCheck className="size-4" />
-              운영자 로그인
-            </button>
-          </fieldset>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            aria-busy={submitting}
+          >
             <div className="space-y-1.5">
               <Label htmlFor={emailId}>이메일</Label>
               <Input
@@ -182,6 +131,7 @@ export function LoginPanel() {
                 autoComplete="username"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
+                disabled={submitting}
                 required
               />
             </div>
@@ -193,38 +143,74 @@ export function LoginPanel() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                disabled={submitting}
                 required
               />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full">
-              로그인
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? "로그인하고 있어요…" : "로그인"}
             </Button>
           </form>
 
-          <div className="rounded-2xl bg-secondary p-4">
-            <div className="flex items-start gap-3">
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" />
-              <div className="min-w-0 flex-1 space-y-3">
-                <div>
-                  <p className="text-sm font-semibold text-secondary-foreground">
-                    {activeAccount.user.name} · 심사용 빠른 로그인
-                  </p>
-                  <p className="mt-1 truncate font-mono text-[0.6875rem] text-guud-text-muted-2">
-                    {activeAccount.email} · {activeAccount.password}
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => finishLogin(role)}
+          {showReviewAccounts && (
+            <section
+              aria-labelledby="review-accounts-title"
+              className="space-y-3 rounded-2xl border border-primary/25 bg-accent/45 p-4"
+            >
+              <div>
+                <h3
+                  id="review-accounts-title"
+                  className="text-sm font-semibold text-foreground"
                 >
-                  {activeAccount.user.name} 계정으로 바로 입장
-                </Button>
+                  심사위원용 테스트 계정
+                </h3>
+                <p className="mt-1 text-xs leading-5 text-guud-text-muted-2">
+                  역할별 계정을 선택하면 로그인 정보가 자동으로 입력됩니다.
+                </p>
               </div>
-            </div>
-          </div>
+              <div className="grid gap-2">
+                {REVIEW_ACCOUNTS.map((account) => {
+                  const meta = REVIEW_ROLE_META[account.role];
+                  const Icon = meta.icon;
+                  return (
+                    <button
+                      key={account.role}
+                      type="button"
+                      onClick={() => {
+                        setEmail(account.email);
+                        setPassword(account.password);
+                        setError(null);
+                      }}
+                      className="flex items-start gap-3 rounded-xl border border-guud-hairline bg-card px-3 py-3 text-left transition-colors hover:border-primary/50 hover:bg-muted"
+                    >
+                      <Icon className="mt-0.5 size-4 shrink-0 text-primary" />
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                          <span className="text-sm font-semibold text-foreground">
+                            {account.role} · {account.name}
+                          </span>
+                          <span className="text-[0.6875rem] text-primary">
+                            입력하기
+                          </span>
+                        </span>
+                        <span className="mt-0.5 block text-xs text-guud-text-muted-2">
+                          {meta.description}
+                        </span>
+                        <span className="mt-1 block break-all font-mono text-[0.6875rem] text-foreground/75">
+                          ID {account.email} · PW {account.password}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
 
           <p className="text-center text-sm text-guud-text-muted-2">
             아직 계정이 없나요?{" "}

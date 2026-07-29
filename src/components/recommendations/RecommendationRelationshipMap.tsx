@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import embeddingShadow from "@/data/people/derived/member-embedding-shadow.json";
+import { getDataset } from "@/lib/dal";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
   MaskedMember,
@@ -76,8 +76,20 @@ export function RecommendationRelationshipMap({
   const sessionShadow = useSessionInteractionStore(
     (state) => state.memberEmbeddingShadows[viewerId],
   );
-  const activeShadow =
-    sessionShadow ?? (embeddingShadow as MemberEmbeddingShadow);
+  const [databaseShadow, setDatabaseShadow] =
+    useState<MemberEmbeddingShadow | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getDataset<MemberEmbeddingShadow>("member-embedding-shadow").then(
+      (result) => {
+        if (!cancelled) setDatabaseShadow(result);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const activeShadow = sessionShadow ?? databaseShadow;
   const memberById = useMemo(
     () => new Map(members.map((member) => [member.id, member])),
     [members],
@@ -95,7 +107,7 @@ export function RecommendationRelationshipMap({
   const cosineByPair = useMemo(
     () =>
       new Map(
-        activeShadow.pairs.map((pair) => [
+        (activeShadow?.pairs ?? []).map((pair) => [
           pairKey(pair.a, pair.b),
           pair.cosine,
         ]),
@@ -104,7 +116,7 @@ export function RecommendationRelationshipMap({
   );
   const nodes = useMemo<MapNode[]>(
     () =>
-      activeShadow.nodes.map((embedded) => {
+      (activeShadow?.nodes ?? []).map((embedded) => {
         const member = memberById.get(embedded.member_id);
         const recommendation = recommendationByMember.get(embedded.member_id);
         return {

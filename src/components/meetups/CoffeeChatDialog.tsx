@@ -21,8 +21,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { saveMeetupAvailability } from "@/lib/dal/meetup-state";
 import { cn } from "@/lib/utils";
-import { useMeetupSessionStore } from "@/stores/meetup-session";
 import type {
   Meetup,
   MeetupAvailability,
@@ -95,9 +95,6 @@ export function CoffeeChatDialog({
   availabilityByMember?: Record<string, MeetupAvailability>;
   participants?: { id: string; name: string }[];
 }) {
-  const shareAvailability = useMeetupSessionStore(
-    (state) => state.shareAvailability,
-  );
   const viewerAvailability = availabilityByMember[viewerId];
   const initialDate = viewerAvailability?.slots[0]?.date ?? nextAvailableDate();
   const [open, setOpen] = useState(false);
@@ -202,10 +199,10 @@ export function CoffeeChatDialog({
     );
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (selectedSlotKeys.length === 0) return;
-    shareAvailability({
+    await saveMeetupAvailability({
       meetup_id: meetup.id,
       member_id: viewerId,
       slots: selectedSlotKeys.map(availabilityFromKey),

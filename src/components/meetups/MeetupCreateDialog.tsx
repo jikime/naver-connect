@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useMeetupSessionStore } from "@/stores/meetup-session";
+import { createMeetup } from "@/lib/dal/meetup-state";
 import type { Field, MaskedMember, Meetup } from "@/types";
 
 const MEETUP_TYPES: Meetup["type"][] = [
@@ -39,7 +39,6 @@ export function MeetupCreateDialog({
   fields: Field[];
   viewer?: MaskedMember;
 }) {
-  const addMeetup = useMeetupSessionStore((state) => state.addMeetup);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -68,13 +67,13 @@ export function MeetupCreateDialog({
     setOpen(nextOpen);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!viewer || !title.trim() || !purpose.trim() || fieldId === null) {
       return;
     }
 
-    addMeetup({
+    await createMeetup({
       id: `USER-MU-${Date.now()}`,
       type,
       title: title.trim(),

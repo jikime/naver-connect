@@ -10,16 +10,20 @@ import {
   getCollabRelationsFromDB,
   getOrganizationsFromDB,
 } from "@/lib/dal/collaboration-server";
+import { getDatasetDocument } from "@/lib/dal/server-datasets";
+import type { Field, SubgroupMapEntry } from "@/types";
 
 export const metadata: Metadata = {
-  title: "협업사례 | 사회혁신기업가네트워크 AX 플랫폼 (목업)",
+  title: "협업사례 | 사회혁신기업가네트워크 AX 플랫폼",
 };
 
 export default async function CollabCasesPage() {
-  const [cases, relations, orgs] = await Promise.all([
+  const [cases, relations, orgs, fields, subgroupMap] = await Promise.all([
     getCollabCasesFromDB(),
     getCollabRelationsFromDB(),
     getOrganizationsFromDB(),
+    getDatasetDocument<Field[]>("fields"),
+    getDatasetDocument<SubgroupMapEntry[]>("subgroup-map"),
   ]);
 
   return (
@@ -44,6 +48,8 @@ export default async function CollabCasesPage() {
           initialCases={cases}
           initialRelations={relations}
           initialOrgs={orgs}
+          initialFields={fields.data}
+          initialSubgroupMap={subgroupMap.data}
         />
       </div>
     </div>

@@ -9,34 +9,40 @@
 import { KnowledgeGraphView } from "@/components/knowledge-graph/KnowledgeGraphView";
 import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
 import { getKnowledgeGraph } from "@/lib/dal";
+import { getServerDataset } from "@/lib/dal/server-datasets";
 
 const PLACEHOLDER_VIEWER = { role: "기업가", personaId: "M-001" } as const;
 
 export default async function KnowledgeGraphPage() {
-  const graph = await getKnowledgeGraph(PLACEHOLDER_VIEWER);
+  const graph = await getKnowledgeGraph(PLACEHOLDER_VIEWER, getServerDataset);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-16 sm:px-10 sm:py-20 lg:px-16">
-      <header className="space-y-3">
-        <div className="flex items-center gap-2">
-          <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-            [ KNOWLEDGE GRAPH · A-v2 ]
-          </p>
+    <div className="flex flex-1 flex-col">
+      <header className="border-b border-guud-hairline bg-guud-header-band">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-end justify-between gap-4 px-6 py-14 sm:px-10 lg:px-16">
+          <div className="space-y-3">
+            <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ KNOWLEDGE GRAPH · A-v2 ]
+            </p>
+            <h1 className="font-heading text-3xl font-light tracking-tight text-foreground sm:text-4xl">
+              사회혁신 네트워크{" "}
+              <span className="text-primary">지식 그래프</span>
+            </h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
+              회원·조직·딜룸·문서·시스템이 어떻게 이어지는지 한 화면에서 봅니다.
+              딜룸 4개를 중심으로 실제 연결은 실선, 잠재 연결은 점선, 잠재가
+              실제로 전환되는 기회는 빨강으로 강조합니다. 노드는 유형별로 접었다
+              펼 수 있고, 2D 평면 뷰와 3D 입체 뷰를 전환할 수 있습니다. 공개
+              정보만 표시합니다.
+            </p>
+          </div>
           <AutomationLevelBadge frId="FR-GR-02" />
         </div>
-        <h1 className="font-heading text-4xl font-semibold tracking-tight text-foreground">
-          사회혁신 네트워크 <span className="text-primary">지식 그래프</span>
-        </h1>
-        <p className="max-w-2xl text-sm text-guud-text-muted-2">
-          회원·조직·딜룸·문서·시스템이 어떻게 이어지는지 한 화면에서 봅니다.
-          딜룸 4개를 중심으로 실제 연결은 실선, 잠재 연결은 점선, 잠재가 실제로
-          전환되는 기회는 빨강으로 강조합니다. 노드는 유형별로 접었다 펼 수
-          있고, 2D 평면 뷰와 3D 입체 뷰를 전환할 수 있습니다. 공개 정보만
-          표시합니다.
-        </p>
       </header>
 
-      <KnowledgeGraphView graph={graph} />
+      <div className="mx-auto w-full max-w-7xl px-6 py-14 sm:px-10 lg:px-16">
+        <KnowledgeGraphView graph={graph} />
+      </div>
     </div>
   );
 }

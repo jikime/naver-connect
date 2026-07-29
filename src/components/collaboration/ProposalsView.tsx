@@ -2,7 +2,7 @@
 
 // ProposalsView — 프로젝트 제안·트래킹(FR-PP-01/02).
 // 근거: ARCHITECTURE.md §5.2/§5.3, PRD §8.17, TASKS #28
-// 상태 전이(제안됨→검토→성사/중단)는 세션 스토어 한정(trackProposal, C-3/A8).
+// 상태 전이(제안됨→검토→성사/중단)는 사용자별 서버 상태에 저장한다(trackProposal).
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";

@@ -3,12 +3,14 @@
 // deal_rooms.json은 민감 시드(핫리드 씨앗 참조) — 이 파일이 유일한 import 지점이어야 한다(ADR-03).
 // v1.1: FR-DR-05("내 딜 현황" 우선 정렬 + 딜소싱 등록분 반영)·FR-BO-06(getExpertMatches) 추가.
 // v1.0 딜룸 보드·백오피스(FR-DR-01~04·FR-BO-01~05)는 여전히 정적 스텁(입력 없음) — registerDeal만
-// SessionInteraction 스토어 한정 쓰기다(A8 v1.1 개정, C-3 해소, §5.3 v1.1 쓰기 경계).
+// 쓰기 결과는 사용자별 서버 상태에 저장하고 Zustand는 화면 반응용 캐시로만 사용한다.
 
-import expertServicesSeed from "@/data/expert_services.json";
-import fieldsSeed from "@/data/fields.json";
-import organizationsSeed from "@/data/organizations.json";
-import dealRoomsSeed from "@/data/private/deal_rooms.json";
+import type { DatasetLoader } from "@/lib/dal/datasets";
+import { getDataset } from "@/lib/dal/datasets";
+import {
+  hydrateRuntimeState,
+  setRuntimeStateValue,
+} from "@/lib/dal/runtime-state";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
   DealRoom,
@@ -18,22 +20,23 @@ import type {
   ViewerContext,
 } from "@/types";
 
-const dealRooms = dealRoomsSeed as DealRoom[];
-const expertServices = expertServicesSeed as ExpertServicesSeed;
-/**
- * 방어 가드 — expert_services.json 항목이 불완전(예: expert_id 누락/undefined 원소)해도
- * 다운스트림(백오피스 카드·연락 CTA·SupplierView 등)이 `.expert_id` 접근에서 크래시하지
- * 않도록 이 파일의 유일한 진입점에서 한 번에 걸러낸다(FR-BO-01~04/06/07 공통).
- */
-const expertServiceList: ExpertService[] = (
-  expertServices.services ?? []
-).filter((svc): svc is ExpertService => Boolean(svc?.expert_id));
-const groupBuyList: GroupBuy[] = expertServices.groupBuys ?? [];
-
 type OrgSeed = { id: string; field_tags: number[]; member_id: string | null };
 type FieldSeed = { id: number; name: string };
-const organizations = organizationsSeed as OrgSeed[];
-const fields = fieldsSeed as FieldSeed[];
+
+async function getExpertServicesData(
+  loadDataset: DatasetLoader = getDataset,
+): Promise<{
+  services: ExpertService[];
+  groupBuys: GroupBuy[];
+}> {
+  const document = await loadDataset<ExpertServicesSeed>("expert-services");
+  return {
+    services: (document.services ?? []).filter(
+      (service): service is ExpertService => Boolean(service?.expert_id),
+    ),
+    groupBuys: document.groupBuys ?? [],
+  };
+}
 
 /** "내가 제안한 딜"(owner) → "내가 참여한 딜"(participating) → 그 외 순으로 정렬(FR-DR-05). */
 function sortMyDealsFirst(
@@ -61,11 +64,16 @@ function sortMyDealsFirst(
 }
 
 /**
- * 딜룸 파이프라인 보드(FR-DR-01~03). v1.0 씨앗 시드 + v1.1 딜소싱 등록분(세션 스토어,
+ * 딜룸 파이프라인 보드(FR-DR-01~03). 기본 데이터와 사용자별 딜소싱 등록분을
  * registerDeal)을 합쳐 반환하고, "내가 제안·진행하는 딜"을 우선 정렬한다(FR-DR-05).
  * 상세 편집·상태 전이는 여전히 제공하지 않는다(FR-DR-04, 정적 스텁 경계 A8 v1.1).
  */
-export async function getDealRooms(vc: ViewerContext): Promise<DealRoom[]> {
+export async function getDealRooms(
+  vc: ViewerContext,
+  loadDataset: DatasetLoader = getDataset,
+): Promise<DealRoom[]> {
+  if (loadDataset === getDataset) await hydrateRuntimeState();
+  const dealRooms = await loadDataset<DealRoom[]>("deal-rooms");
   const registered = useSessionInteractionStore.getState().registeredDeals;
   return sortMyDealsFirst([...dealRooms, ...registered], vc.personaId);
 }
@@ -73,11 +81,9 @@ export async function getDealRooms(vc: ViewerContext): Promise<DealRoom[]> {
 /** 백오피스 마켓 카탈로그 + 공동구매 현황(FR-BO-01~04/07). */
 export async function getExpertServices(
   _vc: ViewerContext,
+  loadDataset: DatasetLoader = getDataset,
 ): Promise<{ services: ExpertService[]; groupBuys: GroupBuy[] }> {
-  return {
-    services: expertServiceList,
-    groupBuys: groupBuyList,
-  };
+  return getExpertServicesData(loadDataset);
 }
 
 /**
@@ -85,7 +91,13 @@ export async function getExpertServices(
  * FR-BO-06(맞춤 전문기관)·자원검색 매칭의 공통 근거 — 그럴듯한 목업 매칭이며, 시드 자체를
  * 창작하지 않고 이미 존재하는 organizations/fields 관계에서만 파생한다.
  */
-export function resolveDealFieldNames(dealId: string): string[] {
+export async function resolveDealFieldNames(dealId: string): Promise<string[]> {
+  await hydrateRuntimeState();
+  const [dealRooms, organizations, fields] = await Promise.all([
+    getDataset<DealRoom[]>("deal-rooms"),
+    getDataset<OrgSeed[]>("organizations"),
+    getDataset<FieldSeed[]>("fields"),
+  ]);
   const room = dealRooms
     .concat(useSessionInteractionStore.getState().registeredDeals)
     .find((r) => r.id === dealId);
@@ -114,6 +126,11 @@ export async function getExpertMatches(
   _vc: ViewerContext,
   dealId: string,
 ): Promise<ExpertService[]> {
+  await hydrateRuntimeState();
+  const [dealRooms, expertServices] = await Promise.all([
+    getDataset<DealRoom[]>("deal-rooms"),
+    getExpertServicesData(),
+  ]);
   const room = dealRooms
     .concat(useSessionInteractionStore.getState().registeredDeals)
     .find((r) => r.id === dealId);
@@ -127,7 +144,7 @@ export async function getExpertMatches(
     "격차기회카드",
   ];
   const policyDriven = policyDrivenSourceTypes.includes(room.source_type);
-  return expertServiceList.filter((svc) => {
+  return expertServices.services.filter((svc) => {
     if (svc.category === "회계세무") {
       return true;
     }
@@ -149,7 +166,10 @@ export interface DealSourcingInput {
 }
 
 /** memberId[] → 그 회원들이 대표로 있는 조직 id[] (organizations.member_id 역참조). */
-function resolveOrgIdsForMembers(memberIds: string[]): string[] {
+function resolveOrgIdsForMembers(
+  organizations: OrgSeed[],
+  memberIds: string[],
+): string[] {
   const ids = new Set<string>();
   for (const org of organizations) {
     if (org.member_id && memberIds.includes(org.member_id)) {
@@ -161,13 +181,15 @@ function resolveOrgIdsForMembers(memberIds: string[]): string[] {
 
 /**
  * 딜소싱 폼 등록(FR-DS-01). v1.1 신규 3단계 쓰기 — SessionInteraction 스토어에만 반영되고
- * 실제 백엔드 쓰기는 없다(A8 v1.1 개정, C-3 해소). 등록된 딜은 씨앗 단계로 딜룸 파이프라인에
- * 즉시 반영되어 getDealRooms에 나타난다(FR-DR-05 연동). 새로고침 시 시드 초기값으로 리셋(A6).
+ * Supabase 사용자 상태에 저장한다. 등록된 딜은 씨앗 단계로 파이프라인에 즉시 반영되고
+ * 새로고침과 재로그인 뒤에도 유지된다(FR-DR-05 연동).
  */
 export async function registerDeal(
   vc: ViewerContext,
   payload: DealSourcingInput,
 ): Promise<DealRoom> {
+  const state = await hydrateRuntimeState();
+  const organizations = await getDataset<OrgSeed[]>("organizations");
   const participantIds = Array.from(
     new Set([vc.personaId, ...payload.participantMemberIds]),
   );
@@ -183,13 +205,16 @@ export async function registerDeal(
       G3: { passed: false, date: null },
       G4: { passed: false, date: null },
     },
-    participating_orgs: resolveOrgIdsForMembers(participantIds),
+    participating_orgs: resolveOrgIdsForMembers(organizations, participantIds),
     agreement_doc: {
       note: `딜소싱 폼 등록 — 사업내용: ${payload.businessContent} / 기대효과: ${payload.expectedEffect} / 정책사업 연계: ${payload.hasPolicyProgram ? "있음" : "없음"}.`,
     },
     owner_member_id: vc.personaId,
     participating_member_ids: participantIds,
   };
-  useSessionInteractionStore.getState().addRegisteredDeal(newRoom);
+  await setRuntimeStateValue("registeredDeals", [
+    ...state.registeredDeals,
+    newRoom,
+  ]);
   return newRoom;
 }

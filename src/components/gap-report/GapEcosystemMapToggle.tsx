@@ -10,7 +10,7 @@
 import { Map as MapIcon, Waypoints } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { Organization, Region, StageLink } from "@/types";
+import type { Organization, Region, StageLink, VCStage } from "@/types";
 import { ConnectionMap } from "./ConnectionMap";
 import { DistrictMapView } from "./DistrictMapView";
 import {
@@ -26,10 +26,12 @@ export function GapEcosystemMapToggle({
   region,
   stageLinks,
   orgs,
+  vcStages,
 }: {
   region: Region;
   stageLinks: StageLink[];
   orgs: Organization[];
+  vcStages: VCStage[];
 }) {
   const [view, setView] = useState<MapView>("graph");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -96,7 +98,12 @@ export function GapEcosystemMapToggle({
         )}
       </div>
 
-      <NodeDetailPanel node={selectedNode} region={region} orgs={orgs} />
+      <NodeDetailPanel
+        node={selectedNode}
+        region={region}
+        orgs={orgs}
+        vcStages={vcStages}
+      />
     </div>
   );
 }

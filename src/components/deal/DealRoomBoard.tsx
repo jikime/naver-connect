@@ -7,10 +7,13 @@
 
 import { useEffect, useState } from "react";
 import { DealRoomCard } from "@/components/deal/DealRoomCard";
-import { getDealRooms } from "@/lib/dal";
+import { getDataset, getDealRooms } from "@/lib/dal";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import { useViewerContext } from "@/stores/viewer-context";
 import type { DealRoom } from "@/types";
+
+type OrgLookup = { id: string; name: string; member_id: string | null };
+type MemberLookup = { id: string; name: string };
 
 const STAGES: DealRoom["stage"][] = ["씨앗", "탐색", "기획", "실행", "자립"];
 
@@ -20,13 +23,21 @@ export function DealRoomBoard() {
     (state) => state.registeredDeals,
   );
   const [dealRooms, setDealRooms] = useState<DealRoom[] | null>(null);
+  const [organizations, setOrganizations] = useState<OrgLookup[]>([]);
+  const [members, setMembers] = useState<MemberLookup[]>([]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: registeredDeals는 딜소싱 등록 시(FR-DS-01) 재조회를 트리거하기 위한 의도적 의존성(본문 미참조).
   useEffect(() => {
     let cancelled = false;
-    getDealRooms(vc).then((result) => {
+    Promise.all([
+      getDealRooms(vc),
+      getDataset<OrgLookup[]>("organizations"),
+      getDataset<MemberLookup[]>("members"),
+    ]).then(([result, orgResult, memberResult]) => {
       if (!cancelled) {
         setDealRooms(result);
+        setOrganizations(orgResult);
+        setMembers(memberResult);
       }
     });
     return () => {
@@ -61,6 +72,8 @@ export function DealRoomBoard() {
                 key={room.id}
                 room={room}
                 viewerPersonaId={vc.personaId}
+                organizations={organizations}
+                members={members}
               />
             ))}
           </div>
@@ -90,6 +103,8 @@ export function DealRoomBoard() {
                       key={room.id}
                       room={room}
                       viewerPersonaId={vc.personaId}
+                      organizations={organizations}
+                      members={members}
                     />
                   ))
                 )}

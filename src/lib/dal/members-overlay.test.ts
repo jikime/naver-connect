@@ -5,6 +5,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import membersSeed from "@/data/members.json";
 import { snapshotSessionState } from "@/lib/dal/matching";
+import { setRuntimeStateValue } from "@/lib/dal/runtime-state";
 import { runMatchingEngine } from "@/lib/server/matching-service";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
@@ -60,15 +61,20 @@ function snapshotFixture(
   };
 }
 
-function storeSnapshot(personaId: string, snapshot: OnboardingFinalizeInput) {
-  useSessionInteractionStore.getState().storeOnboardingResult(personaId, {
-    snapshot,
-    needs: [],
-    offers: [],
-    consents: {
-      publish: snapshot.consents.publish_profile,
-      matching: snapshot.consents.use_private_needs_for_matching,
-      quote: snapshot.consents.quote_in_intro,
+async function storeSnapshot(
+  personaId: string,
+  snapshot: OnboardingFinalizeInput,
+) {
+  await setRuntimeStateValue("onboardingResults", {
+    [personaId]: {
+      snapshot,
+      needs: [],
+      offers: [],
+      consents: {
+        publish: snapshot.consents.publish_profile,
+        matching: snapshot.consents.use_private_needs_for_matching,
+        quote: snapshot.consents.quote_in_intro,
+      },
     },
   });
 }
@@ -80,7 +86,7 @@ beforeEach(() => {
 describe("getMember — 세션 스냅샷 overlay", () => {
   it("온보딩을 확정한 회원은 스냅샷의 조직명·지역·미션·분야로 덮여 조회된다", async () => {
     const snapshot = snapshotFixture();
-    storeSnapshot("M-001", snapshot);
+    await storeSnapshot("M-001", snapshot);
 
     const member = await getMember(OPERATOR, "M-001");
     expect(member.org).toEqual(snapshot.organization);
@@ -95,7 +101,7 @@ describe("getMember — 세션 스냅샷 overlay", () => {
 
   it("공개층(supply_tags·activities·preferred_mode·region)도 스냅샷 값으로 덮인다", async () => {
     const snapshot = snapshotFixture();
-    storeSnapshot("M-001", snapshot);
+    await storeSnapshot("M-001", snapshot);
 
     const member = await getMember(OPERATOR, "M-001");
     expect(member.visibility.public.supply_tags).toEqual(snapshot.supply_tags);
@@ -107,7 +113,7 @@ describe("getMember — 세션 스냅샷 overlay", () => {
   });
 
   it("스냅샷이 없는 다른 회원은 시드 값 그대로 불변이다", async () => {
-    storeSnapshot("M-001", snapshotFixture());
+    await storeSnapshot("M-001", snapshotFixture());
 
     const other = await getMember(OPERATOR, "M-002");
     expect(other.org).toEqual(seedM002.org);
@@ -120,7 +126,7 @@ describe("getMember — 세션 스냅샷 overlay", () => {
   });
 
   it("공개 노출 동의(publish_profile=false)면 공개층 overlay를 적용하지 않고 시드를 유지한다", async () => {
-    storeSnapshot(
+    await storeSnapshot(
       "M-001",
       snapshotFixture({
         consents: {
@@ -146,14 +152,14 @@ describe("getMember — 세션 스냅샷 overlay", () => {
 describe("searchMembers — overlay된 값 기준 검색", () => {
   it("온보딩에서 바꾼 조직명으로 검색하면 해당 회원이 잡힌다", async () => {
     const snapshot = snapshotFixture();
-    storeSnapshot("M-001", snapshot);
+    await storeSnapshot("M-001", snapshot);
 
     const hits = await searchMembers(OPERATOR, "성동 돌봄전환");
     expect(hits.map((m) => m.id)).toContain("M-001");
   });
 
   it("바뀌기 전 시드 조직명으로는 더 이상 잡히지 않는다", async () => {
-    storeSnapshot("M-001", snapshotFixture());
+    await storeSnapshot("M-001", snapshotFixture());
 
     const stale = await searchMembers(OPERATOR, seedM001.org.name);
     expect(stale.map((m) => m.id)).not.toContain("M-001");
@@ -161,9 +167,9 @@ describe("searchMembers — overlay된 값 기준 검색", () => {
 });
 
 describe("runMatchingEngine — 세션 스냅샷이 매칭 컨텍스트에 반영", () => {
-  it("personContext의 region·fieldIds·hotLead가 스냅샷 값을 따른다(keywords는 시드 유지)", () => {
+  it("personContext의 region·fieldIds·hotLead가 스냅샷 값을 따른다(keywords는 시드 유지)", async () => {
     const snapshot = snapshotFixture();
-    storeSnapshot("M-001", snapshot);
+    await storeSnapshot("M-001", snapshot);
 
     const { input } = runMatchingEngine(snapshotSessionState());
     const ctx = input.personContext["M-001"];
@@ -178,9 +184,9 @@ describe("runMatchingEngine — 세션 스냅샷이 매칭 컨텍스트에 반�
     });
   });
 
-  it("impactIntents가 세션 버전(미션·분야·지역)으로 대체되고 시드 intent는 빠진다", () => {
+  it("impactIntents가 세션 버전(미션·분야·지역)으로 대체되고 시드 intent는 빠진다", async () => {
     const snapshot = snapshotFixture();
-    storeSnapshot("M-001", snapshot);
+    await storeSnapshot("M-001", snapshot);
 
     const { input } = runMatchingEngine(snapshotSessionState());
     const mine = input.impactIntents.filter((i) => i.owner.id === "M-001");

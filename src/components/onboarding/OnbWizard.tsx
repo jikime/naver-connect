@@ -23,21 +23,23 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { MatchTypeBadge } from "@/components/shared/MatchTypeBadge";
 import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
 import { Button } from "@/components/ui/button";
 import {
   finalizeOnboarding,
+  getFields,
   getInterviewScript,
   getMeetups,
-  getMember,
+  getMyProfileState,
   getOnboardingMeta,
   getTags,
 } from "@/lib/dal";
-import { useAuthSessionStore } from "@/stores/auth-session";
 import { useViewerContext } from "@/stores/viewer-context";
 import type {
+  Field,
   MaskedMember,
   Meetup,
   OnboardingScriptMeta,
@@ -165,17 +167,18 @@ function canProceedFromStep(
 
 export function OnbWizard() {
   const vc = useViewerContext();
-  const completeOnboarding = useAuthSessionStore(
-    (state) => state.completeOnboarding,
-  );
+  const { update: updateSession } = useSession();
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [fields, setFields] = useState<Field[]>([]);
   const [scriptMeta, setScriptMeta] = useState<OnboardingScriptMeta | null>(
     null,
   );
   const [sourceMember, setSourceMember] = useState<MaskedMember | null>(null);
+  const [persistedComplete, setPersistedComplete] = useState(false);
+  const [editingCompleted, setEditingCompleted] = useState(false);
 
   const [step, setStep] = useState(1);
   // Task #21: 스텝 전환 슬라이드 방향(다음=1, 이전=-1) — AnimatePresence의 initial/exit에 사용
@@ -199,17 +202,23 @@ export function OnbWizard() {
       setLoadError(null);
       setResult(null);
       setStep(1);
+      setEditingCompleted(false);
       setFollowupQueue([]);
       try {
-        const [tagsRes, memberRes, metaRes] = await Promise.all([
+        const [tagsRes, fieldsRes, profileRes, metaRes] = await Promise.all([
           getTags(),
-          getMember(vc, vc.personaId),
+          getFields(),
+          getMyProfileState(),
           getOnboardingMeta(),
         ]);
         if (cancelled) return;
+        const memberRes = profileRes.member;
         setTags(tagsRes);
+        setFields(fieldsRes);
         setScriptMeta(metaRes);
         setSourceMember(memberRes);
+        setPersistedComplete(profileRes.onboardingComplete);
+        const saved = profileRes.onboarding;
         setDraft({
           ...createEmptyDraft(),
           orgName: memberRes.org.name,
@@ -226,10 +235,34 @@ export function OnbWizard() {
               draftId: `${memberRes.id}-trust-${index}`,
             }),
           ),
+          demandSelections:
+            saved?.demand_tags.map(({ tagId, priority }) => ({
+              tagId,
+              priority,
+            })) ?? [],
           supplySelections:
-            memberRes.member_type === "전문가"
-              ? memberRes.visibility.public.supply_tags.slice(0, 3)
-              : [],
+            saved?.supply_tags ??
+            memberRes.visibility.public.supply_tags.slice(0, 3),
+          activities: saved?.activities ?? [],
+          availability: saved?.availability ?? "",
+          preferredMode: saved?.preferred_mode ?? "",
+          readiness: saved?.readiness ?? "",
+          participationScope: saved?.participation_scope ?? "",
+          visibilityConsent: saved?.consents.publish_profile ?? false,
+          consentMatching:
+            saved?.consents.use_private_needs_for_matching ?? false,
+          consentQuote: saved?.consents.quote_in_intro ?? false,
+          safeMatchApprovals: Object.fromEntries(
+            (saved?.demand_tags ?? [])
+              .filter((item) => item.safe_match)
+              .map((item) => [
+                item.tagId,
+                {
+                  approved: item.safe_match?.approved ?? false,
+                  text: item.safe_match?.text ?? "",
+                },
+              ]),
+          ),
         });
       } catch (e) {
         if (!cancelled) {
@@ -400,7 +433,8 @@ export function OnbWizard() {
         visibility_consent: draft.visibilityConsent,
       });
       setResult(finalized);
-      completeOnboarding();
+      setPersistedComplete(true);
+      await updateSession();
       if (
         finalized.firstRecommendations.some((rec) => rec.rec_kind === "모둠")
       ) {
@@ -511,6 +545,97 @@ export function OnbWizard() {
               </Button>
               <Button asChild variant="outline">
                 <Link href="/profile">완성된 프로필 보기</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (persistedComplete && !editingCompleted && sourceMember) {
+    return (
+      <section className="overflow-hidden rounded-[2rem] border border-guud-hairline bg-card shadow-sm">
+        <div className="grid lg:grid-cols-[0.82fr_1.18fr]">
+          <div className="flex flex-col justify-between gap-10 bg-secondary p-7 sm:p-10">
+            <div>
+              <span className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Check className="size-7" strokeWidth={2.5} />
+              </span>
+              <p className="mt-7 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-primary uppercase">
+                [ ONBOARDING SAVED ]
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                온보딩 정보가
+                <br />
+                안전하게 저장되어 있어요
+              </h2>
+              <p className="mt-4 text-sm leading-7 text-guud-text-muted-2">
+                새로고침하거나 다시 로그인해도 저장된 완료 상태를
+                데이터베이스에서 불러옵니다.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-background/75 p-4 text-xs leading-5 text-guud-text-muted-2">
+              내용을 바꾸고 싶을 때만 다시 작성해주세요. 기존 정보는 입력란에
+              그대로 복원됩니다.
+            </div>
+          </div>
+
+          <div className="p-7 sm:p-10">
+            <p className="font-mono text-[0.625rem] tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              [ SAVED PROFILE ]
+            </p>
+            <h3 className="mt-2 font-heading text-2xl font-semibold text-foreground">
+              {sourceMember.name}님의 연결 프로필
+            </h3>
+            <dl className="mt-7 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-guud-hairline bg-background p-5">
+                <dt className="text-xs font-semibold text-guud-text-muted-2">
+                  소속
+                </dt>
+                <dd className="mt-2 text-sm font-semibold text-foreground">
+                  {sourceMember.org.name || "미입력"}
+                </dd>
+              </div>
+              <div className="rounded-2xl border border-guud-hairline bg-background p-5">
+                <dt className="text-xs font-semibold text-guud-text-muted-2">
+                  활동 지역
+                </dt>
+                <dd className="mt-2 text-sm font-semibold text-foreground">
+                  {[sourceMember.region.sido, sourceMember.region.sigungu]
+                    .filter(Boolean)
+                    .join(" ") || "미입력"}
+                </dd>
+              </div>
+              <div className="rounded-2xl border border-guud-hairline bg-background p-5 sm:col-span-2">
+                <dt className="text-xs font-semibold text-guud-text-muted-2">
+                  미션
+                </dt>
+                <dd className="mt-2 text-sm leading-6 font-medium text-foreground">
+                  {sourceMember.mission_statement || "미입력"}
+                </dd>
+              </div>
+            </dl>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="/recommendations">
+                  추천 확인하기 <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/profile">프로필 보기</Link>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setDirection(1);
+                  setStep(1);
+                  setEditingCompleted(true);
+                }}
+              >
+                온보딩 다시 작성하기
               </Button>
             </div>
           </div>
@@ -679,6 +804,7 @@ export function OnbWizard() {
                 <ProfileConfirmStep
                   draft={draft}
                   onChange={updateDraft}
+                  fields={fields}
                   mode="edit"
                 />
               )}
@@ -732,6 +858,7 @@ export function OnbWizard() {
                   <ProfileConfirmStep
                     draft={draft}
                     onChange={updateDraft}
+                    fields={fields}
                     mode="review"
                   />
                   <div className="grid gap-4 xl:grid-cols-2">

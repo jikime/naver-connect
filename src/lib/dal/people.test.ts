@@ -2,6 +2,7 @@
 // 근거: plans/generic-mixing-seahorse.md M0-4, people_match_retrieval_plan.md §4.1
 
 import { describe, expect, it } from "vitest";
+import { getDataset } from "@/lib/dal/datasets";
 import {
   getCapabilityOffers,
   getConsentRecords,
@@ -75,16 +76,22 @@ describe("consents — 목적별 영수증", () => {
     expect(other).toEqual([]);
   });
 
-  it("hasActiveConsent는 매칭 동의를 인정하고, 없는 목적(model_training)은 거부한다", () => {
-    expect(hasActiveConsent("M-001", "use_private_needs_for_matching")).toBe(
-      true,
+  it("hasActiveConsent는 매칭 동의를 인정하고, 없는 목적(model_training)은 거부한다", async () => {
+    expect(
+      await hasActiveConsent(
+        "M-001",
+        "use_private_needs_for_matching",
+        getDataset,
+      ),
+    ).toBe(true);
+    expect(await hasActiveConsent("M-001", "model_training", getDataset)).toBe(
+      false,
     );
-    expect(hasActiveConsent("M-001", "model_training")).toBe(false);
   });
 });
 
 describe("listActiveNeedIntentsForEngine — 엔진 전용", () => {
-  it("활성 Need 전건을 반환한다 (배럴 미등록 — UI 직접 사용 금지 계약)", () => {
-    expect(listActiveNeedIntentsForEngine().length).toBe(15);
+  it("활성 Need 전건을 반환한다 (배럴 미등록 — UI 직접 사용 금지 계약)", async () => {
+    expect((await listActiveNeedIntentsForEngine(getDataset)).length).toBe(15);
   });
 });

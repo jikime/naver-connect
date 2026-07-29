@@ -4,11 +4,13 @@
 // FR-EM2-01~03의 3단 드릴다운은 정적 시드가 작아 DAL이 필드 스코프 번들을 반환하고
 // 컴포넌트가 단계(field→stage→force→region)를 클라이언트 상태로 좁혀나간다(gap-report와 동일 패턴).
 
-import fiveForcesSeed from "@/data/five_forces.json";
-import organizationsSeed from "@/data/organizations.json";
-import stageLinksSeed from "@/data/stage_links.json";
-import vcStagesSeed from "@/data/vc_stages.json";
+import type { DatasetLoader } from "@/lib/dal/datasets";
+import { getDataset } from "@/lib/dal/datasets";
 import { getMember } from "@/lib/dal/members";
+import {
+  hydrateRuntimeState,
+  setRuntimeStateValue,
+} from "@/lib/dal/runtime-state";
 import { useBusinessRelationSessionStore } from "@/stores/business-relation-session";
 import type {
   FiveForce,
@@ -17,11 +19,6 @@ import type {
   VCStage,
   ViewerContext,
 } from "@/types";
-
-const vcStages = vcStagesSeed as VCStage[];
-const fiveForces = fiveForcesSeed as FiveForce[];
-const organizations = organizationsSeed as Organization[];
-const stageLinks = stageLinksSeed as StageLink[];
 
 /**
  * 생태계맵 v2 번들(FR-EM2-01/02/04): 밸류체인 단계 → 5-force 이해관계자 → 실제 단체.
@@ -32,12 +29,19 @@ export async function getEcosystemMap(
   _vc: ViewerContext,
   field?: number,
   region?: string,
+  loadDataset: DatasetLoader = getDataset,
 ): Promise<{
   stages: VCStage[];
   forces: FiveForce[];
   orgs: Organization[];
   stageLinks: StageLink[];
 }> {
+  const [vcStages, fiveForces, organizations, stageLinks] = await Promise.all([
+    loadDataset<VCStage[]>("vc-stages"),
+    loadDataset<FiveForce[]>("five-forces"),
+    loadDataset<Organization[]>("organizations"),
+    loadDataset<StageLink[]>("stage-links"),
+  ]);
   const stages = field
     ? vcStages.filter((s) => s.field_id === field)
     : vcStages;
@@ -67,6 +71,7 @@ export async function getEcosystemMap(
 export async function getMyOrgs(
   vc: ViewerContext,
 ): Promise<{ affiliationOrgId: string | null; targetOrgIds: string[] }> {
+  await hydrateRuntimeState();
   const override =
     useBusinessRelationSessionStore.getState().myOrgsOverrides[vc.personaId];
   if (override) {
@@ -82,13 +87,15 @@ export async function getMyOrgs(
   };
 }
 
-/** "내 소속/대상 단체" 설정(FR-EM2-03). 세션 스토어만 갱신, 새로고침 시 시드로 리셋(A6/C-3). */
+/** "내 소속/대상 단체" 설정(FR-EM2-03). 로그인 사용자의 서버 상태에 저장한다. */
 export async function setMyOrgs(
   vc: ViewerContext,
   affiliationOrgId: string | null,
   targetOrgIds: string[],
 ): Promise<void> {
-  useBusinessRelationSessionStore
-    .getState()
-    .setMyOrgs(vc.personaId, { affiliationOrgId, targetOrgIds });
+  const state = await hydrateRuntimeState();
+  await setRuntimeStateValue("myOrgsOverrides", {
+    ...state.myOrgsOverrides,
+    [vc.personaId]: { affiliationOrgId, targetOrgIds },
+  });
 }

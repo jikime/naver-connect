@@ -3,27 +3,37 @@
 // 근거: research_synthesis.md §6.3, plans/generic-mixing-seahorse.md M0-1
 // 시드: src/data/vocabulary/releases/role-terms-1.0.0.json (비민감 참조 데이터 — 마스킹 불요)
 
-import releaseSeed from "@/data/vocabulary/releases/role-terms-1.0.0.json";
 import type {
   TermLabelRevision,
   VocabularyReleaseFile,
 } from "@/types/vocabulary";
 
-const releaseFile = releaseSeed as VocabularyReleaseFile;
+let releaseFile: VocabularyReleaseFile | null = null;
 
-/** 현재 활성 릴리스(파일 전체). 릴리스 추가 시 최신 semver 선택 로직으로 확장한다. */
-export function getActiveRelease(): VocabularyReleaseFile {
+export function initializeVocabulary(file: VocabularyReleaseFile): void {
+  releaseFile = file;
+}
+
+function activeRelease(): VocabularyReleaseFile {
+  if (!releaseFile) {
+    throw new Error("용어 사전 데이터가 준비되지 않았습니다.");
+  }
   return releaseFile;
 }
 
+/** 현재 활성 릴리스(파일 전체). 릴리스 추가 시 최신 semver 선택 로직으로 확장한다. */
+export function getActiveRelease(): VocabularyReleaseFile {
+  return activeRelease();
+}
+
 function revisionsOf(conceptId: string): TermLabelRevision[] {
-  return releaseFile.label_revisions.filter(
+  return activeRelease().label_revisions.filter(
     (rev) => rev.concept_id === conceptId && rev.locale === "ko-KR",
   );
 }
 
 function assertKnownConcept(conceptId: string): void {
-  if (!releaseFile.concepts.some((c) => c.concept_id === conceptId)) {
+  if (!activeRelease().concepts.some((c) => c.concept_id === conceptId)) {
     throw new Error(`Unknown vocabulary concept: ${conceptId}`);
   }
 }
@@ -86,12 +96,12 @@ export function resolveAuditLabelAt(conceptId: string, at: string): string {
  */
 export function findConceptIdByLabel(label: string): string | undefined {
   const needle = label.trim();
-  return releaseFile.label_revisions.find((rev) => rev.label === needle)
+  return activeRelease().label_revisions.find((rev) => rev.label === needle)
     ?.concept_id;
 }
 
 /** canonical_code(API/분석용) → concept_id. */
 export function findConceptIdByCanonicalCode(code: string): string | undefined {
-  return releaseFile.concepts.find((c) => c.canonical_code === code)
+  return activeRelease().concepts.find((c) => c.canonical_code === code)
     ?.concept_id;
 }

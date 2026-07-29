@@ -2,21 +2,10 @@
 // 클라이언트는 이 모듈을 import하지 않는다(app/api/matching route 또는 테스트 transport만 접근,
 // eslint 클라존 가드 + bundle privacy 게이트가 강제). 여기서만 private 원본(needs/consents/
 // match_scores/recommendations)을 읽고, 클라이언트에는 최소 DTO(MatchingBundle)만 반환한다.
-// 세션 상태(온보딩 적립·거절 오버라이드·가중치)는 요청 파라미터로 받는다 — mock auth 전제:
-// 역할 스위처가 인증을 대신하는 데모 구조라 personaId/session은 클라이언트 신고값이다(M4에서 실인증).
+// 온보딩 적립·거절 오버라이드·가중치는 route가 Supabase에서 읽어 요청 파라미터로 전달한다.
+// 사용자 식별자와 역할은 Auth.js 세션을 기준으로 하며 브라우저 신고값을 권한에 사용하지 않는다.
 // 근거: codex final-rereview-reject #1, people_match_retrieval_plan.md §6, research_synthesis.md §13
 
-import collabRelationsSeed from "@/data/collab_relations.json";
-import meetupsSeed from "@/data/meetups.json";
-import membersPublicSeed from "@/data/members.json";
-import organizationsSeed from "@/data/organizations.json";
-import impactIntentsSeed from "@/data/people/impact_intents.json";
-import offersSeed from "@/data/people/offers.json";
-import matchScoresSeed from "@/data/private/match_scores.json";
-import consentsSeed from "@/data/private/people/consents.json";
-import needsSeed from "@/data/private/people/needs.json";
-import recommendationsOriginalSeed from "@/data/private/recommendations.json";
-import tagsSeed from "@/data/tags.json";
 import { isDemoMode } from "@/lib/app-mode";
 import type {
   DeclineRecord,
@@ -32,6 +21,7 @@ import {
   issueSafeMatchReceipt,
   toEngineNeed,
 } from "@/lib/matching/receipt";
+import { getDatasetDocument } from "@/lib/server/dataset-repository";
 import type {
   OnboardingResult,
   RecommendationOverride,
@@ -102,27 +92,120 @@ export function parseEngineRecId(
   return recipient && other ? { recipient, other } : null;
 }
 
-// ── 시드(서버 원본) ────────────────────────────────────────────────────────
-const members = membersPublicSeed as MemberPublicSeed[];
-const scoresSeed = matchScoresSeed as MatchScoresSeed;
-const recommendationsOriginal = recommendationsOriginalSeed as Recommendation[];
-const tags = tagsSeed as Tag[];
-const seedNeeds = needsSeed as NeedIntentV1[];
-const seedConsents = consentsSeed as ConsentRecordV1[];
-const seedOffers = offersSeed as CapabilityOfferV1[];
-const seedImpacts = impactIntentsSeed as ImpactIntentV1[];
-const organizations = organizationsSeed as { id: string; member_id?: string }[];
-const meetups = meetupsSeed as Meetup[];
-const meetupsById = new Map(meetups.map((m) => [m.id, m]));
-const collabRelations = collabRelationsSeed as {
-  org_a_id: string;
-  org_b_id: string;
-  is_actual?: boolean;
-}[];
+// ── Supabase 정본(서버 원본) ───────────────────────────────────────────────
+interface MatchingDataDocuments {
+  members: MemberPublicSeed[];
+  scores: MatchScoresSeed;
+  recommendations: Recommendation[];
+  tags: Tag[];
+  needs: NeedIntentV1[];
+  consents: ConsentRecordV1[];
+  offers: CapabilityOfferV1[];
+  impacts: ImpactIntentV1[];
+  organizations: { id: string; member_id?: string }[];
+  meetups: Meetup[];
+  collabRelations: {
+    org_a_id: string;
+    org_b_id: string;
+    is_actual?: boolean;
+  }[];
+}
 
-const TAG_NAMES: Record<number, string> = Object.fromEntries(
-  tags.map((t) => [t.id, t.name]),
-);
+let members: MemberPublicSeed[] = [];
+let scoresSeed: MatchScoresSeed = { scores: [], rule_weights: [] };
+let recommendationsOriginal: Recommendation[] = [];
+let seedNeeds: NeedIntentV1[] = [];
+let seedConsents: ConsentRecordV1[] = [];
+let seedOffers: CapabilityOfferV1[] = [];
+let seedImpacts: ImpactIntentV1[] = [];
+let organizations: { id: string; member_id?: string }[] = [];
+let meetupsById = new Map<string, Meetup>();
+let collabRelations: MatchingDataDocuments["collabRelations"] = [];
+let TAG_NAMES: Record<number, string> = {};
+let matchingDataReady = false;
+let matchingDataLoad: Promise<void> | null = null;
+
+function reviewDatasetEnabled(): boolean {
+  return isDemoMode() || process.env.ENABLE_REVIEW_DATA === "true";
+}
+
+export function initializeMatchingData(documents: MatchingDataDocuments): void {
+  members = documents.members;
+  scoresSeed = documents.scores;
+  recommendationsOriginal = documents.recommendations;
+  seedNeeds = documents.needs;
+  seedConsents = documents.consents;
+  seedOffers = documents.offers;
+  seedImpacts = documents.impacts;
+  organizations = documents.organizations;
+  meetupsById = new Map(documents.meetups.map((meetup) => [meetup.id, meetup]));
+  collabRelations = documents.collabRelations;
+  TAG_NAMES = Object.fromEntries(
+    documents.tags.map((tag) => [tag.id, tag.name]),
+  );
+  matchingDataReady = true;
+}
+
+export function loadMatchingDataFromDatabase(force = false): Promise<void> {
+  if (force) matchingDataLoad = null;
+  if (!matchingDataLoad) {
+    matchingDataLoad = Promise.all([
+      getDatasetDocument<MemberPublicSeed[]>("members"),
+      getDatasetDocument<MatchScoresSeed>("match-scores"),
+      getDatasetDocument<Recommendation[]>("recommendations-private"),
+      getDatasetDocument<Tag[]>("tags"),
+      getDatasetDocument<NeedIntentV1[]>("people-needs"),
+      getDatasetDocument<ConsentRecordV1[]>("people-consents"),
+      getDatasetDocument<CapabilityOfferV1[]>("capability-offers"),
+      getDatasetDocument<ImpactIntentV1[]>("impact-intents"),
+      getDatasetDocument<{ id: string; member_id?: string }[]>("organizations"),
+      getDatasetDocument<Meetup[]>("meetups"),
+      getDatasetDocument<MatchingDataDocuments["collabRelations"]>(
+        "collab-relations",
+      ),
+    ])
+      .then(
+        ([
+          memberDoc,
+          scoreDoc,
+          recommendationDoc,
+          tagDoc,
+          needDoc,
+          consentDoc,
+          offerDoc,
+          impactDoc,
+          organizationDoc,
+          meetupDoc,
+          relationDoc,
+        ]) => {
+          initializeMatchingData({
+            members: memberDoc.data,
+            scores: scoreDoc.data,
+            recommendations: recommendationDoc.data,
+            tags: tagDoc.data,
+            needs: needDoc.data,
+            consents: consentDoc.data,
+            offers: offerDoc.data,
+            impacts: impactDoc.data,
+            organizations: organizationDoc.data,
+            meetups: meetupDoc.data,
+            collabRelations: relationDoc.data,
+          });
+        },
+      )
+      .catch((error) => {
+        matchingDataLoad = null;
+        throw error;
+      });
+  }
+  return matchingDataLoad;
+}
+
+function assertMatchingDataReady(): void {
+  if (!matchingDataReady) {
+    throw new Error("매칭 데이터가 준비되지 않았습니다.");
+  }
+}
 
 // ── 동의(서버 판정 — 원본 consent 레코드 + 세션 + APP_MODE fail-closed) ──────
 function matchingConsentOf(
@@ -131,7 +214,7 @@ function matchingConsentOf(
 ): boolean {
   const onboarding = session.onboardingResults[personId];
   if (onboarding) return onboarding.consents.matching;
-  if (!isDemoMode()) return false; // seed_mock은 demo에서만 유효(P1-2)
+  if (!reviewDatasetEnabled()) return false;
   return seedConsents.some(
     (c) =>
       c.person_id === personId &&
@@ -157,7 +240,7 @@ function consentReceiptResolverOf(
     if (consentReceiptId === sessionConsentReceiptId(ownerId)) {
       return session.onboardingResults[ownerId]?.consents.matching === true;
     }
-    if (!isDemoMode()) return false;
+    if (!reviewDatasetEnabled()) return false;
     const record = seedConsents.find((c) => c.id === consentReceiptId);
     return (
       record !== undefined &&
@@ -290,6 +373,7 @@ export function runMatchingEngine(session: MatchingSessionState): {
   input: EngineInput;
   output: EngineOutput;
 } {
+  assertMatchingDataReady();
   const { needs, offers } = mergeWithSession(session);
   const snapshots = session.onboardingResults;
   const input: EngineInput = {
@@ -410,7 +494,7 @@ function computeAllowedSeedRecIds(session: MatchingSessionState): string[] {
   return recommendationsOriginal
     .filter((rec) => {
       if (rec.rec_kind === "모둠") {
-        if (!isDemoMode()) return false;
+        if (!reviewDatasetEnabled()) return false;
         const participants = meetupParticipantsOf(rec);
         if (participants.length === 0) return false;
         return participants.every((id) => matchingConsentOf(id, session));
@@ -500,7 +584,7 @@ function computeGraphEdges(req: MatchingRequest): MatchingGraphEdge[] {
 // ── safe_match_text 승인 영수증 서버 발급(M2 온보딩 P1-1) ─────────────────────
 // Codex 보완 #1: 클라이언트가 issueSafeMatchReceipt를 직접 호출하면 승인자·동의 참조를
 // 스스로 꾸밀 수 있다. 승인 의사(문구)만 받고, 서버가 owner·동의를 확인해 원자 발급한다.
-// mock auth 전제(C3 문서화된 경계): personaId/session은 클라이언트 신고값 — 실인증 결속은 M4.
+// personaId와 session은 route가 Auth.js 세션과 Supabase 상태로 조립한다.
 
 export interface SafeTextApproval {
   needId: string;
@@ -526,6 +610,7 @@ export interface SafeTextConfirmResult {
 export function confirmSafeMatchTexts(
   req: SafeTextConfirmRequest,
 ): SafeTextConfirmResult[] {
+  assertMatchingDataReady();
   const result = req.session.onboardingResults[req.personaId];
   if (!result) {
     throw new Error("승인할 온보딩 결과가 없습니다");
@@ -559,6 +644,7 @@ export function confirmSafeMatchTexts(
 
 /** 단일 진입점 — route/transport가 호출한다. */
 export function computeMatchingBundle(req: MatchingRequest): MatchingBundle {
+  assertMatchingDataReady();
   const { output } = runMatchingEngine(req.session);
   const scores: MatchScore[] = output.pairs.map((p) => ({
     from_member_id: p.from,

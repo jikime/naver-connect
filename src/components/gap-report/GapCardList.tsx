@@ -9,9 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type {
   CollabCase,
   GapCard,
+  Opportunity,
   Organization,
   ProjectProposal,
+  Resource,
   StageLink,
+  VCStage,
 } from "@/types";
 import { GapCardCTAs } from "./GapCardCTAs";
 import { resolveCandidateResource, stageLabel } from "./lookups";
@@ -23,6 +26,9 @@ export function GapCardList({
   orgs,
   collabCases,
   proposals,
+  vcStages,
+  resources,
+  opportunities,
 }: {
   gapCards: GapCard[];
   stageLinks: StageLink[];
@@ -30,6 +36,9 @@ export function GapCardList({
   orgs: Organization[];
   collabCases: CollabCase[];
   proposals: ProjectProposal[];
+  vcStages: VCStage[];
+  resources: Resource[];
+  opportunities: Opportunity[];
 }) {
   const stageLinkById = new Map(stageLinks.map((link) => [link.id, link]));
   const orgByMemberId = new Map(
@@ -72,9 +81,9 @@ export function GapCardList({
                       <span className="font-semibold text-foreground">
                         #{link.id} {link.status}
                       </span>{" "}
-                      {stageLabel(link.from_stage)} →{" "}
-                      {stageLabel(link.to_stage)} ({link.resource_flow}) —{" "}
-                      {link.rationale}
+                      {stageLabel(vcStages, link.from_stage)} →{" "}
+                      {stageLabel(vcStages, link.to_stage)} (
+                      {link.resource_flow}) — {link.rationale}
                     </li>
                   );
                 })}
@@ -115,7 +124,11 @@ export function GapCardList({
               </h4>
               <ul className="mt-1 space-y-0.5">
                 {card.candidate_resources.map((resId) => {
-                  const resolved = resolveCandidateResource(resId);
+                  const resolved = resolveCandidateResource(
+                    resources,
+                    opportunities,
+                    resId,
+                  );
                   if (!resolved) return <li key={resId}>{resId}</li>;
                   const label =
                     resolved.kind === "resource"

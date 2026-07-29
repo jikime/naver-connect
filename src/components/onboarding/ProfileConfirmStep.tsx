@@ -26,7 +26,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import fieldsSeed from "@/data/fields.json";
 import { cn } from "@/lib/utils";
 import type { Field } from "@/types";
 import {
@@ -35,15 +34,15 @@ import {
   type TrustConnectionDraft,
 } from "./onboarding-draft";
 
-const fields = fieldsSeed as Field[];
-
 export function ProfileConfirmStep({
   draft,
   onChange,
+  fields,
   mode = "edit",
 }: {
   draft: OnboardingDraft;
   onChange: (patch: Partial<OnboardingDraft>) => void;
+  fields: Field[];
   mode?: "edit" | "review";
 }) {
   const orgNameId = useId();

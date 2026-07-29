@@ -19,7 +19,8 @@ import { ChevronDown, Menu } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import {
   type RefObject,
   useEffect,
@@ -38,8 +39,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { clearDatasetCache, clearRuntimeStateCache } from "@/lib/dal";
 import { cn } from "@/lib/utils";
-import { useAuthSessionStore } from "@/stores/auth-session";
 import {
   groupHasActiveItem,
   isItemActive,
@@ -284,11 +285,9 @@ function AccordionSection({
 
 export function GlobalNav() {
   const pathname = usePathname();
-  const router = useRouter();
-  const user = useAuthSessionStore((state) => state.user);
-  const hasHydrated = useAuthSessionStore((state) => state.hasHydrated);
-  const signOut = useAuthSessionStore((state) => state.signOut);
-  const isAuthenticated = hasHydrated && user !== null;
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const isAuthenticated = status === "authenticated" && user !== undefined;
   const [openKey, setOpenKey] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
@@ -335,8 +334,9 @@ export function GlobalNav() {
   }
 
   function handleSignOut() {
-    signOut();
-    router.replace("/");
+    clearDatasetCache();
+    clearRuntimeStateCache();
+    void signOut({ redirectTo: "/" });
   }
 
   // Escape 닫힘은 document 레벨 리스너로 — hover로 연 경우 실제 포커스는 래퍼 바깥이라
@@ -479,7 +479,7 @@ export function GlobalNav() {
                 <>
                   <div className="flex items-center gap-3 rounded-2xl bg-background/70 p-3">
                     <span className="flex size-9 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
-                      {user.name.slice(0, 1)}
+                      {user.name?.slice(0, 1) ?? "회"}
                     </span>
                     <div>
                       <p className="text-sm font-semibold text-foreground">

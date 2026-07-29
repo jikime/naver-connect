@@ -1,6 +1,5 @@
-// BusinessRelationSession 스토어 — v1.1 2단계(생태계맵 v2·협업사례·제안 트래킹) 세션 쓰기.
-// 근거: ARCHITECTURE.md §5.3 "v1.1 쓰기 경계(C-3·A8 개정)" — 이 스토어의 쓰기는 전부
-// 세션 한정이며 실제 백엔드 쓰기가 없고 새로고침 시 리셋된다(A6와 동일 원칙).
+// BusinessRelationSession 스토어 — 생태계·협업사례·제안 상태의 화면 반응용 캐시.
+// 정본은 ax_private.user_runtime_states이며 API 저장 후 이 캐시를 다시 수화한다.
 // FR-EM2-03(setMyOrgs)·FR-CS-01(inputCollabCase)·FR-PP-02(trackProposal)가 이 스토어를 쓴다.
 //
 // 기존 session-interaction.ts(추천/온보딩 세션)와 분리된 별도 스토어다 — v1.1 3개 구현
@@ -10,17 +9,17 @@
 import { create } from "zustand";
 import type { CollabCase, ProjectProposal } from "@/types";
 
-interface MyOrgsSetting {
+export interface MyOrgsSetting {
   affiliationOrgId: string | null;
   targetOrgIds: string[];
 }
 
-interface BusinessRelationSessionStore {
-  /** personaId → "내 소속/대상 단체" 세션 오버라이드(FR-EM2-03). 없으면 시드 기본값 사용. */
+export interface BusinessRelationSessionStore {
+  /** personaId → "내 소속/대상 단체" 사용자 오버라이드(FR-EM2-03). */
   myOrgsOverrides: Record<string, MyOrgsSetting>;
-  /** 이번 세션에 입력된 신규 협업 사례(FR-CS-01). */
+  /** 사용자가 입력해 DB 상태에 저장한 신규 협업 사례(FR-CS-01). */
   addedCollabCases: CollabCase[];
-  /** proposalId → 세션 중 변경된 트래킹 상태(FR-PP-02). */
+  /** proposalId → 저장된 트래킹 상태(FR-PP-02). */
   proposalStatusOverrides: Record<string, ProjectProposal["track_status"]>;
 
   setMyOrgs: (personaId: string, setting: MyOrgsSetting) => void;
@@ -29,13 +28,16 @@ interface BusinessRelationSessionStore {
     proposalId: string,
     status: ProjectProposal["track_status"],
   ) => void;
+  hydrate: (state: Partial<BusinessRelationSnapshot>) => void;
   reset: () => void;
 }
 
-const INITIAL_STATE: Pick<
+export type BusinessRelationSnapshot = Pick<
   BusinessRelationSessionStore,
   "myOrgsOverrides" | "addedCollabCases" | "proposalStatusOverrides"
-> = {
+>;
+
+const INITIAL_STATE: BusinessRelationSnapshot = {
   myOrgsOverrides: {},
   addedCollabCases: [],
   proposalStatusOverrides: {},
@@ -59,5 +61,6 @@ export const useBusinessRelationSessionStore =
           [proposalId]: status,
         },
       })),
+    hydrate: (state) => set({ ...INITIAL_STATE, ...state }),
     reset: () => set(INITIAL_STATE),
   }));

@@ -8,11 +8,8 @@
 //    (gap-report.ts·ecosystem.ts와 동일 선례).
 //  - 노드 detail에는 공개 최상위 필드와 visibility.public만 투영한다.
 
-import fieldsSeed from "@/data/fields.json";
-import gapCardsSeed from "@/data/gap_cards.json";
-import organizationsSeed from "@/data/organizations.json";
-import regionHanbitSeed from "@/data/region_hanbit.json";
-import vcStagesSeed from "@/data/vc_stages.json";
+import type { DatasetLoader } from "@/lib/dal/datasets";
+import { getDataset } from "@/lib/dal/datasets";
 import { getDealRooms } from "@/lib/dal/deal";
 import { getMembers } from "@/lib/dal/members";
 import type { RecommendationGraphEdge } from "@/lib/dal/recommendations";
@@ -28,20 +25,6 @@ import type {
   ViewerContext,
 } from "@/types";
 
-const organizations = organizationsSeed as Organization[];
-const gapCards = gapCardsSeed as GapCard[];
-const region = regionHanbitSeed as Region;
-const fields = fieldsSeed as Field[];
-const vcStages = vcStagesSeed as VCStage[];
-
-const fieldName = (id: number) =>
-  fields.find((f) => f.id === id)?.name ?? `#${id}`;
-const stageName = (id: number) => {
-  const s = vcStages.find((v) => v.id === id);
-  return s ? `${fieldName(s.field_id)} · ${s.name}` : `단계 ${id}`;
-};
-const orgName = (id: string) =>
-  organizations.find((o) => o.id === id)?.name ?? id;
 /** 나라장터는 개별/집계 조직이 아니라 외부 공고 시스템 노드(SYS-NARA)로 표현한다. */
 const isNaraOrg = (o: Organization) => o.name.includes("나라장터");
 
@@ -119,11 +102,35 @@ const REPORT_ID = "DOC-REPORT";
  */
 export async function getKnowledgeGraph(
   vc: ViewerContext,
+  loadDataset: DatasetLoader = getDataset,
 ): Promise<KnowledgeGraph> {
-  const [members, dealRooms] = await Promise.all([
-    getMembers(vc),
-    getDealRooms(vc),
+  const [
+    members,
+    dealRooms,
+    organizations,
+    gapCards,
+    region,
+    fields,
+    vcStages,
+  ] = await Promise.all([
+    getMembers(vc, loadDataset),
+    getDealRooms(vc, loadDataset),
+    loadDataset<Organization[]>("organizations"),
+    loadDataset<GapCard[]>("gap-cards"),
+    loadDataset<Region>("region-hanbit"),
+    loadDataset<Field[]>("fields"),
+    loadDataset<VCStage[]>("vc-stages"),
   ]);
+  const fieldName = (id: number) =>
+    fields.find((field) => field.id === id)?.name ?? `#${id}`;
+  const stageName = (id: number) => {
+    const stage = vcStages.find((value) => value.id === id);
+    return stage
+      ? `${fieldName(stage.field_id)} · ${stage.name}`
+      : `단계 ${id}`;
+  };
+  const orgName = (id: string) =>
+    organizations.find((organization) => organization.id === id)?.name ?? id;
   // C3(final-rereview #1): 사람↔사람 추천 엣지는 공개 정적 전경에서 제외한다.
   // RSC가 placeholder 뷰어로 프리렌더한 정적 HTML에 특정 개인 스코프의 추천 관계가
   // 박히는 것을 차단 — 뷰어 스코프 추천 엣지 오버레이는 클라이언트에서 /api/matching

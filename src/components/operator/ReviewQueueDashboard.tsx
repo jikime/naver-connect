@@ -6,7 +6,7 @@
 //       그대로 안내로 보여준다(운영자 전용 접근제어는 클라이언트 시뮬레이션, ADR-03 §9 참조).
 //
 // 반려는 approveRecommendation과 대칭인 rejectRecommendation(DAL, review.ts)을 거쳐
-// status→rejected로 실제 전이된다(세션 스토어 갱신, 서버 호출 없음 NFR-02). 승인과 마찬가지로
+// status→rejected로 실제 전이되어 운영자별 서버 상태에 저장된다. 승인과 마찬가지로
 // 반려된 건도 다음 getReviewQueue 조회(reload)부터 큐(draft/pending_review)에서 사라진다 —
 // 로컬 컴포넌트 상태로 반려 여부를 별도 추적하지 않는다(ARCHITECTURE.md §5.3 사후 동기화).
 //

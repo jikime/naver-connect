@@ -25,20 +25,15 @@ import Image from "next/image";
 import { useEffect, useId, useState } from "react";
 import { VisibilityGate } from "@/components/shared/VisibilityGate";
 import { Badge } from "@/components/ui/badge";
-import fieldsSeed from "@/data/fields.json";
-import tagsSeed from "@/data/tags.json";
-import { getMember } from "@/lib/dal";
+import { getFields, getMyProfile, getTags } from "@/lib/dal";
 import { useViewerContext } from "@/stores/viewer-context";
 import type { Field, MaskedMember, Tag } from "@/types";
 
-const fields = fieldsSeed as Field[];
-const tags = tagsSeed as Tag[];
-
-function fieldName(id: number): string {
+function fieldName(fields: readonly Field[], id: number): string {
   return fields.find((field) => field.id === id)?.name ?? `#${id}`;
 }
 
-function tagName(id: number): string {
+function tagName(tags: readonly Tag[], id: number): string {
   return tags.find((tag) => tag.id === id)?.name ?? `태그 #${id}`;
 }
 
@@ -69,15 +64,21 @@ export function ProfileCard() {
   const [member, setMember] = useState<MaskedMember | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fields, setFields] = useState<Field[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: vc 객체는 selector가 매 렌더 새로 만들어 원시값(personaId/role)만 추적한다
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
-    getMember(vc, vc.personaId)
-      .then((nextMember) => {
-        if (!cancelled) setMember(nextMember);
+    Promise.all([getMyProfile(), getFields(), getTags()])
+      .then(([nextMember, nextFields, nextTags]) => {
+        if (!cancelled) {
+          setMember(nextMember);
+          setFields(nextFields);
+          setTags(nextTags);
+        }
       })
       .catch((caught) => {
         if (!cancelled) {
@@ -152,7 +153,7 @@ export function ProfileCard() {
                         key={id}
                         className="rounded-full border border-guud-hairline bg-background px-2.5 py-1 font-semibold tracking-normal text-guud-text-muted-2 normal-case"
                       >
-                        {fieldName(id)}
+                        {fieldName(fields, id)}
                       </Badge>
                     ))}
                   </div>
@@ -247,7 +248,7 @@ export function ProfileCard() {
               >
                 <div className="flex items-center justify-between gap-3">
                   <Badge className="rounded-full bg-background px-2.5 py-1 font-semibold tracking-normal text-foreground normal-case">
-                    {tagName(supply.tagId)}
+                    {tagName(tags, supply.tagId)}
                   </Badge>
                   <span className="font-mono text-xs text-guud-text-faint">
                     0{index + 1}
@@ -371,7 +372,7 @@ export function ProfileCard() {
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge className="rounded-full bg-background/10 px-2.5 py-1 font-semibold tracking-normal text-background normal-case">
-                          {tagName(demand.tagId)}
+                          {tagName(tags, demand.tagId)}
                         </Badge>
                         {demand.priority && (
                           <Badge className="rounded-full bg-primary px-2.5 py-1 font-semibold tracking-normal text-primary-foreground normal-case">

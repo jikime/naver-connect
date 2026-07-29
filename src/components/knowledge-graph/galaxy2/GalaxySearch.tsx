@@ -65,7 +65,7 @@ export function GalaxySearch({ onSelect, entities }: GalaxySearchProps) {
   // Focus the input and load recent nodes whenever the overlay opens
   useEffect(() => {
     if (open) {
-      setRecent(getRecentNodes());
+      void getRecentNodes().then(setRecent);
       inputRef.current?.focus();
     }
   }, [open]);

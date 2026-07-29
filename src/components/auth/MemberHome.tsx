@@ -13,7 +13,7 @@ import {
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
-import { useAuthSessionStore } from "@/stores/auth-session";
+import { useSession } from "next-auth/react";
 
 const MEMBER_ACTIONS = [
   {
@@ -76,10 +76,23 @@ const OPERATOR_ACTIONS = [
 ];
 
 export function MemberHome() {
-  const user = useAuthSessionStore((state) => state.user);
+  const { data: session } = useSession();
+  const user = session?.user;
   if (!user) return null;
 
-  const actions = user.role === "운영자" ? OPERATOR_ACTIONS : MEMBER_ACTIONS;
+  const actions =
+    user.role === "운영자"
+      ? OPERATOR_ACTIONS
+      : MEMBER_ACTIONS.map((action) =>
+          action.href === "/onboarding" && user.onboardingComplete
+            ? {
+                ...action,
+                label: "연결 프로필 관리",
+                description:
+                  "저장된 온보딩 정보를 확인하거나 필요한 내용을 업데이트해요.",
+              }
+            : action,
+        );
 
   return (
     <div className="flex flex-1 flex-col">
@@ -100,7 +113,11 @@ export function MemberHome() {
               </p>
             </div>
             <span className="rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-secondary-foreground">
-              {user.role === "운영자" ? "운영 모드" : "온보딩 완료"}
+              {user.role === "운영자"
+                ? "운영 모드"
+                : user.onboardingComplete
+                  ? "온보딩 완료"
+                  : "온보딩 진행 전"}
             </span>
           </div>
         </div>

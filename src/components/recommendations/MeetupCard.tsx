@@ -24,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { joinMeetup, leaveMeetup } from "@/lib/dal/meetup-state";
 import { cn } from "@/lib/utils";
 import { useMeetupSessionStore } from "@/stores/meetup-session";
 import type { Meetup, MeetupChatMessage, Recommendation } from "@/types";
@@ -92,8 +93,6 @@ export function MeetupCard({
   const chatMessages = useMeetupSessionStore(
     (state) => state.chatMessagesByMeetup[meetup.id] ?? EMPTY_CHAT_MESSAGES,
   );
-  const joinMeetup = useMeetupSessionStore((state) => state.joinMeetup);
-  const leaveMeetup = useMeetupSessionStore((state) => state.leaveMeetup);
   const formation = FORMATION_COPY[meetup.created_source];
   const host = membersById[meetup.host_member_id];
   const joinedMemberIds = [
@@ -122,9 +121,9 @@ export function MeetupCard({
   function toggleParticipation() {
     if (!viewerId || isHost) return;
     if (hasJoined) {
-      leaveMeetup(meetup.id, viewerId);
+      void leaveMeetup(meetup.id, viewerId);
     } else {
-      joinMeetup(meetup.id, viewerId);
+      void joinMeetup(meetup.id, viewerId);
     }
   }
 

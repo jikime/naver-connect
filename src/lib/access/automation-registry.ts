@@ -26,7 +26,7 @@ export const AUTOMATION_REGISTRY: AutomationMeta[] = [
   {
     fr_id: "FR-ON-09",
     level: "보조",
-    swap_point: "finalizeOnboarding(세션 스토어) → POST /onboarding/finalize",
+    swap_point: "POST /onboarding/finalize → Supabase 프로필·동의·매칭 상태",
   },
   {
     fr_id: "FR-ON-10",

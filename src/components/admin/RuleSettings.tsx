@@ -119,7 +119,7 @@ export function RuleSettings() {
               </Button>
               {savedNotice && (
                 <span className="text-xs text-guud-text-muted-2">
-                  반영됐어요(세션 한정, 새로고침 시 초기화).
+                  Supabase에 저장하고 점수를 다시 계산했어요.
                 </span>
               )}
             </div>

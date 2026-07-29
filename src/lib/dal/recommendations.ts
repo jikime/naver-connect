@@ -3,33 +3,33 @@
 //       FR-RC-01/02/06/08, BR-01/BR-04, N-5(FR-RC-01↔08 상호참조)
 // 시드: src/data/private/recommendations.json (민감 — contact_point가 비공개 수요 원문 인용)
 
-// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
-import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
+import { getDataset } from "@/lib/dal/datasets";
 // C3: 동의 판정·엔진 산출·허용 pair·그래프 엣지는 전부 서버 번들에서 온다(클라 private 입력 0).
 import {
   getMatchingBundle,
   normalizeRecommendationId,
   parseEngineRecId,
 } from "@/lib/dal/matching";
-import { meetupsById } from "@/lib/dal/meetups";
 import { getExpertSubtype } from "@/lib/dal/members";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
   MatchScore,
   MatchType,
+  Meetup,
   Recommendation,
   RecStatus,
   ViewerContext,
 } from "@/types";
-
-const seed = recommendationsSeed as Recommendation[];
 
 function scoreKey(fromId: string, toId: string | null): string {
   return `${fromId}→${toId ?? ""}`;
 }
 
 /** rec_kind==='모둠'인 레코드의 참여자 목록을 meetup_id로 meetups.json에서 조회한다(ADR-06 v1.1). */
-function meetupMemberIds(rec: Recommendation): string[] {
+function meetupMemberIds(
+  rec: Recommendation,
+  meetupsById: ReadonlyMap<string, Meetup>,
+): string[] {
   if (rec.rec_kind !== "모둠" || !rec.meetup_id) return [];
   return meetupsById.get(rec.meetup_id)?.member_ids ?? [];
 }
@@ -38,12 +38,14 @@ function meetupMemberIds(rec: Recommendation): string[] {
 function isRecommendationParty(
   rec: Recommendation,
   vc: ViewerContext,
+  meetupsById: ReadonlyMap<string, Meetup>,
 ): boolean {
   return (
     vc.role === "운영자" ||
     vc.personaId === rec.to_member_id ||
     vc.personaId === rec.from_member_id ||
-    (rec.rec_kind === "모둠" && meetupMemberIds(rec).includes(vc.personaId))
+    (rec.rec_kind === "모둠" &&
+      meetupMemberIds(rec, meetupsById).includes(vc.personaId))
   );
 }
 
@@ -51,11 +53,12 @@ function isRecommendationParty(
 function withSessionAndMask(
   rec: Recommendation,
   vc: ViewerContext,
+  meetupsById: ReadonlyMap<string, Meetup>,
 ): Recommendation {
   const override =
     useSessionInteractionStore.getState().recommendationOverrides[rec.id];
   const merged: Recommendation = override ? { ...rec, ...override } : rec;
-  const isParty = isRecommendationParty(merged, vc);
+  const isParty = isRecommendationParty(merged, vc, meetupsById);
   // FR-RC-06/BR-01: 당사자·운영자가 아니면 최소노출 문구만.
   // C3: 클라이언트 시드는 중립 twin이라 원문 자체가 없다 — 원문 열람 복원은 서버 경계에서
   // 동의(C) 검증과 함께 M2에 제공한다.
@@ -71,9 +74,13 @@ function withSessionAndMask(
 }
 
 /** 뷰어(vc.personaId)에게 "온" 추천인지: 1:1은 to_member_id, 모둠은 meetups.json 참여자 목록. */
-function isAddressedTo(rec: Recommendation, personaId: string): boolean {
+function isAddressedTo(
+  rec: Recommendation,
+  personaId: string,
+  meetupsById: ReadonlyMap<string, Meetup>,
+): boolean {
   if (rec.rec_kind === "모둠") {
-    return meetupMemberIds(rec).includes(personaId);
+    return meetupMemberIds(rec, meetupsById).includes(personaId);
   }
   return rec.to_member_id === personaId;
 }
@@ -125,9 +132,16 @@ export async function getRecommendations(
   vc: ViewerContext,
   week?: string,
 ): Promise<{ common: Recommendation[]; different: Recommendation[] }> {
-  const targetSubtype = getExpertSubtype(vc.personaId);
+  const [targetSubtype, bundle, seed, meetups] = await Promise.all([
+    getExpertSubtype(vc.personaId),
+    getMatchingBundle(vc),
+    getDataset<Recommendation[]>("recommendations-redacted"),
+    getDataset<Meetup[]>("meetups"),
+  ]);
+  const meetupsById = new Map(
+    meetups.map((meetup) => [meetup.id, meetup] as const),
+  );
   // C3: 서버 번들 1회 호출 — 엔진 추천·허용 pair·점수를 함께 받는다(클라 private 입력 0).
-  const bundle = await getMatchingBundle(vc);
   const allowedSeedIds = new Set(bundle.allowedSeedRecIds);
   // C4(#3): declined(사유 5종 전부)는 주간 목록에 재노출하지 않는다 — 원본 declined는
   // 클라 twin에서 status가 중립화돼 있어 서버 판정(hiddenSeedRecIds)만이 정본이다.
@@ -137,7 +151,8 @@ export async function getRecommendations(
   const addressedToViewer = [
     ...seed.filter(
       (rec) =>
-        (vc.role === "운영자" || isAddressedTo(rec, vc.personaId)) &&
+        (vc.role === "운영자" ||
+          isAddressedTo(rec, vc.personaId, meetupsById)) &&
         allowedSeedIds.has(rec.id) &&
         !hiddenSeedIds.has(rec.id),
     ),
@@ -150,7 +165,9 @@ export async function getRecommendations(
     targetSubtype === "공공중간지원"
       ? weekFiltered.filter((rec) => rec.rec_kind === "모둠")
       : weekFiltered;
-  const masked = branchFiltered.map((rec) => withSessionAndMask(rec, vc));
+  const masked = branchFiltered.map((rec) =>
+    withSessionAndMask(rec, vc, meetupsById),
+  );
   const scoresByPair = new Map(
     bundle.scores.map((s) => [scoreKey(s.from_member_id, s.to_member_id), s]),
   );
@@ -197,6 +214,13 @@ export async function getRecommendation(
   vc: ViewerContext,
   id: string,
 ): Promise<Recommendation> {
+  const [seed, meetups] = await Promise.all([
+    getDataset<Recommendation[]>("recommendations-redacted"),
+    getDataset<Meetup[]>("meetups"),
+  ]);
+  const meetupsById = new Map(
+    meetups.map((meetup) => [meetup.id, meetup] as const),
+  );
   const normalizedId = normalizeRecommendationId(id);
   const engineRef = parseEngineRecId(normalizedId);
   // 엔진 ID의 recipient/other를 바꿔 대입하며 타인 추천 존재 여부를 열거하지 못하게
@@ -219,16 +243,16 @@ export async function getRecommendation(
     if (!rec) {
       throw new Error(`Recommendation not found: ${normalizedId}`);
     }
-    return withSessionAndMask(rec, vc);
+    return withSessionAndMask(rec, vc, meetupsById);
   }
   const bundle = await getMatchingBundle(vc);
   const rec = seed.find((r) => r.id === normalizedId);
   if (
     !rec ||
     !bundle.allowedSeedRecIds.includes(normalizedId) ||
-    !isRecommendationParty(rec, vc)
+    !isRecommendationParty(rec, vc, meetupsById)
   ) {
     throw new Error(`Recommendation not found: ${normalizedId}`);
   }
-  return withSessionAndMask(rec, vc);
+  return withSessionAndMask(rec, vc, meetupsById);
 }

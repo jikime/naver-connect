@@ -21,9 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import fieldsSeed from "@/data/fields.json";
-import organizationsSeedFallback from "@/data/organizations.json";
-import subgroupMapSeed from "@/data/subgroup_map.json";
 import {
   getSubgroupCode,
   inputCollabCase,
@@ -40,9 +37,6 @@ import type {
   SubgroupMapEntry,
 } from "@/types";
 
-const fields = fieldsSeed as Field[];
-const subgroupMap = subgroupMapSeed as SubgroupMapEntry[];
-
 // ──────────────────────────────────────────────
 // 유틸 — 색상/라벨은 src/lib/dal/collaboration.ts의 단일 소스를 공유한다.
 // ──────────────────────────────────────────────
@@ -53,21 +47,22 @@ const SUBGROUP_KIND_BG: Record<string, string> = {
   activist: "#e6f1f4",
 };
 
-function fieldName(id: number): string {
+function fieldName(fields: readonly Field[], id: number): string {
   return fields.find((f) => f.id === id)?.name ?? `#${id}`;
 }
 
-// orgName은 메인 뷰 props로부터 주입된 orgs를 참조한다.
-// 컴포넌트 외부에서는 fallback으로 JSON 시드 사용.
-const fallbackOrgs = organizationsSeedFallback as Organization[];
-let _resolvedOrgs: Organization[] = fallbackOrgs;
-
-function orgName(id: string): string {
-  return _resolvedOrgs.find((o) => o.id === id)?.name ?? id;
+function orgName(orgs: readonly Organization[], id: string): string {
+  return orgs.find((org) => org.id === id)?.name ?? id;
 }
 
-function SubgroupBadge({ orgId }: { orgId: string }) {
-  const code = getSubgroupCode(orgId);
+function SubgroupBadge({
+  orgId,
+  subgroupMap,
+}: {
+  orgId: string;
+  subgroupMap: readonly SubgroupMapEntry[];
+}) {
+  const code = getSubgroupCode(orgId, subgroupMap);
   const entry = subgroupMap.find((e) => e.org_id === orgId);
   if (!code || !entry) return null;
   const bg = SUBGROUP_KIND_BG[entry.kind] ?? "#eef0f2";
@@ -87,7 +82,17 @@ function SubgroupBadge({ orgId }: { orgId: string }) {
 // 협업사례 카드
 // ──────────────────────────────────────────────
 
-function CaseCard({ collabCase }: { collabCase: CollabCase }) {
+function CaseCard({
+  collabCase,
+  orgs,
+  fields,
+  subgroupMap,
+}: {
+  collabCase: CollabCase;
+  orgs: readonly Organization[];
+  fields: readonly Field[];
+  subgroupMap: readonly SubgroupMapEntry[];
+}) {
   return (
     <li className="rounded-2xl border border-guud-hairline bg-card p-4">
       <div className="flex items-start justify-between gap-2">
@@ -109,8 +114,8 @@ function CaseCard({ collabCase }: { collabCase: CollabCase }) {
         {collabCase.participant_org_ids.map((id, idx) => (
           <span key={id} className="flex items-center gap-1">
             {idx > 0 && <span className="text-guud-text-muted-2">×</span>}
-            <SubgroupBadge orgId={id} />
-            <span>{orgName(id)}</span>
+            <SubgroupBadge orgId={id} subgroupMap={subgroupMap} />
+            <span>{orgName(orgs, id)}</span>
           </span>
         ))}
         <span className="ml-1 text-guud-text-muted-2">
@@ -121,7 +126,8 @@ function CaseCard({ collabCase }: { collabCase: CollabCase }) {
         {collabCase.outcome_summary}
       </p>
       <p className="mt-1 text-xs text-guud-text-muted-2">
-        분야: {collabCase.field_tags.map(fieldName).join(", ")} ·{" "}
+        분야:{" "}
+        {collabCase.field_tags.map((id) => fieldName(fields, id)).join(", ")} ·{" "}
         {collabCase.input_by}
       </p>
     </li>
@@ -132,13 +138,21 @@ function CaseCard({ collabCase }: { collabCase: CollabCase }) {
 // 협업관계 상세 패널 (선택된 엣지 정보)
 // ──────────────────────────────────────────────
 
-function RelationDetailPanel({ relation }: { relation: CollabRelation }) {
+function RelationDetailPanel({
+  relation,
+  orgs,
+  fields,
+}: {
+  relation: CollabRelation;
+  orgs: readonly Organization[];
+  fields: readonly Field[];
+}) {
   const strengthPct = Math.round(relation.strength * 100);
   return (
     <div className="mt-3 rounded-xl border border-guud-hairline bg-card p-3 text-xs">
       <p className="font-semibold text-foreground">{relation.pair_code}</p>
       <p className="mt-0.5 text-guud-text-muted-2">
-        {orgName(relation.org_a_id)} × {orgName(relation.org_b_id)}
+        {orgName(orgs, relation.org_a_id)} × {orgName(orgs, relation.org_b_id)}
       </p>
       <p className="mt-1 font-medium text-foreground">{relation.description}</p>
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-guud-text-muted-2">
@@ -157,7 +171,8 @@ function RelationDetailPanel({ relation }: { relation: CollabRelation }) {
         </span>
       </div>
       <p className="mt-1 text-guud-text-muted-2">
-        분야: {relation.domain_tags.map(fieldName).join(", ")}
+        분야:{" "}
+        {relation.domain_tags.map((id) => fieldName(fields, id)).join(", ")}
         {relation.basis_case_id && <> · 근거: {relation.basis_case_id}</>}
       </p>
     </div>
@@ -168,7 +183,13 @@ function RelationDetailPanel({ relation }: { relation: CollabRelation }) {
 // 시뮬레이션 패널
 // ──────────────────────────────────────────────
 
-function SimulationPanel() {
+function SimulationPanel({
+  orgs,
+  subgroupMap,
+}: {
+  orgs: readonly Organization[];
+  subgroupMap: readonly SubgroupMapEntry[];
+}) {
   const vc = useViewerContext();
   const [orgId, setOrgId] = useState<string>("");
   const [result, setResult] = useState<Awaited<
@@ -204,8 +225,8 @@ function SimulationPanel() {
             <SelectValue placeholder="기준 조직 선택" />
           </SelectTrigger>
           <SelectContent>
-            {_resolvedOrgs.map((org) => {
-              const code = getSubgroupCode(org.id);
+            {orgs.map((org) => {
+              const code = getSubgroupCode(org.id, subgroupMap);
               return (
                 <SelectItem key={org.id} value={org.id}>
                   {code ? `[${code}] ` : ""}
@@ -240,7 +261,10 @@ function SimulationPanel() {
                     >
                       <div className="flex items-center justify-between gap-1">
                         <div className="flex items-center gap-1.5">
-                          <SubgroupBadge orgId={c.org.id} />
+                          <SubgroupBadge
+                            orgId={c.org.id}
+                            subgroupMap={subgroupMap}
+                          />
                           <span className="text-xs font-semibold text-foreground">
                             {c.org.name}
                           </span>
@@ -297,7 +321,15 @@ function SimulationPanel() {
 // 사례 입력 폼
 // ──────────────────────────────────────────────
 
-function InputForm({ onAdded }: { onAdded: (c: CollabCase) => void }) {
+function InputForm({
+  onAdded,
+  orgs,
+  subgroupMap,
+}: {
+  onAdded: (collabCase: CollabCase) => void;
+  orgs: readonly Organization[];
+  subgroupMap: readonly SubgroupMapEntry[];
+}) {
   const vc = useViewerContext();
   const [title, setTitle] = useState("");
   const [participantIds, setParticipantIds] = useState<string[]>([]);
@@ -318,7 +350,7 @@ function InputForm({ onAdded }: { onAdded: (c: CollabCase) => void }) {
     const fieldTags = Array.from(
       new Set(
         participantIds.flatMap(
-          (id) => _resolvedOrgs.find((o) => o.id === id)?.field_tags ?? [],
+          (id) => orgs.find((org) => org.id === id)?.field_tags ?? [],
         ),
       ),
     );
@@ -358,8 +390,8 @@ function InputForm({ onAdded }: { onAdded: (c: CollabCase) => void }) {
         <div>
           <Label>참여 조직 (2곳 이상)</Label>
           <ul className="mt-1 max-h-40 space-y-1 overflow-y-auto rounded-lg border border-guud-hairline p-2">
-            {_resolvedOrgs.map((org) => {
-              const code = getSubgroupCode(org.id);
+            {orgs.map((org) => {
+              const code = getSubgroupCode(org.id, subgroupMap);
               return (
                 <li key={org.id} className="flex items-center gap-2">
                   <Checkbox
@@ -451,21 +483,21 @@ interface CollabCasesViewProps {
   initialCases?: CollabCase[];
   initialRelations?: CollabRelation[];
   initialOrgs?: Organization[];
+  initialFields?: Field[];
+  initialSubgroupMap?: SubgroupMapEntry[];
 }
 
 export function CollabCasesView({
   initialCases = [],
   initialRelations = [],
-  initialOrgs = fallbackOrgs,
+  initialOrgs = [],
+  initialFields = [],
+  initialSubgroupMap = [],
 }: CollabCasesViewProps) {
-  // 전달된 orgs를 module-level 조회 함수에 주입
-  _resolvedOrgs = initialOrgs.length > 0 ? initialOrgs : fallbackOrgs;
-
   const vc = useViewerContext();
   const [activeTab, setActiveTab] = useState<Tab>("graph");
   const [cases, setCases] = useState<CollabCase[]>(initialCases);
-  const [relations, setRelations] =
-    useState<CollabRelation[]>(initialRelations);
+  const [relations] = useState<CollabRelation[]>(initialRelations);
   const [showPotential, setShowPotential] = useState(false);
   const [selectedRelation, setSelectedRelation] =
     useState<CollabRelation | null>(null);
@@ -499,117 +531,133 @@ export function CollabCasesView({
         ))}
       </div>
 
-      <>
-        {/* 관계 그래프 탭 */}
-        {activeTab === "graph" && (
-          <div className="space-y-4">
-            {/* 통계 요약 */}
-            <div className="flex flex-wrap gap-4">
-              <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
-                <p className="text-xs text-guud-text-muted-2">실제 협력</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {actualCount}
-                  <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
-                    건
-                  </span>
-                </p>
-              </div>
-              <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
-                <p className="text-xs text-guud-text-muted-2">잠재 협력</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {potentialCount}
-                  <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
-                    건
-                  </span>
-                </p>
-              </div>
-              <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
-                <p className="text-xs text-guud-text-muted-2">사례 수</p>
-                <p className="text-2xl font-bold text-foreground">
-                  {cases.length}
-                  <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
-                    건
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            {/* 잠재 협력 토글 */}
-            <div className="flex cursor-pointer items-center gap-2 text-sm text-guud-text-muted-2">
-              <Checkbox
-                checked={showPotential}
-                onCheckedChange={(v) => setShowPotential(v === true)}
-                id="show-potential"
-              />
-              <Label
-                htmlFor="show-potential"
-                className="cursor-pointer font-normal"
-              >
-                잠재 협력 관계도 표시
-              </Label>
-            </div>
-
-            <CollabRelationMap
-              relations={displayedRelations}
-              orgs={initialOrgs}
-              onSelectRelation={setSelectedRelation}
-            />
-
-            {selectedRelation && (
-              <RelationDetailPanel relation={selectedRelation} />
-            )}
-          </div>
-        )}
-
-        {/* 협업 사례 탭 */}
-        {activeTab === "cases" && (
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <section>
-              <h2 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground">
-                협업 사례
-                <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-                  [ {cases.length} ]
+      {/* 관계 그래프 탭 */}
+      {activeTab === "graph" && (
+        <div className="space-y-4">
+          {/* 통계 요약 */}
+          <div className="flex flex-wrap gap-4">
+            <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
+              <p className="text-xs text-guud-text-muted-2">실제 협력</p>
+              <p className="text-2xl font-bold text-foreground">
+                {actualCount}
+                <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
+                  건
                 </span>
-              </h2>
-              <ul className="space-y-2">
-                {cases.map((c) => (
-                  <CaseCard key={c.id} collabCase={c} />
-                ))}
-              </ul>
-            </section>
-            <InputForm onAdded={(c) => setCases((prev) => [...prev, c])} />
-          </div>
-        )}
-
-        {/* 패턴 분석 탭 */}
-        {activeTab === "patterns" && (
-          <div className="space-y-4">
-            <p className="text-sm text-guud-text-muted-2">
-              실제 협력 관계 기준으로 하위그룹 쌍(예: A5 × A4)이 얼마나 자주
-              협업하는지, 어떤 관계 유형이 많은지 분석합니다.
-            </p>
-            <div className="rounded-2xl border border-guud-hairline bg-card p-4">
-              <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-                실제 협력 패턴
-              </h3>
-              <CollabPatternPanel onlyActual={true} />
+              </p>
             </div>
-            <div className="rounded-2xl border border-guud-hairline bg-card p-4">
-              <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-                전체 패턴 (잠재 포함)
-              </h3>
-              <CollabPatternPanel onlyActual={false} />
+            <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
+              <p className="text-xs text-guud-text-muted-2">잠재 협력</p>
+              <p className="text-2xl font-bold text-foreground">
+                {potentialCount}
+                <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
+                  건
+                </span>
+              </p>
+            </div>
+            <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
+              <p className="text-xs text-guud-text-muted-2">사례 수</p>
+              <p className="text-2xl font-bold text-foreground">
+                {cases.length}
+                <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
+                  건
+                </span>
+              </p>
             </div>
           </div>
-        )}
 
-        {/* 시뮬레이션 탭 */}
-        {activeTab === "simulate" && (
-          <div className="max-w-lg">
-            <SimulationPanel />
+          {/* 잠재 협력 토글 */}
+          <div className="flex cursor-pointer items-center gap-2 text-sm text-guud-text-muted-2">
+            <Checkbox
+              checked={showPotential}
+              onCheckedChange={(v) => setShowPotential(v === true)}
+              id="show-potential"
+            />
+            <Label
+              htmlFor="show-potential"
+              className="cursor-pointer font-normal"
+            >
+              잠재 협력 관계도 표시
+            </Label>
           </div>
-        )}
-      </>
+
+          <CollabRelationMap
+            relations={displayedRelations}
+            orgs={initialOrgs}
+            subgroupMap={initialSubgroupMap}
+            onSelectRelation={setSelectedRelation}
+          />
+
+          {selectedRelation && (
+            <RelationDetailPanel
+              relation={selectedRelation}
+              orgs={initialOrgs}
+              fields={initialFields}
+            />
+          )}
+        </div>
+      )}
+
+      {/* 협업 사례 탭 */}
+      {activeTab === "cases" && (
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <section>
+            <h2 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground">
+              협업 사례
+              <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+                [ {cases.length} ]
+              </span>
+            </h2>
+            <ul className="space-y-2">
+              {cases.map((c) => (
+                <CaseCard
+                  key={c.id}
+                  collabCase={c}
+                  orgs={initialOrgs}
+                  fields={initialFields}
+                  subgroupMap={initialSubgroupMap}
+                />
+              ))}
+            </ul>
+          </section>
+          <InputForm
+            orgs={initialOrgs}
+            subgroupMap={initialSubgroupMap}
+            onAdded={(c) => setCases((prev) => [...prev, c])}
+          />
+        </div>
+      )}
+
+      {/* 패턴 분석 탭 */}
+      {activeTab === "patterns" && (
+        <div className="space-y-4">
+          <p className="text-sm text-guud-text-muted-2">
+            실제 협력 관계 기준으로 하위그룹 쌍(예: A5 × A4)이 얼마나 자주
+            협업하는지, 어떤 관계 유형이 많은지 분석합니다.
+          </p>
+          <div className="rounded-2xl border border-guud-hairline bg-card p-4">
+            <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              실제 협력 패턴
+            </h3>
+            <CollabPatternPanel onlyActual={true} />
+          </div>
+          <div className="rounded-2xl border border-guud-hairline bg-card p-4">
+            <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+              전체 패턴 (잠재 포함)
+            </h3>
+            <CollabPatternPanel onlyActual={false} />
+          </div>
+        </div>
+      )}
+
+      {/* 시뮬레이션 탭 */}
+      {activeTab === "simulate" && (
+        <div className="max-w-lg">
+          <SimulationPanel
+            orgs={initialOrgs}
+            subgroupMap={initialSubgroupMap}
+          />
+        </div>
+      )}
     </div>
   );
 }

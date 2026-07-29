@@ -1,7 +1,7 @@
 "use client";
 
 // MyOrgsPanel — 소속 단체와 관심 단체를 설정하고 관계의 공통 기반을 비교한다.
-// 설정은 목업 정책상 현재 세션에서만 유지된다(C-3/A8).
+// 설정은 로그인 사용자 상태로 서버에 저장된다.
 
 import { Building2, Handshake, MapPin, Search, Target } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -15,17 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import fieldsSeed from "@/data/fields.json";
 import { getCollabCases, getMyOrgs, setMyOrgs } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import { useViewerContext } from "@/stores/viewer-context";
 import type { CollabCase, Field, Organization } from "@/types";
 
-const fieldById = new Map(
-  (fieldsSeed as Field[]).map((field) => [field.id, field]),
-);
-
-export function MyOrgsPanel({ orgs }: { orgs: Organization[] }) {
+export function MyOrgsPanel({
+  orgs,
+  fields,
+}: {
+  orgs: Organization[];
+  fields: Field[];
+}) {
   const vc = useViewerContext();
   const [affiliationId, setAffiliationId] = useState<string | null>(null);
   const [targetIds, setTargetIds] = useState<string[]>([]);
@@ -52,6 +53,10 @@ export function MyOrgsPanel({ orgs }: { orgs: Organization[] }) {
   const orgById = useMemo(
     () => new Map(orgs.map((org) => [org.id, org])),
     [orgs],
+  );
+  const fieldById = useMemo(
+    () => new Map(fields.map((field) => [field.id, field])),
+    [fields],
   );
   const affiliationOrg = affiliationId ? orgById.get(affiliationId) : undefined;
   const filteredTargetOrgs = useMemo(() => {

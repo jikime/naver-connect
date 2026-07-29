@@ -4,23 +4,21 @@
 // 기대효과를 입력해 등록하면 딜룸 파이프라인에 씨앗으로 반영되고(FR-DR-05 연동), 자원검색·
 // 백오피스·금융 서비스로의 연결 CTA가 뜬다(FR-DS-02).
 // 근거: ARCHITECTURE.md §5.3 registerDeal, §3 ② v1.1 3단계 경계(세션 쓰기 허용, A8 개정)
-// 목업은 등록 시뮬레이션 — SessionInteraction 스토어에만 반영되고 새로고침 시 리셋된다(A6).
+// 등록 결과는 로그인 사용자의 서버 상태에 저장되어 새로고침·재로그인 후에도 유지된다.
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import membersSeed from "@/data/members.json";
-import { registerDeal } from "@/lib/dal";
+import { getDataset, registerDeal } from "@/lib/dal";
 import { cn } from "@/lib/utils";
 import { useViewerContext } from "@/stores/viewer-context";
 import type { DealRoom } from "@/types";
 
-type MemberSeed = { id: string; name: string; org: { name: string } };
-const members = membersSeed as MemberSeed[];
+type MemberRecord = { id: string; name: string; org: { name: string } };
 
 export function DealSourcingForm() {
   const vc = useViewerContext();
@@ -33,6 +31,17 @@ export function DealSourcingForm() {
   const [expectedEffect, setExpectedEffect] = useState("");
   const [registered, setRegistered] = useState<DealRoom | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [members, setMembers] = useState<MemberRecord[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getDataset<MemberRecord[]>("members").then((result) => {
+      if (!cancelled) setMembers(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const otherMembers = members.filter((m) => m.id !== vc.personaId);
   const canSubmit =
@@ -70,8 +79,7 @@ export function DealSourcingForm() {
     return (
       <div className="flex flex-col gap-4 rounded-2xl border border-guud-hairline bg-muted p-6">
         <p className="text-sm font-semibold text-foreground">
-          "{registered.title}" 딜이 씨앗 단계로 등록되었습니다(세션 한정,
-          새로고침 시 초기화).
+          "{registered.title}" 딜이 씨앗 단계로 등록되었습니다.
         </p>
         <p className="text-xs text-guud-text-muted-2">
           FR-DS-02: 등록된 딜에 이어 자원검색·백오피스·금융 서비스로 바로 연결할

@@ -4,23 +4,29 @@
 // (collaboration-server.ts의 비배럴 선례. eslint T-005는 dal 밖 private 시드 직접 import를 이미 차단.)
 // 근거: plans/generic-mixing-seahorse.md M1-6, people_match_retrieval_plan.md §6
 
-import consentsSeed from "@/data/private/people/consents.json";
-import needsSeed from "@/data/private/people/needs.json";
+import type { DatasetLoader } from "@/lib/dal/datasets";
+import type { DatasetKey } from "@/lib/data/dataset-registry";
+import { getDatasetDocument } from "@/lib/server/dataset-repository";
 import type { ConsentPurpose, ConsentRecordV1, NeedIntentV1 } from "@/types";
 
-const needs = needsSeed as NeedIntentV1[];
-const consents = consentsSeed as ConsentRecordV1[];
+const loadServerDataset: DatasetLoader = async <T>(key: DatasetKey) =>
+  (await getDatasetDocument<T>(key)).data;
 
 /** 엔진 전용 — 활성 Need 전건. 반환값은 절대 그대로 UI로 흘리지 않는다. */
-export function listActiveNeedIntentsForEngine(): NeedIntentV1[] {
+export async function listActiveNeedIntentsForEngine(
+  loadDataset: DatasetLoader = loadServerDataset,
+): Promise<NeedIntentV1[]> {
+  const needs = await loadDataset<NeedIntentV1[]>("people-needs");
   return needs.filter((n) => n.status === "active");
 }
 
 /** 목적별 유효 동의 여부 — 철회(withdrawn_at) 시 즉시 false. hard filter의 1번 게이트. */
-export function hasActiveConsent(
+export async function hasActiveConsent(
   personId: string,
   purpose: ConsentPurpose,
-): boolean {
+  loadDataset: DatasetLoader = loadServerDataset,
+): Promise<boolean> {
+  const consents = await loadDataset<ConsentRecordV1[]>("people-consents");
   return consents.some(
     (c) =>
       c.person_id === personId &&

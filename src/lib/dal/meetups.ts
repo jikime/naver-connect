@@ -3,15 +3,9 @@
 // 시드: src/data/meetups.json (비민감 — visibility/demand_tags 없음, RSC/Client 직접 참조 가능하나
 //       FR-DA-01 원칙에 따라 화면은 DAL 경유로만 읽는다). [창작 목업]
 
-import meetupsSeed from "@/data/meetups.json";
+import { getDataset } from "@/lib/dal/datasets";
+import { hydrateRuntimeState } from "@/lib/dal/runtime-state";
 import type { Meetup, ViewerContext } from "@/types";
-
-const seed = meetupsSeed as Meetup[];
-
-/** id → Meetup 조회 맵. recommendations.ts(모둠 변형 meetup_id 참조)가 재사용한다. */
-export const meetupsById = new Map<string, Meetup>(
-  seed.map((meetup) => [meetup.id, meetup]),
-);
 
 export interface MeetupFilter {
   type?: Meetup["type"];
@@ -26,7 +20,9 @@ export async function getMeetups(
   _vc: ViewerContext,
   filter?: MeetupFilter,
 ): Promise<Meetup[]> {
-  return seed.filter((meetup) => {
+  await hydrateRuntimeState();
+  const meetups = await getDataset<Meetup[]>("meetups");
+  return meetups.filter((meetup) => {
     if (filter?.type && meetup.type !== filter.type) return false;
     if (filter?.fieldId && !meetup.field_tags.includes(filter.fieldId)) {
       return false;
@@ -50,7 +46,9 @@ export async function getMeetup(
   _vc: ViewerContext,
   id: string,
 ): Promise<Meetup> {
-  const meetup = meetupsById.get(id);
+  await hydrateRuntimeState();
+  const meetups = await getDataset<Meetup[]>("meetups");
+  const meetup = meetups.find((item) => item.id === id);
   if (!meetup) {
     throw new Error(`Meetup not found: ${id}`);
   }

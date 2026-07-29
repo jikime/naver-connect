@@ -3,17 +3,9 @@
 // opportunities.json·financial_products.json은 비민감 시드(직접 import 가능, ADR-03 밖).
 // 검색/필터는 순수 read이며 쓰기가 없다 — 정적 스텁 v1.0 경계와 무관하게 세션 상태도 불필요.
 
-import fieldsSeed from "@/data/fields.json";
-import financialProductsSeed from "@/data/financial_products.json";
-import opportunitiesSeed from "@/data/opportunities.json";
+import { getDataset } from "@/lib/dal/datasets";
 import { resolveDealFieldNames } from "@/lib/dal/deal";
 import type { FinancialProduct, Opportunity, ViewerContext } from "@/types";
-
-const opportunities = opportunitiesSeed as Opportunity[];
-const financialProducts = financialProductsSeed as FinancialProduct[];
-
-type FieldSeed = { id: number; name: string };
-const fields = fieldsSeed as FieldSeed[];
 
 /** FR-RS-01 자원검색 필터. */
 export interface OpportunityFilter {
@@ -28,6 +20,7 @@ export async function searchOpportunities(
   _vc: ViewerContext,
   filter: OpportunityFilter = {},
 ): Promise<Opportunity[]> {
+  const opportunities = await getDataset<Opportunity[]>("opportunities");
   return opportunities.filter((opp) => {
     if (filter.field && opp.field !== filter.field) {
       return false;
@@ -65,7 +58,7 @@ export async function matchOpportunitiesForDeal(
   vc: ViewerContext,
   dealId: string,
 ): Promise<Opportunity[]> {
-  const dealFieldNames = new Set(resolveDealFieldNames(dealId));
+  const dealFieldNames = new Set(await resolveDealFieldNames(dealId));
   if (dealFieldNames.size === 0) {
     return [];
   }
@@ -90,6 +83,8 @@ export async function getFinancialProducts(
   _vc: ViewerContext,
   filter: FinancialProductFilter = {},
 ): Promise<FinancialProduct[]> {
+  const financialProducts =
+    await getDataset<FinancialProduct[]>("financial-products");
   return financialProducts.filter((product) => {
     if (filter.fieldId && !product.field_tags.includes(filter.fieldId)) {
       return false;
@@ -114,9 +109,4 @@ export async function getFinancialProducts(
     }
     return true;
   });
-}
-
-/** 분야 id → 분야명 조회(필터 UI 라벨용). */
-export function getFieldName(fieldId: number): string | undefined {
-  return fields.find((f) => f.id === fieldId)?.name;
 }

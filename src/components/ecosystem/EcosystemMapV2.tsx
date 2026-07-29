@@ -17,7 +17,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import fieldsSeed from "@/data/fields.json";
 import { cn } from "@/lib/utils";
 import type {
   Field,
@@ -28,7 +27,6 @@ import type {
 } from "@/types";
 import { MyOrgsPanel } from "./MyOrgsPanel";
 
-const fields = (fieldsSeed as Field[]).filter((field) => !field.is_extension);
 const forceRoles: FiveForce["role"][] = [
   "신규진입자",
   "공급자",
@@ -141,12 +139,18 @@ export function EcosystemMapV2({
   forces,
   orgs,
   stageLinks,
+  fields: allFields,
 }: {
   stages: VCStage[];
   forces: FiveForce[];
   orgs: Organization[];
   stageLinks: StageLink[];
+  fields: Field[];
 }) {
+  const fields = useMemo(
+    () => allFields.filter((field) => !field.is_extension),
+    [allFields],
+  );
   const defaultFieldId =
     fields.find((field) => field.name === "돌봄")?.id ??
     stages[0]?.field_id ??
@@ -160,7 +164,7 @@ export function EcosystemMapV2({
 
   const fieldById = useMemo(
     () => new Map(fields.map((field) => [field.id, field])),
-    [],
+    [fields],
   );
   const stageById = useMemo(
     () => new Map(stages.map((stage) => [stage.id, stage])),
@@ -721,7 +725,7 @@ export function EcosystemMapV2({
         </section>
       </div>
 
-      <MyOrgsPanel orgs={orgs} />
+      <MyOrgsPanel orgs={orgs} fields={allFields} />
     </div>
   );
 }

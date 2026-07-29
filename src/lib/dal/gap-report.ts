@@ -4,11 +4,8 @@
 // 목업 스코프는 지역 1곳("한빛구", OQ-01 이월)뿐이라 stageLinks/orgs/collabCases는 전건을
 // 그대로 묶어 반환한다. 다지역 확장 시 이 지점에 지역별 필터를 추가한다.
 
-import collabCasesSeed from "@/data/collab_cases.json";
-import gapCardsSeed from "@/data/gap_cards.json";
-import organizationsSeed from "@/data/organizations.json";
-import regionHanbitSeed from "@/data/region_hanbit.json";
-import stageLinksSeed from "@/data/stage_links.json";
+import type { DatasetLoader } from "@/lib/dal/datasets";
+import { getDataset } from "@/lib/dal/datasets";
 import type {
   CollabCase,
   GapCard,
@@ -18,16 +15,11 @@ import type {
   ViewerContext,
 } from "@/types";
 
-const region = regionHanbitSeed as Region;
-const stageLinks = stageLinksSeed as StageLink[];
-const organizations = organizationsSeed as Organization[];
-const gapCards = gapCardsSeed as GapCard[];
-const collabCases = collabCasesSeed as CollabCase[];
-
 /** 사업기회 발굴 셸(FR-GR-01/03) + 연결맵(FR-GR-02/04) + 기회카드(FR-GR-05) + buying_power·협업사례(v1.1 FR-GR-08/09) 데이터 묶음. */
 export async function getGapReport(
   _vc: ViewerContext,
   regionId: string,
+  loadDataset: DatasetLoader = getDataset,
 ): Promise<{
   region: Region;
   stageLinks: StageLink[];
@@ -35,6 +27,14 @@ export async function getGapReport(
   gapCards: GapCard[];
   collabCases: CollabCase[];
 }> {
+  const [region, stageLinks, organizations, gapCards, collabCases] =
+    await Promise.all([
+      loadDataset<Region>("region-hanbit"),
+      loadDataset<StageLink[]>("stage-links"),
+      loadDataset<Organization[]>("organizations"),
+      loadDataset<GapCard[]>("gap-cards"),
+      loadDataset<CollabCase[]>("collab-cases"),
+    ]);
   if (region.id !== regionId) {
     throw new Error(`Region not found: ${regionId}`);
   }

@@ -7,7 +7,7 @@ import Image from "next/image";
 import { OnbWizard } from "@/components/onboarding/OnbWizard";
 
 export const metadata: Metadata = {
-  title: "온보딩 | 사회혁신기업가네트워크 AX 플랫폼 (목업)",
+  title: "온보딩 | 사회혁신기업가네트워크 AX 플랫폼",
 };
 
 export default function OnboardingPage() {
