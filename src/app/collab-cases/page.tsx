@@ -25,7 +25,7 @@ export default async function CollabCasesPage() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="border-b border-guud-hairline bg-guud-header-band">
-        <div className="mx-auto w-full max-w-5xl space-y-3 px-6 py-14 sm:px-10 lg:px-16">
+        <div className="mx-auto w-full max-w-7xl space-y-3 px-6 py-14 sm:px-10 lg:px-16">
           <p className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
             [ LAYER 02 · COLLAB CASES ]
           </p>
@@ -39,7 +39,7 @@ export default async function CollabCasesPage() {
           </p>
         </div>
       </header>
-      <div className="mx-auto w-full max-w-5xl px-6 py-14 sm:px-10 lg:px-16">
+      <div className="mx-auto w-full max-w-7xl px-6 py-14 sm:px-10 lg:px-16">
         <CollabCasesView
           initialCases={cases}
           initialRelations={relations}
