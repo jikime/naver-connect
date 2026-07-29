@@ -1,26 +1,28 @@
 "use client";
 
-// MeetupList — 개설된 모듬 목록·검색(v1.1 · 1-6, 신규 화면). 유형·분야·지역 필터.
+// MeetupList — 개설된 모둠 목록·검색(v1.1 · 1-6, 신규 화면). 유형·분야·지역 필터.
 // 근거: ARCHITECTURE.md §3(L2 MeetupList), TASKS v1.1, FR-MG-01
 // 정본은 meetups.json(ADR-06 v1.1 개정) — MeetupCard(공유 컴포넌트)를 그대로 재사용한다.
 
 import { Layers3, MapPin, RotateCcw, Search, Tags } from "lucide-react";
-import { type ReactNode, useEffect, useId, useState } from "react";
-import { MeetupFormationGuide } from "@/components/meetups/MeetupFormationGuide";
+import { type ReactNode, useEffect, useId, useMemo, useState } from "react";
+import { MeetupCreateDialog } from "@/components/meetups/MeetupCreateDialog";
 import { MeetupCard } from "@/components/recommendations/MeetupCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getFields, getMeetups, getMembers } from "@/lib/dal";
+import { getFields, getMatchScores, getMeetups, getMembers } from "@/lib/dal";
+import { buildAiSuggestedMeetups } from "@/lib/meetup-recommendations";
 import { cn } from "@/lib/utils";
+import { useMeetupSessionStore } from "@/stores/meetup-session";
 import { useViewerContext } from "@/stores/viewer-context";
-import type { Field, MaskedMember, Meetup } from "@/types";
+import type { Field, MaskedMember, MatchScore, Meetup } from "@/types";
 
 const MEETUP_TYPES: Meetup["type"][] = [
   "학습모임",
   "취미모임",
   "지역앰배서더",
-  "공공모듬",
+  "공공모둠",
 ];
 
 function FilterChoice({
@@ -57,40 +59,58 @@ export function MeetupList() {
   const [fieldId, setFieldId] = useState<number | "all">("all");
   const [fields, setFields] = useState<Field[]>([]);
   const [members, setMembers] = useState<MaskedMember[]>([]);
-  const [allMeetups, setAllMeetups] = useState<Meetup[]>([]);
-  const [meetups, setMeetups] = useState<Meetup[] | null>(null);
+  const [scores, setScores] = useState<MatchScore[]>([]);
+  const [seedMeetups, setSeedMeetups] = useState<Meetup[] | null>(null);
+  const createdMeetups = useMeetupSessionStore((state) => state.createdMeetups);
   const queryInputId = useId();
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([getFields(), getMembers(vc), getMeetups(vc)]).then(
-      ([fieldResult, memberResult, meetupResult]) => {
-        if (!cancelled) {
-          setFields(fieldResult);
-          setMembers(memberResult);
-          setAllMeetups(meetupResult);
-        }
-      },
-    );
+    Promise.all([
+      getFields(),
+      getMembers(vc),
+      getMeetups(vc),
+      getMatchScores(vc),
+    ]).then(([fieldResult, memberResult, meetupResult, matchingResult]) => {
+      if (!cancelled) {
+        setFields(fieldResult);
+        setMembers(memberResult);
+        setSeedMeetups(meetupResult);
+        setScores(matchingResult.scores);
+      }
+    });
     return () => {
       cancelled = true;
     };
   }, [vc]);
 
-  useEffect(() => {
-    let cancelled = false;
-    getMeetups(vc, {
-      type: type === "all" ? undefined : type,
-      fieldId: fieldId === "all" ? undefined : fieldId,
-      sido: sido === "all" ? undefined : sido,
-      query: query || undefined,
-    }).then((result) => {
-      if (!cancelled) setMeetups(result);
+  const aiMeetups = useMemo(
+    () => buildAiSuggestedMeetups(members, fields, scores),
+    [fields, members, scores],
+  );
+  const allMeetups = useMemo(
+    () => [...createdMeetups, ...aiMeetups, ...(seedMeetups ?? [])],
+    [aiMeetups, createdMeetups, seedMeetups],
+  );
+  const meetups = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return allMeetups.filter((meetup) => {
+      if (type !== "all" && meetup.type !== type) return false;
+      if (fieldId !== "all" && !meetup.field_tags.includes(fieldId)) {
+        return false;
+      }
+      if (sido !== "all" && meetup.region.sido !== sido) return false;
+      if (
+        normalizedQuery &&
+        !`${meetup.title} ${meetup.purpose}`
+          .toLowerCase()
+          .includes(normalizedQuery)
+      ) {
+        return false;
+      }
+      return true;
     });
-    return () => {
-      cancelled = true;
-    };
-  }, [vc, query, sido, type, fieldId]);
+  }, [allMeetups, fieldId, query, sido, type]);
 
   const sidoOptions = Array.from(
     new Set(allMeetups.map((meetup) => meetup.region.sido)),
@@ -128,22 +148,25 @@ export function MeetupList() {
   const fieldNamesById = Object.fromEntries(
     fields.map((field) => [field.id, field.name]),
   );
+  const viewer = members.find((member) => member.id === vc.personaId);
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 px-6 py-14 sm:px-10 lg:px-16">
-      <MeetupFormationGuide />
-
       <section aria-labelledby="meetup-list-title" className="space-y-5">
-        <div className="space-y-1">
-          <h2
-            id="meetup-list-title"
-            className="font-heading text-2xl font-medium tracking-tight text-foreground"
-          >
-            참여할 모듬 찾기
-          </h2>
-          <p className="text-sm text-guud-text-muted-2">
-            형성 배경과 참여 구성을 확인한 뒤 의향을 남겨보세요.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h2
+              id="meetup-list-title"
+              className="font-heading text-2xl font-medium tracking-tight text-foreground"
+            >
+              개설된 모둠
+            </h2>
+            <p className="text-sm text-guud-text-muted-2">
+              관심 있는 모둠에 참여해보세요. 두 명 이상 모이면 온라인 첫
+              미팅 가능 시간을 함께 공유할 수 있어요.
+            </p>
+          </div>
+          <MeetupCreateDialog fields={fields} viewer={viewer} />
         </div>
 
         <div className="rounded-2xl border border-guud-hairline bg-card p-5 sm:p-6">
@@ -242,10 +265,10 @@ export function MeetupList() {
           </div>
         </div>
 
-        {meetups !== null && (
+        {seedMeetups !== null && (
           <div className="flex min-h-9 flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-guud-text-muted-2">
-              조건에 맞는 모듬{" "}
+              조건에 맞는 모둠{" "}
               <strong className="font-semibold text-foreground">
                 {meetups.length}개
               </strong>
@@ -264,12 +287,12 @@ export function MeetupList() {
           </div>
         )}
 
-        {meetups === null ? (
+        {seedMeetups === null ? (
           <p className="text-sm text-guud-text-muted-2">불러오는 중입니다…</p>
         ) : meetups.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-guud-hairline px-6 py-12 text-center">
             <p className="text-sm font-medium text-foreground">
-              조건에 맞는 모듬이 없습니다.
+              조건에 맞는 모둠이 없습니다.
             </p>
             <p className="mt-1 text-xs text-guud-text-muted-2">
               다른 지역·유형·분야를 선택해보세요.
@@ -282,7 +305,7 @@ export function MeetupList() {
               onClick={resetFilters}
             >
               <RotateCcw aria-hidden />
-              전체 모듬 보기
+              전체 모둠 보기
             </Button>
           </div>
         ) : (

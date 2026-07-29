@@ -2,7 +2,7 @@
 
 // WeeklyRecommendationList — 주간 추천 개편(v1.1 FR-RC-01/02): 공통점 많은 회원 5명 + 차이점
 // 많은 회원 5명을 구분 제시하고, 각 그룹을 "더 보기"로 최대 15명까지 확장한다. 공공중간지원
-// 분기·모듬 변형은 기존대로 MeetupCard(meetup_id→meetups.json 참조, ADR-06 v1.1)로 렌더한다.
+// 분기·모둠 변형은 기존대로 MeetupCard(meetup_id→meetups.json 참조, ADR-06 v1.1)로 렌더한다.
 // 근거: ARCHITECTURE.md §3(L2 WeeklyRecommendationList·L3 MeetupCard), FR-RC-01/02/08.
 // 그룹핑·정렬(핫리드+퍼즐형 우선)·15건 캡은 getRecommendations(DAL)가 이미 처리하므로
 // 이 컴포넌트는 초기 5건/더보기 페이지네이션과 렌더만 담당한다.
@@ -126,7 +126,7 @@ function RecommendationSummaryCard({
   );
 }
 
-/** 추천 1건 렌더 — 모듬 변형(meetup_id)이면 MeetupCard, 아니면 1:1 요약 카드. */
+/** 추천 1건 렌더 — 모둠 변형(meetup_id)이면 MeetupCard, 아니면 1:1 요약 카드. */
 function RecommendationCard({
   rec,
   meetupsById,
@@ -145,7 +145,7 @@ function RecommendationCard({
   const linkedMeetup = rec.meetup_id
     ? meetupsById.get(rec.meetup_id)
     : undefined;
-  if (rec.rec_kind === "모듬") {
+  if (rec.rec_kind === "모둠") {
     if (!linkedMeetup) return null;
     return (
       <MeetupCard

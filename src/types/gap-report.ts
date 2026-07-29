@@ -27,7 +27,7 @@ export interface GapCard {
   /** Resource∪Opportunity 유니온 (BR-11) */
   candidate_resources: string[];
   actions: {
-    type: "추천발송" | "모듬개설" | "3단계협업지원";
+    type: "추천발송" | "모둠개설" | "3단계협업지원";
     desc: string;
   }[];
 }

@@ -4,7 +4,7 @@ const FORMATION_PATHS = [
   {
     title: "공정한 다자 연결",
     description:
-      "공공·중간지원 회원은 특정 1:1 대신 여러 참여자가 함께 만나는 모듬으로 추천돼요.",
+      "공공·중간지원 회원은 특정 1:1 대신 여러 참여자가 함께 만나는 모둠으로 추천돼요.",
     icon: Building2,
   },
   {
@@ -16,7 +16,7 @@ const FORMATION_PATHS = [
   {
     title: "회원 제안으로 개설",
     description:
-      "공통 관심사나 기존 추천 대화가 발전하면 학습·취미 모듬으로 이어져요.",
+      "공통 관심사나 기존 추천 대화가 발전하면 학습·취미 모둠으로 이어져요.",
     icon: Users,
   },
 ];
@@ -35,7 +35,7 @@ export function MeetupFormationGuide() {
           id="meetup-formation-title"
           className="mt-2 font-heading text-2xl font-medium tracking-tight text-foreground"
         >
-          모듬은 이렇게 만들어져요
+          모둠은 이렇게 만들어져요
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-guud-text-muted-2">
           현재는 아래 세 가지 개설 경로가 있고, 카드마다 어떤 경로로

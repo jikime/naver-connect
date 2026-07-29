@@ -411,7 +411,7 @@ export async function getKnowledgeGraph(
   for (const re of recEdges) {
     if (!memberIds.has(re.from) || !memberIds.has(re.to)) continue;
     const key =
-      re.rec_kind === "모듬"
+      re.rec_kind === "모둠"
         ? `mu:${re.from}->${re.to}`
         : [re.from, re.to].sort().join("~");
     if (seenPairs.has(key)) continue;
@@ -420,14 +420,14 @@ export async function getKnowledgeGraph(
       re.status === "accepted" ||
       recEdges.some(
         (x) =>
-          x.rec_kind !== "모듬" &&
+          x.rec_kind !== "모둠" &&
           [x.from, x.to].sort().join("~") === key &&
           x.status === "accepted",
       );
     const kind = pairAccepted ? "real" : "potential";
     const emphasis = kind === "potential" && bothInSameDeal(re.from, re.to);
     const label =
-      re.rec_kind === "모듬" ? `${re.match_type}(모듬)` : re.match_type;
+      re.rec_kind === "모둠" ? `${re.match_type}(모둠)` : re.match_type;
     pushEdge(re.from, re.to, label, kind, emphasis);
     recDegree.set(re.from, (recDegree.get(re.from) ?? 0) + 1);
     recDegree.set(re.to, (recDegree.get(re.to) ?? 0) + 1);

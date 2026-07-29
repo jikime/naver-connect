@@ -183,7 +183,7 @@ export function OnbWizard() {
   const [finalizing, setFinalizing] = useState(false);
   const [finalizeError, setFinalizeError] = useState<string | null>(null);
   const [result, setResult] = useState<FinalizeResult | null>(null);
-  // v1.1 ADR-06: 모듬 변형은 meetup_id로 meetups.json을 참조한다(인라인 meetup 객체 폐지).
+  // v1.1 ADR-06: 모둠 변형은 meetup_id로 meetups.json을 참조한다(인라인 meetup 객체 폐지).
   const [meetupsById, setMeetupsById] = useState<Map<string, Meetup>>(
     new Map(),
   );
@@ -370,7 +370,7 @@ export function OnbWizard() {
       setResult(finalized);
       completeOnboarding();
       if (
-        finalized.firstRecommendations.some((rec) => rec.rec_kind === "모듬")
+        finalized.firstRecommendations.some((rec) => rec.rec_kind === "모둠")
       ) {
         const meetups = await getMeetups(vc);
         setMeetupsById(new Map(meetups.map((m) => [m.id, m])));
@@ -460,10 +460,10 @@ export function OnbWizard() {
                     <MatchTypeBadge type={rec.match_type} />
                   </div>
                   <p className="mt-3 text-sm leading-6 text-foreground">
-                    {rec.rec_kind === "모듬"
+                    {rec.rec_kind === "모둠"
                       ? ((rec.meetup_id
                           ? meetupsById.get(rec.meetup_id)?.purpose
-                          : undefined) ?? "모듬 추천")
+                          : undefined) ?? "모둠 추천")
                       : rec.matching_rationale}
                   </p>
                 </li>

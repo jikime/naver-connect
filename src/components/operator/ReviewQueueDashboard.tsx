@@ -80,7 +80,7 @@ function QueueItem({
         <div className="flex flex-wrap items-center gap-1.5">
           <MatchTypeBadge type={rec.match_type} />
           <Badge className="rounded-full border border-border bg-background px-2.5 py-0.5 font-semibold tracking-normal text-guud-text-muted-2 normal-case">
-            {rec.rec_kind === "모듬" ? "모듬" : rec.value_class}
+            {rec.rec_kind === "모둠" ? "모둠" : rec.value_class}
           </Badge>
           <Badge className="rounded-full border border-border bg-background px-2.5 py-0.5 font-semibold tracking-normal text-guud-text-muted-2 normal-case">
             {STATUS_LABEL[rec.status]}
@@ -157,7 +157,7 @@ export function ReviewQueueDashboard() {
   }
 
   function memberName(id: string | null): string {
-    if (!id) return "(모듬 참여자)";
+    if (!id) return "(모둠 참여자)";
     return members.find((m) => m.id === id)?.name ?? id;
   }
 

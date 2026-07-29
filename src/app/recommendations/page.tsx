@@ -19,7 +19,7 @@ export default function RecommendationsPage() {
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
               공통점이 많은 연결 5건과 차이점이 많은 연결 5건을 구분해 보여줘요
-              — 1:1 대화가 모듬으로 이어지는 경로도 함께 확인할 수 있어요.
+              — 1:1 대화가 모둠으로 이어지는 경로도 함께 확인할 수 있어요.
             </p>
           </div>
           <AutomationLevelBadge frId="FR-RC-01" />
