@@ -16,6 +16,7 @@ Read this after
 ## Attached decision and research snapshots
 
 - `docs/decisions/2026-07-29-embedding-decision-register.md`
+- `docs/decisions/2026-07-29-embedding-map-v5-validation.md`
 - `docs/decisions/2026-07-29-demo-viewer-integration-plan.md`
 - `docs/decisions/2026-07-29-local-evidence-schema-reference.md`
 - `docs/decisions/2026-07-29-main-08eec42-integration-plan.md`

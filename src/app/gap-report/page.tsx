@@ -73,12 +73,12 @@ export default async function GapReportPage() {
       </section>
 
       {/* ④ 밴드 B(muted): 커버리지 요약 */}
-      <section className="bg-muted py-16 sm:py-20">
+      <section
+        className="bg-muted py-16 sm:py-20"
+        aria-labelledby="coverage-heading"
+      >
         <div className="mx-auto w-full max-w-7xl space-y-4 px-6 sm:px-10 lg:px-16">
-          <div
-            className="flex items-center gap-2"
-            aria-labelledby="coverage-heading"
-          >
+          <div className="flex items-center gap-2">
             <h2
               id="coverage-heading"
               className="font-heading text-2xl font-light tracking-tight text-foreground"
@@ -92,12 +92,12 @@ export default async function GapReportPage() {
       </section>
 
       {/* ④ 밴드 C(canvas): 연결맵 · 지역 맵(캔버스 보존, 크롬만 리듬화) */}
-      <section className="bg-background py-16 sm:py-20">
+      <section
+        className="bg-background py-16 sm:py-20"
+        aria-labelledby="connection-map-heading"
+      >
         <div className="mx-auto w-full max-w-7xl space-y-4 px-6 sm:px-10 lg:px-16">
-          <div
-            className="flex items-center gap-2"
-            aria-labelledby="connection-map-heading"
-          >
+          <div className="flex items-center gap-2">
             <h2
               id="connection-map-heading"
               className="font-heading text-2xl font-light tracking-tight text-foreground"
@@ -115,12 +115,12 @@ export default async function GapReportPage() {
       </section>
 
       {/* ④ 밴드 D(muted): 기회 카드(card 어휘, muted 위 card 면으로 판독) */}
-      <section className="flex-1 bg-muted py-16 sm:py-20">
+      <section
+        className="flex-1 bg-muted py-16 sm:py-20"
+        aria-labelledby="gap-cards-heading"
+      >
         <div className="mx-auto w-full max-w-7xl space-y-4 px-6 sm:px-10 lg:px-16">
-          <div
-            className="flex items-center gap-2"
-            aria-labelledby="gap-cards-heading"
-          >
+          <div className="flex items-center gap-2">
             <h2
               id="gap-cards-heading"
               className="font-heading text-2xl font-light tracking-tight text-foreground"

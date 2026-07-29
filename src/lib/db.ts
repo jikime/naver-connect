@@ -5,7 +5,6 @@
 import { Pool } from "pg";
 
 declare global {
-  // eslint-disable-next-line no-var
   var __pgPool: Pool | undefined;
 }
 
@@ -25,10 +24,13 @@ function createPool(): Pool {
   });
 }
 
-const pool: Pool =
-  process.env.NODE_ENV === "production"
-    ? createPool()
-    : (globalThis.__pgPool ?? (globalThis.__pgPool = createPool()));
+function getPool(): Pool {
+  if (process.env.NODE_ENV === "production") return createPool();
+  if (!globalThis.__pgPool) globalThis.__pgPool = createPool();
+  return globalThis.__pgPool;
+}
+
+const pool = getPool();
 
 /**
  * 파라미터화된 쿼리 헬퍼.
