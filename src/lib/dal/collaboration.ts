@@ -50,12 +50,12 @@ export const SUBGROUP_KIND_COLOR: Record<SubgroupKindOrLetter, string> = {
 
 /** 층(kind)별 한글 라벨. */
 export const SUBGROUP_KIND_LABEL: Record<SubgroupKindOrLetter, string> = {
-  "non-social": "비사회적기업",
-  supporter: "지원가",
-  activist: "활동가",
-  C: "비사회적기업",
-  B: "지원가",
-  A: "활동가",
+  "non-social": "일반기업",
+  supporter: "사회혁신지원가",
+  activist: "사회혁신활동가",
+  C: "일반기업",
+  B: "사회혁신지원가",
+  A: "사회혁신활동가",
 };
 
 // ──────────────────────────────────────────────

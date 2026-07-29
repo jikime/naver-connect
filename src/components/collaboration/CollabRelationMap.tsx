@@ -367,9 +367,9 @@ export function CollabRelationMap({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-guud-hairline bg-card px-4 py-2.5 text-xs">
         {/* 레이어 토글 */}
         {([
-          { key: "showA" as const, layer: "A" as const, label: "A 활동가" },
-          { key: "showB" as const, layer: "B" as const, label: "B 지원가" },
-          { key: "showC" as const, layer: "C" as const, label: "C 비사회적" },
+          { key: "showA" as const, layer: "A" as const, label: "A 사회혁신활동가" },
+          { key: "showB" as const, layer: "B" as const, label: "B 사회혁신지원가" },
+          { key: "showC" as const, layer: "C" as const, label: "C 일반기업" },
         ]).map(({ key, layer, label }) => (
           <label key={key} className="flex cursor-pointer items-center gap-1.5">
             <input type="checkbox" checked={filter[key]}
@@ -441,7 +441,7 @@ export function CollabRelationMap({
                         fill={LAYER[l].border} opacity={0.2} />
                   <text x={COL_X[l] + COL_W / 2} y={18.5} textAnchor="middle"
                         fontSize="9" fontWeight="800" fill={LAYER[l].text} letterSpacing="0.1em">
-                    {l === "A" ? "A  활동가 레이어" : l === "B" ? "B  지원가 레이어" : "C  비사회적 레이어"}
+                    {l === "A" ? "A  사회혁신활동가 레이어" : l === "B" ? "B  사회혁신지원가 레이어" : "C  일반기업 레이어"}
                   </text>
                 </g>
               );
@@ -626,7 +626,7 @@ export function CollabRelationMap({
         {(["A", "B", "C"] as const).map(l => (
           <span key={l} className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-3 rounded-sm" style={{ background: LAYER[l].border }} />
-            {l === "A" ? "활동가 (A)" : l === "B" ? "지원가 (B)" : "비사회적 (C)"}
+            {l === "A" ? "사회혁신활동가 (A)" : l === "B" ? "사회혁신지원가 (B)" : "일반기업 (C)"}
           </span>
         ))}
         <span className="flex items-center gap-1.5">
