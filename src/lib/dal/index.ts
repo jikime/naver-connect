@@ -6,6 +6,7 @@ export * from "./collaboration";
 // collaboration-server는 server-only이므로 barrel에서 제외 (Client에서 import 금지)
 export * from "./deal";
 export * from "./ecosystem";
+export * from "./embedding";
 export * from "./errors";
 export * from "./fields";
 export * from "./gap-report";

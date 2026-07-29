@@ -6,7 +6,11 @@
 // P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
 import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
 // C3: 동의 판정·엔진 산출·허용 pair·그래프 엣지는 전부 서버 번들에서 온다(클라 private 입력 0).
-import { getMatchingBundle, parseEngineRecId } from "@/lib/dal/matching";
+import {
+  getMatchingBundle,
+  normalizeRecommendationId,
+  parseEngineRecId,
+} from "@/lib/dal/matching";
 import { meetupsById } from "@/lib/dal/meetups";
 import { getExpertSubtype } from "@/lib/dal/members";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
@@ -133,7 +137,7 @@ export async function getRecommendations(
   const addressedToViewer = [
     ...seed.filter(
       (rec) =>
-        isAddressedTo(rec, vc.personaId) &&
+        (vc.role === "운영자" || isAddressedTo(rec, vc.personaId)) &&
         allowedSeedIds.has(rec.id) &&
         !hiddenSeedIds.has(rec.id),
     ),
@@ -193,7 +197,8 @@ export async function getRecommendation(
   vc: ViewerContext,
   id: string,
 ): Promise<Recommendation> {
-  const engineRef = parseEngineRecId(id);
+  const normalizedId = normalizeRecommendationId(id);
+  const engineRef = parseEngineRecId(normalizedId);
   // 엔진 ID의 recipient/other를 바꿔 대입하며 타인 추천 존재 여부를 열거하지 못하게
   // 서버 번들 조회 전에 동일한 당사자/운영자 게이트를 적용한다.
   if (
@@ -202,7 +207,7 @@ export async function getRecommendation(
     vc.personaId !== engineRef.recipient &&
     vc.personaId !== engineRef.other
   ) {
-    throw new Error(`Recommendation not found: ${id}`);
+    throw new Error(`Recommendation not found: ${normalizedId}`);
   }
   if (engineRef) {
     // 서버 번들은 recipient 관점으로 계산된다 — 운영자/상대가 조회해도 동일 산출.
@@ -210,20 +215,20 @@ export async function getRecommendation(
       role: vc.role,
       personaId: engineRef.recipient,
     });
-    const rec = bundle.engineRecommendations.find((r) => r.id === id);
+    const rec = bundle.engineRecommendations.find((r) => r.id === normalizedId);
     if (!rec) {
-      throw new Error(`Recommendation not found: ${id}`);
+      throw new Error(`Recommendation not found: ${normalizedId}`);
     }
     return withSessionAndMask(rec, vc);
   }
   const bundle = await getMatchingBundle(vc);
-  const rec = seed.find((r) => r.id === id);
+  const rec = seed.find((r) => r.id === normalizedId);
   if (
     !rec ||
-    !bundle.allowedSeedRecIds.includes(id) ||
+    !bundle.allowedSeedRecIds.includes(normalizedId) ||
     !isRecommendationParty(rec, vc)
   ) {
-    throw new Error(`Recommendation not found: ${id}`);
+    throw new Error(`Recommendation not found: ${normalizedId}`);
   }
   return withSessionAndMask(rec, vc);
 }

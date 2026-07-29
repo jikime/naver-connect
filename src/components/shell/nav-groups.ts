@@ -44,7 +44,7 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         href: "/recommendations",
-        label: "주간추천",
+        label: "이번 주 추천",
         description: "공통점·차이점 많은 회원 추천을 매주 받아요",
       },
       {

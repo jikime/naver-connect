@@ -5,6 +5,7 @@ import {
   BarChart3,
   BriefcaseBusiness,
   ClipboardCheck,
+  ClipboardPenLine,
   Network,
   Search,
   SlidersHorizontal,
@@ -15,6 +16,12 @@ import Link from "next/link";
 import { useAuthSessionStore } from "@/stores/auth-session";
 
 const MEMBER_ACTIONS = [
+  {
+    href: "/onboarding",
+    label: "연결 프로필 만들기",
+    description: "내 활동과 필요한 연결을 입력해 추천 기준을 업데이트해요.",
+    icon: ClipboardPenLine,
+  },
   {
     href: "/recommendations",
     label: "이번 주 추천",
@@ -93,7 +100,7 @@ export function MemberHome() {
               </p>
             </div>
             <span className="rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-secondary-foreground">
-              온보딩 완료
+              {user.role === "운영자" ? "운영 모드" : "온보딩 완료"}
             </span>
           </div>
         </div>
@@ -110,7 +117,7 @@ export function MemberHome() {
             </h2>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {actions.map((item, index) => {
             const Icon = item.icon;
             return (

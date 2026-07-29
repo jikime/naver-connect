@@ -53,6 +53,16 @@ describe("getRecommendations — v1.1 공통점/차이점 그룹핑(FR-RC-01/02)
     expect(different.length).toBeGreaterThan(0);
     expect(different.every((rec) => rec.is_hot_lead === false)).toBe(true);
   });
+
+  it("운영자는 온보딩 persona 없이 전체 허용 추천을 확인한다", async () => {
+    const { common, different } = await getRecommendations({
+      role: "운영자",
+      personaId: "OPERATOR",
+    });
+    const all = [...common, ...different];
+    expect(all.length).toBeGreaterThan(0);
+    expect(new Set(all.map((rec) => rec.to_member_id)).size).toBeGreaterThan(1);
+  });
 });
 
 describe("getRecommendations/getRecommendation — 최소노출 마스킹(FR-RC-06 → P1-1 강화)", () => {
@@ -111,6 +121,20 @@ describe("getRecommendationGraphEdges — 뷰어 범위와 동의 gate", () => {
         engine?.id ?? "",
       ),
     ).rejects.toThrow("Recommendation not found");
+  });
+
+  it("Next 동적 경로가 percent-encode한 엔진 추천 ID도 상세 조회된다", async () => {
+    const owner = { role: "기업가" as const, personaId: "M-001" };
+    const { common, different } = await getRecommendations(owner);
+    const engine = [...common, ...different].find(
+      (rec) => rec.source === "engine",
+    );
+    expect(engine).toBeDefined();
+    const detail = await getRecommendation(
+      owner,
+      encodeURIComponent(engine?.id ?? ""),
+    );
+    expect(detail.id).toBe(engine?.id);
   });
 });
 

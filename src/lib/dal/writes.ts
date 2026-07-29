@@ -4,6 +4,7 @@
 import declineReasonsSeed from "@/data/decline_reasons.json";
 // P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
 import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
+import { embedPublicProfile } from "@/lib/dal/embedding";
 import {
   confirmSafeTexts,
   getEngineRecommendationsFor,
@@ -20,6 +21,7 @@ import type {
   MaskedMember,
   NeedIntentV1,
   OnboardingFinalizeInput,
+  PublicEmbeddingProfile,
   Recommendation,
   ViewerContext,
 } from "@/types";
@@ -196,6 +198,23 @@ export async function finalizeOnboarding(
         quote: profile.consents.quote_in_intro,
       },
     });
+  }
+
+  if (profile.consents.publish_profile) {
+    const publicEmbeddingProfile: PublicEmbeddingProfile = {
+      member_id: vc.personaId,
+      publish_profile: true,
+      organization: { ...profile.organization },
+      region: { ...profile.region },
+      field_tags: [...profile.field_tags],
+      value_chain_stage: profile.value_chain_stage,
+      mission_statement: profile.mission_statement,
+      supply_tags: profile.supply_tags.map((tag) => ({ ...tag })),
+      activities: [...profile.activities],
+      preferred_mode: profile.preferred_mode,
+    };
+    const shadow = await embedPublicProfile(publicEmbeddingProfile);
+    store.setMemberEmbeddingShadow(vc.personaId, shadow);
   }
 
   const member = await getMember(vc, vc.personaId);

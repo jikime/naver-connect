@@ -40,6 +40,7 @@ import type {
   Recommendation,
 } from "@/types";
 import { MeetupCard, type MeetupMemberSummary } from "./MeetupCard";
+import { RecommendationRelationshipMap } from "./RecommendationRelationshipMap";
 
 const INITIAL_VISIBLE = 5;
 const MAX_VISIBLE = 15;
@@ -255,36 +256,58 @@ export function WeeklyRecommendationList() {
   const [scoresByPair, setScoresByPair] = useState<Map<string, MatchScore>>(
     new Map(),
   );
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: overrides는 거절/후기/승인 세션 반영 시 재조회를 트리거하기 위한 의도적 의존성(본문 미참조).
   useEffect(() => {
     let cancelled = false;
+    setLoadError(null);
     Promise.all([
       getRecommendations(vc),
       getMeetups(vc),
       getMatchScores(vc),
       getMembers(vc),
       getFields(),
-    ]).then(([result, meetups, matchScores, memberResult, fieldResult]) => {
-      if (!cancelled) {
-        setGroups(result);
-        setMeetupsById(new Map(meetups.map((m) => [m.id, m])));
-        setMembers(memberResult);
-        setFields(fieldResult);
-        setScoresByPair(
-          new Map(
-            matchScores.scores.map((s) => [
-              scoreKey(s.from_member_id, s.to_member_id),
-              s,
-            ]),
-          ),
-        );
-      }
-    });
+    ])
+      .then(([result, meetups, matchScores, loadedMembers, loadedFields]) => {
+        if (!cancelled) {
+          setGroups(result);
+          setMeetupsById(new Map(meetups.map((m) => [m.id, m])));
+          setScoresByPair(
+            new Map(
+              matchScores.scores.map((s) => [
+                scoreKey(s.from_member_id, s.to_member_id),
+                s,
+              ]),
+            ),
+          );
+          setMembers(loadedMembers);
+          setFields(loadedFields);
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(
+            error instanceof Error
+              ? error.message
+              : "추천을 불러오지 못했습니다.",
+          );
+        }
+      });
     return () => {
       cancelled = true;
     };
   }, [vc, overrides]);
+
+  if (loadError) {
+    return (
+      <div className="mx-auto w-full max-w-7xl px-6 py-14 sm:px-10 lg:px-16">
+        <p className="text-sm text-destructive">
+          추천을 불러오지 못했습니다: {loadError}
+        </p>
+      </div>
+    );
+  }
 
   if (groups === null) {
     return (
@@ -319,6 +342,14 @@ export function WeeklyRecommendationList() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-16 px-6 py-14 sm:px-10 lg:px-16">
+      {vc.role !== "운영자" && (
+        <RecommendationRelationshipMap
+          viewerId={vc.personaId}
+          recommendations={[...groups.common, ...groups.different]}
+          members={members}
+          scoresByPair={scoresByPair}
+        />
+      )}
       <RecommendationGroup
         title="공통점이 많은 회원"
         description="거울형·선배형·취미형 등 나와 비슷한 축의 매칭입니다. 매칭 점수가 높은 순으로 보여드려요."

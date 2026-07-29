@@ -105,6 +105,10 @@ describe("finalizeOnboarding — safe_match_text 승인 흐름(M2 P1-1)", () => 
     expect(need.safe_match_receipt?.consent_receipt_id).toContain(
       "consent-session-M-001",
     );
+    expect(
+      useSessionInteractionStore.getState().memberEmbeddingShadows["M-001"]
+        ?.model.id,
+    ).toBe("nlpai-lab/KURE-v1");
     const { input } = runMatchingEngine(snapshotSessionState());
     expect(input.needs.find((n) => n.id === need.id)?.match_text).toBe(
       "데이터 분석 협업 파트너 찾는 중",

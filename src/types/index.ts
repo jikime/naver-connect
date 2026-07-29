@@ -5,6 +5,7 @@ export * from "./collaboration";
 export * from "./common";
 export * from "./deal";
 export * from "./ecosystem";
+export * from "./embedding";
 export * from "./finance";
 export * from "./gap-report";
 export * from "./knowledge-graph";

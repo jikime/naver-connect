@@ -27,11 +27,21 @@ export type { MatchingBundle } from "@/lib/server/matching-service";
 /** 엔진 추천 ID — 회원 ID에 '-'가 들어가므로 구분자는 ':'를 쓴다. (서비스와 동일 규칙) */
 export const ENGINE_REC_PREFIX = "REC-ENG:";
 
+/** Next 동적 경로가 ':'를 '%3A'로 전달해도 엔진 추천 ID를 동일하게 해석한다. */
+export function normalizeRecommendationId(id: string): string {
+  try {
+    return decodeURIComponent(id);
+  } catch {
+    return id;
+  }
+}
+
 export function parseEngineRecId(
   id: string,
 ): { recipient: string; other: string } | null {
-  if (!id.startsWith(ENGINE_REC_PREFIX)) return null;
-  const [, recipient, other] = id.split(":");
+  const normalized = normalizeRecommendationId(id);
+  if (!normalized.startsWith(ENGINE_REC_PREFIX)) return null;
+  const [, recipient, other] = normalized.split(":");
   return recipient && other ? { recipient, other } : null;
 }
 
@@ -140,7 +150,7 @@ export async function getMatchScores(
 
 /**
  * 관리자 가중치 편집(FR-RL-02) + 재산출(FR-RL-03). 운영자가 아니면 403 시뮬레이션.
- * 세션 스토어만 갱신(NFR-02) — 새로고침 시 시드 원본으로 리셋(A6).
+ * 브라우저 데모 스토어만 갱신(NFR-02) — 실서비스에서는 서버 세션/RLS로 교체한다.
  */
 export async function setRuleWeights(
   vc: ViewerContext,
