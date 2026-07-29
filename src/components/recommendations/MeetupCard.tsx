@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import { CoffeeChatDialog } from "@/components/meetups/CoffeeChatDialog";
+import { MeetupChatDialog } from "@/components/meetups/MeetupChatDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +26,7 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useMeetupSessionStore } from "@/stores/meetup-session";
-import type { Meetup, Recommendation } from "@/types";
+import type { Meetup, MeetupChatMessage, Recommendation } from "@/types";
 
 export interface MeetupMemberSummary {
   id: string;
@@ -35,6 +36,7 @@ export interface MeetupMemberSummary {
 }
 
 const EMPTY_AVAILABILITY_BY_MEMBER = {};
+const EMPTY_CHAT_MESSAGES: MeetupChatMessage[] = [];
 
 const FORMATION_COPY: Record<
   Meetup["created_source"],
@@ -86,6 +88,9 @@ export function MeetupCard({
   const availabilityByMember = useMeetupSessionStore(
     (state) =>
       state.availabilityByMeetup[meetup.id] ?? EMPTY_AVAILABILITY_BY_MEMBER,
+  );
+  const chatMessages = useMeetupSessionStore(
+    (state) => state.chatMessagesByMeetup[meetup.id] ?? EMPTY_CHAT_MESSAGES,
   );
   const joinMeetup = useMeetupSessionStore((state) => state.joinMeetup);
   const leaveMeetup = useMeetupSessionStore((state) => state.leaveMeetup);
@@ -352,16 +357,29 @@ export function MeetupCard({
                 : "참여하기"}
           </Button>
           {viewerId && (
-            <CoffeeChatDialog
-              meetup={meetup}
-              viewerId={viewerId}
-              enabled={canScheduleCoffeeChat}
-              availabilityByMember={availabilityByMember}
-              participants={joinedMembers.map((member) => ({
-                id: member.id,
-                name: member.name,
-              }))}
-            />
+            <>
+              <MeetupChatDialog
+                meetup={meetup}
+                viewerId={viewerId}
+                viewerName={membersById[viewerId]?.name ?? "회원"}
+                enabled={hasJoined}
+                participants={joinedMembers.map((member) => ({
+                  id: member.id,
+                  name: member.name,
+                }))}
+                messages={chatMessages}
+              />
+              <CoffeeChatDialog
+                meetup={meetup}
+                viewerId={viewerId}
+                enabled={canScheduleCoffeeChat}
+                availabilityByMember={availabilityByMember}
+                participants={joinedMembers.map((member) => ({
+                  id: member.id,
+                  name: member.name,
+                }))}
+              />
+            </>
           )}
           {recommendation && (
             <Button size="sm" variant="outline" asChild>
