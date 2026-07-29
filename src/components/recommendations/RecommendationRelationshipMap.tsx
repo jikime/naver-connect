@@ -11,6 +11,8 @@ import type {
   MemberEmbeddingShadow,
   Recommendation,
 } from "@/types";
+import { RecommendationBenefitSummary } from "./RecommendationBenefitSummary";
+import { scoreForRecommendation } from "./recommendation-score";
 
 interface Props {
   viewerId: string;
@@ -26,7 +28,7 @@ interface MapNode {
   x: number;
   y: number;
   recommendation?: Recommendation;
-  score?: number;
+  score?: MatchScore;
 }
 
 const WIDTH = 800;
@@ -113,9 +115,7 @@ export function RecommendationRelationshipMap({
           y: svgY(embedded.y),
           recommendation,
           score: recommendation
-            ? scoresByPair.get(
-                `${recommendation.from_member_id}→${recommendation.to_member_id ?? ""}`,
-              )?.score
+            ? scoreForRecommendation(recommendation, scoresByPair)
             : undefined,
         };
       }),
@@ -297,21 +297,39 @@ export function RecommendationRelationshipMap({
       </div>
 
       {selected?.recommendation && (
-        <div className="flex flex-wrap items-start justify-between gap-3 border-t border-guud-hairline pt-4">
-          <p className="max-w-3xl text-sm leading-relaxed text-guud-text-muted-2">
-            <span className="font-semibold text-foreground">
-              {selected.name}
-            </span>
-            {selected.org ? ` · ${selected.org}` : ""}
-            {selectedCosine !== undefined
-              ? ` · KURE 원본 1024차원 cosine ${selectedCosine.toFixed(3)}`
-              : ""}
-            {selected.score !== undefined
-              ? ` · 추천 엔진 점수 ${selected.score}`
-              : ""}
-            <br />
+        <div
+          className="space-y-3 border-t border-guud-hairline pt-4"
+          aria-live="polite"
+        >
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-sm text-guud-text-muted-2">
+              <span className="font-semibold text-foreground">
+                {selected.name}
+              </span>
+              {selected.org ? ` · ${selected.org}` : ""}
+            </p>
+            <p className="text-xs text-guud-text-muted-2">
+              {selectedCosine !== undefined
+                ? `KURE 원본 1024차원 cosine ${selectedCosine.toFixed(3)}`
+                : ""}
+              {selected.score
+                ? ` · 추천 엔진 점수 ${selected.score.score}`
+                : ""}
+            </p>
+          </div>
+          <p className="text-sm leading-relaxed text-guud-text-muted-2">
             {selected.recommendation.matching_rationale}
           </p>
+          <RecommendationBenefitSummary
+            recommendation={selected.recommendation}
+            reasonKeywords={
+              selected.score
+                ? selected.recommendation.rec_axis === "공통점"
+                  ? selected.score.shared_keywords
+                  : selected.score.complementary_keywords
+                : []
+            }
+          />
         </div>
       )}
 
