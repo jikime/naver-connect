@@ -62,7 +62,7 @@ async function assertIsRecipient(
   const isRecipient =
     vc.role === "운영자" ||
     rec.to_member_id === vc.personaId ||
-    (rec.rec_kind === "모듬" &&
+    (rec.rec_kind === "모둠" &&
       rec.meetup_id !== undefined &&
       (meetupsById.get(rec.meetup_id)?.member_ids.includes(vc.personaId) ??
         false));

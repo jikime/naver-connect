@@ -64,7 +64,7 @@ Supabase service role REST를 이용해 행 값은 출력하지 않고 테이블
 #### 추천 방식
 
 1. `src/data/private/recommendations.json`의 수동 작성 추천 11건을 읽는다.
-2. 현재 persona에게 수신된 추천만 필터한다. 공공중간지원 subtype은 1:1을 제거하고 모듬만 남긴다.
+2. 현재 persona에게 수신된 추천만 필터한다. 공공중간지원 subtype은 1:1을 제거하고 모둠만 남긴다.
 3. `match_scores.json`의 56개 방향성 pair에서 shared/complementary keyword를 읽는다.
 4. 운영자 세션 가중치로 `40 + keyword weight 합 × 12`를 계산하고 0~100으로 clamp한다.
 5. 공통점 그룹은 점수 내림차순, 차이점 그룹은 `hot_lead && 퍼즐형`을 먼저 놓고 이후 점수순으로 정렬한다.

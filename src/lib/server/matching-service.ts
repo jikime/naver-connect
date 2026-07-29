@@ -71,7 +71,7 @@ export interface MatchingGraphEdge {
   from: string;
   to: string;
   match_type: MatchType;
-  rec_kind: "1:1" | "모듬";
+  rec_kind: "1:1" | "모둠";
   status: RecStatus;
 }
 
@@ -84,7 +84,7 @@ export interface MatchingBundle {
   allowedSeedRecIds: string[];
   /**
    * C4(#3): 주간 목록에서 숨길 declined 시드 추천 id(사유 5종 전부, 원본 status·세션
-   * override 불문). 뷰어가 당사자(1:1 endpoint/모듬 참여자)이거나 운영자인 건만 담아
+   * override 불문). 뷰어가 당사자(1:1 endpoint/모둠 참여자)이거나 운영자인 건만 담아
    * 타인 추천의 거절 상태를 열거하지 못하게 한다. 상세(영수증) 조회는 계속 허용된다.
    */
   hiddenSeedRecIds: string[];
@@ -192,7 +192,7 @@ function buildDeclines(session: MatchingSessionState): DeclineRecord[] {
   const overrides = session.recommendationOverrides;
   const out: DeclineRecord[] = [];
   for (const rec of recommendationsOriginal) {
-    if (rec.rec_kind === "모듬" || !rec.to_member_id) continue;
+    if (rec.rec_kind === "모둠" || !rec.to_member_id) continue;
     const override = overrides[rec.id];
     if (!override) continue;
     const merged = { ...rec, ...override };
@@ -381,9 +381,9 @@ function buildEngineRecommendations(
     });
 }
 
-/** 모듬 참여자 = meetups 시드 정본 참여자 ∪ 개설자(from_member_id). */
+/** 모둠 참여자 = meetups 시드 정본 참여자 ∪ 개설자(from_member_id). */
 function meetupParticipantsOf(rec: Recommendation): string[] {
-  if (rec.rec_kind !== "모듬" || !rec.meetup_id) return [];
+  if (rec.rec_kind !== "모둠" || !rec.meetup_id) return [];
   const listed = meetupsById.get(rec.meetup_id)?.member_ids ?? [];
   if (listed.length === 0) return [];
   return listed.includes(rec.from_member_id)
@@ -401,7 +401,7 @@ function mergedStatusOf(
 
 /**
  * 노출 허용 시드 추천 id — 동의 gate. 주간 목록·상세·그래프 엣지의 공통 전제다.
- * - C4(#2): 모듬은 demo에서만 유효(seed 모듬은 목업 — non-demo 0건) + 참여자 전원 매칭 동의.
+ * - C4(#2): 모둠은 demo에서만 유효(seed 모둠은 목업 — non-demo 0건) + 참여자 전원 매칭 동의.
  *   참여자 목록이 비면 fail-closed로 제외.
  * - 1:1은 양측 매칭 동의(P1-2), to_member_id 없는 1:1은 fail-closed 제외.
  * declined 숨김은 hiddenSeedRecIds가 담당한다(상세 영수증 조회는 유지해야 하므로 분리).
@@ -409,7 +409,7 @@ function mergedStatusOf(
 function computeAllowedSeedRecIds(session: MatchingSessionState): string[] {
   return recommendationsOriginal
     .filter((rec) => {
-      if (rec.rec_kind === "모듬") {
+      if (rec.rec_kind === "모둠") {
         if (!isDemoMode()) return false;
         const participants = meetupParticipantsOf(rec);
         if (participants.length === 0) return false;
@@ -424,9 +424,9 @@ function computeAllowedSeedRecIds(session: MatchingSessionState): string[] {
     .map((r) => r.id);
 }
 
-/** 뷰어가 이 추천의 당사자인지(1:1 endpoint 또는 모듬 참여자). */
+/** 뷰어가 이 추천의 당사자인지(1:1 endpoint 또는 모둠 참여자). */
 function isPartyOf(rec: Recommendation, personaId: string): boolean {
-  if (rec.rec_kind === "모듬") {
+  if (rec.rec_kind === "모둠") {
     return meetupParticipantsOf(rec).includes(personaId);
   }
   return personaId === rec.from_member_id || personaId === rec.to_member_id;
@@ -447,9 +447,9 @@ function computeHiddenSeedRecIds(req: MatchingRequest): string[] {
 }
 
 /**
- * 뷰어 권한 반영 그래프 엣지(#1~#3 patch 정책 + C4 모듬 이관).
- * allowedSeedRecIds(동의·non-demo 모듬 gate) 통과분에서 declined를 제외하고,
- * 뷰어 당사자 판정을 얹는다: 운영자=전체, 일반=본인이 endpoint(1:1) 또는 참여자(모듬)인 것만.
+ * 뷰어 권한 반영 그래프 엣지(#1~#3 patch 정책 + C4 모둠 이관).
+ * allowedSeedRecIds(동의·non-demo 모둠 gate) 통과분에서 declined를 제외하고,
+ * 뷰어 당사자 판정을 얹는다: 운영자=전체, 일반=본인이 endpoint(1:1) 또는 참여자(모둠)인 것만.
  * 거절된 연결은 그래프에도 광고하지 않는다(C4 #3의 그래프 대응).
  */
 function computeGraphEdges(req: MatchingRequest): MatchingGraphEdge[] {
@@ -460,12 +460,12 @@ function computeGraphEdges(req: MatchingRequest): MatchingGraphEdge[] {
     const status = mergedStatusOf(rec, req.session);
     if (status === "declined") continue;
     if (req.role !== "운영자" && !isPartyOf(rec, req.personaId)) continue;
-    if (rec.rec_kind === "모듬") {
+    if (rec.rec_kind === "모둠") {
       const organizer = rec.from_member_id;
       for (const memberId of meetupParticipantsOf(rec)) {
         if (memberId === organizer) continue;
         // 열거 불변식(기존 테스트 계약): 일반 회원 엣지는 항상 본인이 endpoint다.
-        // 같은 모듬이라도 타 참여자 간 엣지는 운영자에게만 내려간다(멤버십 자체는 공개 시드).
+        // 같은 모둠이라도 타 참여자 간 엣지는 운영자에게만 내려간다(멤버십 자체는 공개 시드).
         if (
           req.role !== "운영자" &&
           req.personaId !== organizer &&
@@ -478,7 +478,7 @@ function computeGraphEdges(req: MatchingRequest): MatchingGraphEdge[] {
           from: organizer,
           to: memberId,
           match_type: rec.match_type,
-          rec_kind: "모듬",
+          rec_kind: "모둠",
           status,
         });
       }

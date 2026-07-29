@@ -244,7 +244,7 @@ async function run(): Promise<void> {
   const recsRaw = readJson<
     ({
       id: string;
-      rec_kind: "1:1" | "모듬";
+      rec_kind: "1:1" | "모둠";
       from_member_id: string;
       to_member_id: string | null;
       match_type: string;

@@ -1,4 +1,4 @@
-// 매칭 서비스 gate 유닛 — C4: 모듬 동의(참여자 전원)·non-demo seed 모듬 차단(#2),
+// 매칭 서비스 gate 유닛 — C4: 모둠 동의(참여자 전원)·non-demo seed 모둠 차단(#2),
 // declined 5종 주간 재노출 0건·그래프 미광고(#3). 승인 조건(final-rereview REJECT) 회귀 방지.
 // 근거: codex final-rereview-reject #2·#3, decline_reasons.json 5종, meetups.json MU-001
 
@@ -19,7 +19,7 @@ import type { DeclineReasonCode, Recommendation } from "@/types";
 
 const recsOriginal = recommendationsOriginalSeed as Recommendation[];
 const groupSeedIds = recsOriginal
-  .filter((r) => r.rec_kind === "모듬")
+  .filter((r) => r.rec_kind === "모둠")
   .map((r) => r.id);
 const ALL_DECLINE_REASONS = (
   declineReasonsSeed as { code: DeclineReasonCode }[]
@@ -75,13 +75,13 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-describe("C4 #2 — 모듬 동의 gate", () => {
-  it("demo에서 참여자 전원(개설자 포함) 매칭 동의가 유효하면 모듬 시드가 허용된다", () => {
+describe("C4 #2 — 모둠 동의 gate", () => {
+  it("demo에서 참여자 전원(개설자 포함) 매칭 동의가 유효하면 모둠 시드가 허용된다", () => {
     const bundle = computeMatchingBundle(request("M-001"));
     expect(bundle.allowedSeedRecIds).toContain("REC-05");
   });
 
-  it("참여자 1명이 세션 온보딩에서 매칭 동의를 철회하면 모듬 전체가 제외된다", () => {
+  it("참여자 1명이 세션 온보딩에서 매칭 동의를 철회하면 모둠 전체가 제외된다", () => {
     // REC-05 = MU-001, 참여자 M-006·M-001·M-002. M-002가 동의 철회.
     const session: MatchingSessionState = {
       ...EMPTY,
@@ -89,12 +89,12 @@ describe("C4 #2 — 모듬 동의 gate", () => {
     };
     const bundle = computeMatchingBundle(request("M-001", "기업가", session));
     expect(bundle.allowedSeedRecIds).not.toContain("REC-05");
-    expect(bundle.graphEdges.filter((e) => e.rec_kind === "모듬")).toHaveLength(
+    expect(bundle.graphEdges.filter((e) => e.rec_kind === "모둠")).toHaveLength(
       0,
     );
   });
 
-  it("non-demo에서는 seed 모듬이 0건이다(운영자 포함, 승인 조건)", () => {
+  it("non-demo에서는 seed 모둠이 0건이다(운영자 포함, 승인 조건)", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_MODE", "pilot");
     for (const req of [request("M-001"), request("M-001", "운영자")]) {
       const bundle = computeMatchingBundle(req);
@@ -102,7 +102,7 @@ describe("C4 #2 — 모듬 동의 gate", () => {
         expect(bundle.allowedSeedRecIds).not.toContain(groupId);
       }
       expect(
-        bundle.graphEdges.filter((e) => e.rec_kind === "모듬"),
+        bundle.graphEdges.filter((e) => e.rec_kind === "모둠"),
       ).toHaveLength(0);
     }
   });
@@ -145,18 +145,18 @@ describe("C4 #3 — declined 재노출 차단", () => {
   });
 });
 
-describe("C4 — 모듬 그래프 엣지 서버 이관", () => {
-  it("모듬 참여자는 본인이 endpoint인 엣지만, 개설자·운영자는 전체를 받고, 비참여자는 0건이다", () => {
+describe("C4 — 모둠 그래프 엣지 서버 이관", () => {
+  it("모둠 참여자는 본인이 endpoint인 엣지만, 개설자·운영자는 전체를 받고, 비참여자는 0건이다", () => {
     // 열거 불변식: 일반 회원 엣지는 항상 본인이 endpoint(기존 1:1 계약과 동일).
     const participant = computeMatchingBundle(request("M-001"));
     const participantGroup = participant.graphEdges.filter(
-      (e) => e.rec_kind === "모듬",
+      (e) => e.rec_kind === "모둠",
     );
     expect(participantGroup.map((e) => e.id)).toEqual(["REC-05:M-001"]);
 
     const organizer = computeMatchingBundle(request("M-006", "전문가"));
     const organizerGroup = organizer.graphEdges.filter(
-      (e) => e.rec_kind === "모듬",
+      (e) => e.rec_kind === "모둠",
     );
     expect(organizerGroup.map((e) => e.id).sort()).toEqual([
       "REC-05:M-001",
@@ -166,12 +166,12 @@ describe("C4 — 모듬 그래프 엣지 서버 이관", () => {
 
     const operator = computeMatchingBundle(request("M-999", "운영자"));
     expect(
-      operator.graphEdges.filter((e) => e.rec_kind === "모듬").length,
+      operator.graphEdges.filter((e) => e.rec_kind === "모둠").length,
     ).toBeGreaterThanOrEqual(2);
 
     const outsider = computeMatchingBundle(request("M-007", "전문가"));
     expect(
-      outsider.graphEdges.filter((e) => e.rec_kind === "모듬"),
+      outsider.graphEdges.filter((e) => e.rec_kind === "모둠"),
     ).toHaveLength(0);
   });
 });

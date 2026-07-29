@@ -24,9 +24,9 @@ function scoreKey(fromId: string, toId: string | null): string {
   return `${fromId}→${toId ?? ""}`;
 }
 
-/** rec_kind==='모듬'인 레코드의 참여자 목록을 meetup_id로 meetups.json에서 조회한다(ADR-06 v1.1). */
+/** rec_kind==='모둠'인 레코드의 참여자 목록을 meetup_id로 meetups.json에서 조회한다(ADR-06 v1.1). */
 function meetupMemberIds(rec: Recommendation): string[] {
-  if (rec.rec_kind !== "모듬" || !rec.meetup_id) return [];
+  if (rec.rec_kind !== "모둠" || !rec.meetup_id) return [];
   return meetupsById.get(rec.meetup_id)?.member_ids ?? [];
 }
 
@@ -39,7 +39,7 @@ function isRecommendationParty(
     vc.role === "운영자" ||
     vc.personaId === rec.to_member_id ||
     vc.personaId === rec.from_member_id ||
-    (rec.rec_kind === "모듬" && meetupMemberIds(rec).includes(vc.personaId))
+    (rec.rec_kind === "모둠" && meetupMemberIds(rec).includes(vc.personaId))
   );
 }
 
@@ -66,15 +66,15 @@ function withSessionAndMask(
   };
 }
 
-/** 뷰어(vc.personaId)에게 "온" 추천인지: 1:1은 to_member_id, 모듬은 meetups.json 참여자 목록. */
+/** 뷰어(vc.personaId)에게 "온" 추천인지: 1:1은 to_member_id, 모둠은 meetups.json 참여자 목록. */
 function isAddressedTo(rec: Recommendation, personaId: string): boolean {
-  if (rec.rec_kind === "모듬") {
+  if (rec.rec_kind === "모둠") {
     return meetupMemberIds(rec).includes(personaId);
   }
   return rec.to_member_id === personaId;
 }
 
-/** match_scores.json 기준 점수(높을수록 우선). 모듬처럼 대응 점수가 없으면 0(최하위) 취급. */
+/** match_scores.json 기준 점수(높을수록 우선). 모둠처럼 대응 점수가 없으면 0(최하위) 취급. */
 function scoreOf(
   rec: Recommendation,
   scoresByPair: Map<string, MatchScore>,
@@ -112,7 +112,7 @@ function sortDifferentGroup(
 
 /**
  * 주간 추천 리스트(v1.1 개편 FR-RC-01/02). 대상(vc.personaId)의 expert_subtype이 '공공중간지원'이면
- * 1:1 추천은 애초에 포함하지 않고 rec_kind='모듬'만 남긴다 — 사후 필터가 아니라
+ * 1:1 추천은 애초에 포함하지 않고 rec_kind='모둠'만 남긴다 — 사후 필터가 아니라
  * getRecommendations 자체가 "생성 단계"를 흉내내는 지점이므로 이 함수 안에서 강제한다(FR-RC-08·N-5).
  * v1.1: 결과를 rec_axis 기준 "공통점"/"차이점" 두 그룹으로 나눠 반환한다(각 최대 15, 화면에서
  * 초기 5+더보기로 노출 — 그룹 캡·정렬만 DAL이 하고 페이지네이션은 화면 책임).
@@ -144,7 +144,7 @@ export async function getRecommendations(
     : addressedToViewer;
   const branchFiltered =
     targetSubtype === "공공중간지원"
-      ? weekFiltered.filter((rec) => rec.rec_kind === "모듬")
+      ? weekFiltered.filter((rec) => rec.rec_kind === "모둠")
       : weekFiltered;
   const masked = branchFiltered.map((rec) => withSessionAndMask(rec, vc));
   const scoresByPair = new Map(
@@ -167,7 +167,7 @@ export interface RecommendationGraphEdge {
   from: string;
   to: string;
   match_type: MatchType;
-  rec_kind: "1:1" | "모듬";
+  rec_kind: "1:1" | "모둠";
   status: RecStatus;
 }
 
@@ -182,7 +182,7 @@ export interface RecommendationGraphEdge {
 export async function getRecommendationGraphEdges(
   vc: ViewerContext,
 ): Promise<RecommendationGraphEdge[]> {
-  // C3·C4: 뷰어 권한·동의·declined·모듬(참여자 전원 동의, demo 한정) gate가 전부
+  // C3·C4: 뷰어 권한·동의·declined·모둠(참여자 전원 동의, demo 한정) gate가 전부
   // 서버(computeGraphEdges)에서 계산된 엣지를 그대로 반환한다.
   const bundle = await getMatchingBundle(vc);
   return bundle.graphEdges;

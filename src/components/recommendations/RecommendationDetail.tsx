@@ -87,15 +87,15 @@ export function RecommendationDetail({ id }: { id: string }) {
               {rec.value_class}
             </Badge>
             {rec.is_hot_lead && <HotLeadBadge />}
-            {rec.rec_kind === "모듬" && (
+            {rec.rec_kind === "모둠" && (
               <Badge className="rounded-full border border-border bg-background px-2.5 py-0.5 font-semibold tracking-normal text-guud-text-muted-2 normal-case">
-                모듬
+                모둠
               </Badge>
             )}
           </div>
           {(fromMember || toMember) && (
             <p className="text-xs text-guud-text-muted-2">
-              {fromMember?.name ?? "?"} → {toMember?.name ?? "(모듬 참여자)"}
+              {fromMember?.name ?? "?"} → {toMember?.name ?? "(모둠 참여자)"}
             </p>
           )}
         </CardHeader>

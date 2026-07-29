@@ -14,7 +14,7 @@ const CHECKLIST_ITEMS = [
   "첫 행동이 구체적으로 특정됐는가",
   "비공개 수요는 최소 노출로만 인용됐는가(FR-RC-06)",
   "A→B/B→A 양쪽이 개별 작성됐는가(FR-RC-07)",
-  "공공·중간지원 대상은 1:1이 아닌 모듬인가(FR-RC-08)",
+  "공공·중간지원 대상은 1:1이 아닌 모둠인가(FR-RC-08)",
 ] as const;
 
 export function ReviewChecklist({

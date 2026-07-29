@@ -89,7 +89,7 @@
   },
   {
     "id": "REC-05",
-    "rec_kind": "모듬",
+    "rec_kind": "모둠",
     "from_member_id": "M-006",
     "to_member_id": null,
     "match_type": "퍼즐형",

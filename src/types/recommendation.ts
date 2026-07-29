@@ -1,4 +1,4 @@
-// Recommendation — 1:1 + 모듬 변형(N-7, 18번째 시드 없이 수용, ADR-06)
+// Recommendation — 1:1 + 모둠 변형(N-7, 18번째 시드 없이 수용, ADR-06)
 // 근거: ARCHITECTURE.md §4.2, FR-RC-01~08, FR-FB-*
 // 시드: src/data/private/recommendations.json (민감 — contact_point 가 비공개 수요 원문 인용)
 
@@ -22,10 +22,10 @@ export type DeclineReasonCode =
 
 export interface Recommendation {
   id: string;
-  /** N-7: 모듬 변형 판별 */
-  rec_kind: "1:1" | "모듬";
+  /** N-7: 모둠 변형 판별 */
+  rec_kind: "1:1" | "모둠";
   from_member_id: string;
-  /** 모듬이면 null */
+  /** 모둠이면 null */
   to_member_id: string | null;
   match_type: MatchType;
   value_class: RecValueClass;
@@ -47,7 +47,7 @@ export interface Recommendation {
   min_exposure_note: string;
   /** FR-RC-07 개별 작성(복붙 대칭 금지) */
   authored_direction: "A→B" | "B→A";
-  /** v1.1 ADR-06: rec_kind==="모듬"이면 meetups.json 참조(상세는 Meetup). 데이터 중복 방지. */
+  /** v1.1 ADR-06: rec_kind==="모둠"이면 meetups.json 참조(상세는 Meetup). 데이터 중복 방지. */
   meetup_id?: string;
   sent_week: string;
   /** FR-OP-04 상태 전이 */

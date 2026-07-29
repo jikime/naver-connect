@@ -54,8 +54,8 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         href: "/meetups",
-        label: "모듬",
-        description: "유형·분야·지역으로 모듬을 찾아 참여해요",
+        label: "모둠",
+        description: "유형·분야·지역으로 모둠을 찾아 참여해요",
       },
     ],
   },

@@ -14,14 +14,14 @@ beforeEach(() => {
 });
 
 describe("getRecommendations — 공공중간지원 분기(FR-RC-08)", () => {
-  it("대상이 공공중간지원(M-006)이면 1:1 카드는 0건, 모듬만 반환한다", async () => {
+  it("대상이 공공중간지원(M-006)이면 1:1 카드는 0건, 모둠만 반환한다", async () => {
     const { common, different } = await getRecommendations({
       role: "전문가",
       personaId: "M-006",
     });
     const all = [...common, ...different];
     expect(all.length).toBeGreaterThan(0);
-    expect(all.every((r) => r.rec_kind === "모듬")).toBe(true);
+    expect(all.every((r) => r.rec_kind === "모둠")).toBe(true);
   });
 
   it("일반 회원(M-004)은 1:1 추천을 정상적으로 받는다(FR-RC-01)", async () => {
