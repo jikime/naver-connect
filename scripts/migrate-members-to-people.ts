@@ -9,12 +9,14 @@
 //          불일치 파일명을 나열한 뒤 exit 1. CI 프라이버시 게이트의 결정성 축.
 // 근거: plans/generic-mixing-seahorse.md M0-3, people_match_retrieval_plan.md §3
 
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  rmSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -48,18 +50,47 @@ function sha256(bytes: Buffer): string {
   return createHash("sha256").update(bytes).digest("hex");
 }
 /**
- * 산출물 1건을 생성한다.
- * 기본 모드: 실제 파일에 쓴다. --check 모드: 쓰지 않고 바이트만 모아 뒀다가 나중에 비교한다.
+ * 산출물 1건을 등록한다. 실제 쓰기/비교는 formatEmitted() → flushEmitted()/verifyDeterminism()
+ * 순서로 일괄 처리한다 — 커밋본은 `biome check --write`가 포맷을 관리하므로(짧은 배열 한 줄 접기 등)
+ * JSON.stringify 원시 바이트로는 결정성 비교가 어긋난다.
  */
 function writeJson(rel: string, data: unknown): void {
   const bytes = Buffer.from(`${JSON.stringify(data, null, 2)}\n`, "utf8");
   emitted.push({ rel, bytes });
-  if (!CHECK_MODE) {
+  console.log(`  ${rel}`);
+}
+
+/**
+ * 산출물 전부에 repo Biome 포맷을 적용한다(pinned devDependency — 결정적).
+ * biome.json 발견을 위해 임시 디렉토리는 repo 안에 만든다.
+ */
+function formatEmitted(): void {
+  const tmp = mkdtempSync(join(ROOT, ".migrate-fmt-"));
+  try {
+    for (const e of emitted) {
+      const abs = join(tmp, e.rel);
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, e.bytes);
+    }
+    execFileSync("npx", ["biome", "format", "--write", tmp], {
+      cwd: ROOT,
+      stdio: "ignore",
+    });
+    for (const e of emitted) {
+      e.bytes = readFileSync(join(tmp, e.rel));
+    }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+/** 기본 모드 전용: 포맷 완료된 산출물을 실제 경로에 쓴다. */
+function flushEmitted(): void {
+  for (const { rel, bytes } of emitted) {
     const abs = join(ROOT, rel);
     mkdirSync(dirname(abs), { recursive: true });
     writeFileSync(abs, bytes);
   }
-  console.log(`  ${rel}`);
 }
 
 /**
@@ -263,7 +294,12 @@ async function run(): Promise<void> {
     `\n${CHECK_MODE ? "▶ 재생성" : "✅"} 완료 — offers ${offers.length} · impact ${impactIntents.length} · needs ${needs.length} · consents ${consents.length}`,
   );
 
-  if (CHECK_MODE) verifyDeterminism();
+  formatEmitted();
+  if (CHECK_MODE) {
+    verifyDeterminism();
+  } else {
+    flushEmitted();
+  }
 }
 
 run().catch((err) => {
