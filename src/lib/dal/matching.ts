@@ -27,11 +27,21 @@ export type { MatchingBundle } from "@/lib/server/matching-service";
 /** 엔진 추천 ID — 회원 ID에 '-'가 들어가므로 구분자는 ':'를 쓴다. (서비스와 동일 규칙) */
 export const ENGINE_REC_PREFIX = "REC-ENG:";
 
+/** Next 동적 경로가 ':'를 '%3A'로 전달해도 엔진 추천 ID를 동일하게 해석한다. */
+export function normalizeRecommendationId(id: string): string {
+  try {
+    return decodeURIComponent(id);
+  } catch {
+    return id;
+  }
+}
+
 export function parseEngineRecId(
   id: string,
 ): { recipient: string; other: string } | null {
-  if (!id.startsWith(ENGINE_REC_PREFIX)) return null;
-  const [, recipient, other] = id.split(":");
+  const normalized = normalizeRecommendationId(id);
+  if (!normalized.startsWith(ENGINE_REC_PREFIX)) return null;
+  const [, recipient, other] = normalized.split(":");
   return recipient && other ? { recipient, other } : null;
 }
 

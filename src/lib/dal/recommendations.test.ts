@@ -122,6 +122,20 @@ describe("getRecommendationGraphEdges — 뷰어 범위와 동의 gate", () => {
       ),
     ).rejects.toThrow("Recommendation not found");
   });
+
+  it("Next 동적 경로가 percent-encode한 엔진 추천 ID도 상세 조회된다", async () => {
+    const owner = { role: "기업가" as const, personaId: "M-001" };
+    const { common, different } = await getRecommendations(owner);
+    const engine = [...common, ...different].find(
+      (rec) => rec.source === "engine",
+    );
+    expect(engine).toBeDefined();
+    const detail = await getRecommendation(
+      owner,
+      encodeURIComponent(engine?.id ?? ""),
+    );
+    expect(detail.id).toBe(engine?.id);
+  });
 });
 
 describe("getRecommendations — declined 주간 목록 재노출 차단(C4 #3)", () => {
