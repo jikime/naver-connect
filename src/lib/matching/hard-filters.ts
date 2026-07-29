@@ -27,15 +27,15 @@ export function evaluateHardFilters(
   }
 
   for (const d of input.declines) {
-    const samePair =
-      (d.fromId === from && d.toId === to) ||
-      (d.fromId === to && d.toId === from);
+    const sameDirection = d.fromId === from && d.toId === to;
+    const samePair = sameDirection || (d.fromId === to && d.toId === from);
     if (d.reason === "이미아는사이" && samePair) {
       codes.push("DECLINED_KNOWN");
     }
-    // 관심없음은 거절한 사람(from)에게 같은 상대를 다시 추천하는 방향만 차단
-    if (d.reason === "관심없음" && d.fromId === from && d.toId === to) {
-      codes.push("DECLINED_NOT_INTERESTED");
+    // 현재 세션에서 명시적으로 거절한 모든 사유는 최소한 같은 방향 재노출을 차단한다.
+    // "이미 아는 사이"만 관계 자체의 신호이므로 위에서 양방향을 차단한다.
+    if (d.reason !== "이미아는사이" && sameDirection) {
+      codes.push("DECLINED_THIS_SESSION");
     }
   }
 

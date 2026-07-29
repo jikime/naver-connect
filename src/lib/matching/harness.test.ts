@@ -15,6 +15,7 @@ import { getRecommendation } from "@/lib/dal/recommendations";
 import { submitDecline } from "@/lib/dal/writes";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
+  DeclineReasonCode,
   NeedIntentV1,
   OnboardingFinalizeInput,
   Recommendation,
@@ -27,9 +28,19 @@ const seedRecs = recommendationsSeed as Recommendation[];
 /** 스냅샷 픽스처(P1-3 무손실 계약) — 테스트마다 detail_quote만 바꿔 쓸 수 있게 팩토리로 */
 function snapshotFixture(quote: string): OnboardingFinalizeInput {
   return {
+    organization: {
+      name: "수정한 조직",
+      type: "사회적기업",
+      role: "대표",
+    },
+    region: { sido: "서울", sigungu: "성동구" },
+    field_tags: [2, 5],
+    value_chain_stage: "성장",
+    mission_statement: "지역의 돌봄 문제를 연결로 해결합니다",
     demand_tags: [{ tagId: 4, priority: true, detail_quote: quote }],
     supply_tags: [{ tagId: 10, detail: "운영 경험 나눔" }],
     activities: ["학습모임"],
+    availability: "월 2~3회",
     preferred_mode: "무관",
     participation_scope: null,
     hot_lead: null,
@@ -160,8 +171,9 @@ describe("하니스 — 온보딩 적립 → 엔진 즉시 반영", () => {
     expect(mine).toHaveLength(1);
     const saved =
       useSessionInteractionStore.getState().onboardingResults["M-001"];
-    expect(saved.snapshot.readiness).toBe("관심있는 협업이면 환영해요");
-    expect(saved.snapshot.consents.quote_in_intro).toBe(false);
+    expect(saved.snapshot).toEqual(
+      snapshotFixture("AI 도입을 도와줄 파트너가 필요해요"),
+    );
   });
 
   it("매칭 동의 B를 철회한 persona는 엔진 pair에서 제외된다 (fail-closed)", () => {
@@ -278,20 +290,29 @@ describe("하니스 — 재리뷰 #5 safe-match provenance (mapper 3중 검증)"
 });
 
 describe("하니스 — P1-4 엔진 거절 반영·ID 검증 통합", () => {
-  it("엔진 추천을 거절하면 재실행에서 같은 pair가 재등장하지 않는다", async () => {
-    const vc = { role: "기업가" as const, personaId: "M-001" };
-    const recs = buildEngineRecommendationsFor("M-001");
-    expect(recs.length).toBeGreaterThan(0);
-    const target = recs[0];
-    await submitDecline(vc, target.id, "관심없음");
-    const after = buildEngineRecommendationsFor("M-001");
-    expect(after.some((r) => r.id === target.id)).toBe(false);
-    expect(
-      runMatchingEngine().output.pairs.some(
-        (p) => p.from === "M-001" && p.to === target.from_member_id,
-      ),
-    ).toBe(false);
-  });
+  it.each<DeclineReasonCode>([
+    "여력없음",
+    "접점약함",
+    "이미아는사이",
+    "관심없음",
+    "기타",
+  ])(
+    "%s 거절 후 재실행에서 같은 방향 pair가 재등장하지 않는다",
+    async (reason) => {
+      const vc = { role: "기업가" as const, personaId: "M-001" };
+      const recs = buildEngineRecommendationsFor("M-001");
+      expect(recs.length).toBeGreaterThan(0);
+      const target = recs[0];
+      await submitDecline(vc, target.id, reason);
+      const after = buildEngineRecommendationsFor("M-001");
+      expect(after.some((r) => r.id === target.id)).toBe(false);
+      expect(
+        runMatchingEngine().output.pairs.some(
+          (p) => p.from === "M-001" && p.to === target.from_member_id,
+        ),
+      ).toBe(false);
+    },
+  );
 
   it("실재하지 않는 엔진 추천 ID에는 반응을 저장할 수 없다", async () => {
     const vc = { role: "기업가" as const, personaId: "M-001" };

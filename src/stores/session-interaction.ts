@@ -17,7 +17,8 @@ import type {
 
 /**
  * M1(P1-3 무손실): 온보딩 확정이 적립하는 전체 스냅샷 + people 아이템 + 동의 3분리.
- * snapshot이 원본 계약(activities·preferred_mode·participation_scope·hot_lead·readiness·
+ * snapshot이 원본 계약(organization·region·field_tags·value_chain_stage·mission_statement·
+ * activities·availability·preferred_mode·participation_scope·hot_lead·readiness·
  * trust_connections 포함)을 그대로 보존한다 — 시스템이 임의 요약·재구성하지 않는다.
  */
 export interface OnboardingResult {

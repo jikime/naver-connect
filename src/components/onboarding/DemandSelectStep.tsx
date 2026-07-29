@@ -1,8 +1,8 @@
 "use client";
 
-// DemandSelectStep — 12태그 중 수요 정확히 3개 + 최우선 ★1 선택(FR-ON-02).
+// DemandSelectStep — 12태그 중 수요 1~3개 + 최우선 ★1 선택(FR-ON-02).
 // 근거: ARCHITECTURE.md §3(L2 OnbWizard), TASKS.md T-009a
-// 태그 선택 카드(pill 토글) + 별표 최우선 표시. 정확히 3개 미만/초과, 최우선 미지정 시 다음 버튼 비활성(셸이 검증).
+// 태그 선택 카드(pill 토글) + 별표 최우선 표시. 1~3개 범위와 최우선 지정은 셸이 검증한다.
 
 import { Check, EyeOff, Star } from "lucide-react";
 import { motion } from "motion/react";
@@ -60,8 +60,8 @@ export function DemandSelectStep({
         <div>
           <p className="text-sm leading-6 text-foreground">
             {memberType === "전문가"
-              ? "이 네트워크에서 얻고 싶은 것을 최대 세 가지 골라주세요. 전문가도 얻어가는 것이 있어야 건강한 연결이 됩니다."
-              : "지금 우리 조직에 가장 필요한 것을 최대 세 가지(한 가지 이상) 골라주세요."}
+              ? "이 네트워크에서 얻고 싶은 것을 1~3개 골라주세요. 전문가도 얻어가는 것이 있어야 건강한 연결이 됩니다."
+              : "지금 우리 조직에 가장 필요한 것을 1~3개 골라주세요."}
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-guud-text-muted-2">
             <EyeOff className="size-3.5" /> 선택 내용은 공개 프로필에 표시되지

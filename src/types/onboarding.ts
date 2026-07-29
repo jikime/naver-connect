@@ -47,9 +47,24 @@ export interface InterviewScriptsSeed {
  * (store가 스냅샷으로 보존해야 해서 writes.ts가 아닌 타입 배럴에 둔다 — 순환 방지)
  */
 export interface OnboardingFinalizeInput {
+  /** 스텝1에서 사용자가 확인·수정한 공개 프로필 원값 */
+  organization: {
+    name: string;
+    type: string;
+    role: string;
+  };
+  region: {
+    sido: string;
+    sigungu: string;
+  };
+  field_tags: number[];
+  value_chain_stage: string;
+  mission_statement: string;
   demand_tags: { tagId: number; priority: boolean; detail_quote: string }[];
   supply_tags: { tagId: number; detail: string }[];
   activities: string[];
+  /** 스텝4에서 선택한 현재 협업 가능 시간 */
+  availability: string;
   preferred_mode: string;
   participation_scope: "개인 자격으로 참여" | "소속 기관을 대표해 참여" | null;
   hot_lead: {

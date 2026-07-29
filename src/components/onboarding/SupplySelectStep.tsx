@@ -1,6 +1,6 @@
 "use client";
 
-// SupplySelectStep — 12태그 중 공급 정확히 3개 선택 + 짧은 설명(FR-ON-03).
+// SupplySelectStep — 12태그 중 공급 1~3개 선택 + 짧은 설명(FR-ON-03).
 // 근거: ARCHITECTURE.md §3(L2 OnbWizard), TASKS.md T-009a
 // 태그 선택 카드(pill 토글). 선택된 태그만 상세 설명 입력란이 열린다(공개 프로필 supply_tags.detail).
 
@@ -57,8 +57,8 @@ export function SupplySelectStep({
         <div>
           <p className="text-sm leading-6 text-foreground">
             {memberType === "전문가"
-              ? "전문 분야를 바탕으로 미리 선택해 두었어요. 맞는지 확인하고 필요한 항목을 추가해주세요."
-              : "다른 회원이 나를 찾아와야 할 이유를 최대 세 가지(한 가지 이상) 골라주세요."}
+              ? "전문 분야를 바탕으로 미리 선택해 두었어요. 1~3개 범위에서 확인하거나 바꿔주세요."
+              : "다른 회원이 나를 찾아와야 할 이유를 1~3개 골라주세요."}
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-guud-text-muted-2">
             {hasPrefilledValues ? (

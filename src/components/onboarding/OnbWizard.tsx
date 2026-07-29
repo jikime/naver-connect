@@ -2,7 +2,7 @@
 
 // OnbWizard — 온보딩 위저드 셸. 7스텝 진행 상태·검증·데이터 패칭을 소유한다.
 // 근거: ARCHITECTURE.md §3(L2 OnbWizard), TASKS.md T-009a/T-009b, FR-ON-01~11
-// 스텝: ①프로필확인 ②수요3+★1 ③공급3 ④협력성향4문항 ⑤민감정보고지 ⑥AI후속질문 ⑦확정.
+// 스텝: ①프로필확인 ②수요1~3+★1 ③공급1~3 ④협력성향4문항 ⑤민감정보고지 ⑥AI후속질문 ⑦확정.
 // 협업준비도='구체적 프로젝트 있음'→hot_lead(스텝6 후속질문 +3 분기 트리거, FR-ON-05).
 
 import {
@@ -82,7 +82,7 @@ const STEP_META = [
   },
   {
     title: "필요한 연결",
-    description: "지금 가장 필요한 것(최대 3가지)과 우선순위를 알려주세요.",
+    description: "지금 가장 필요한 것을 1~3가지 고르고 우선순위를 알려주세요.",
     time: "약 1분",
     icon: Lock,
   },
@@ -360,9 +360,22 @@ export function OnbWizard() {
         : null;
 
       const finalized = await finalizeOnboarding(vc, {
+        organization: {
+          name: draft.orgName,
+          type: draft.orgType,
+          role: draft.orgRole,
+        },
+        region: {
+          sido: draft.sido,
+          sigungu: draft.sigungu,
+        },
+        field_tags: [...draft.fieldTags],
+        value_chain_stage: draft.valueChainStage,
+        mission_statement: draft.missionStatement,
         demand_tags,
         supply_tags,
         activities: draft.activities,
+        availability: draft.availability,
         preferred_mode: draft.preferredMode,
         participation_scope: draft.participationScope || null,
         hot_lead,

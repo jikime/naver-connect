@@ -105,14 +105,33 @@ describe("evaluateHardFilters — 위반 0 계약", () => {
     expect(evaluateHardFilters("B", "A", input).pass).toBe(false);
   });
 
-  it("'관심없음' 거절은 해당 방향만 차단한다", () => {
-    const input = {
-      ...baseInput(),
-      declines: [{ fromId: "A", toId: "B", reason: "관심없음" as const }],
-    };
-    expect(evaluateHardFilters("A", "B", input).pass).toBe(false);
-    expect(evaluateHardFilters("B", "A", input).pass).toBe(true);
-  });
+  it.each([
+    "여력없음",
+    "접점약함",
+    "이미아는사이",
+    "관심없음",
+    "기타",
+  ] as const)(
+    "%s 거절은 현재 세션에서 같은 방향 재노출을 차단한다",
+    (reason) => {
+      const input = {
+        ...baseInput(),
+        declines: [{ fromId: "A", toId: "B", reason }],
+      };
+      expect(evaluateHardFilters("A", "B", input).pass).toBe(false);
+    },
+  );
+
+  it.each(["여력없음", "접점약함", "관심없음", "기타"] as const)(
+    "%s 거절은 반대 방향까지 차단하지 않는다",
+    (reason) => {
+      const input = {
+        ...baseInput(),
+        declines: [{ fromId: "A", toId: "B", reason }],
+      };
+      expect(evaluateHardFilters("B", "A", input).pass).toBe(true);
+    },
+  );
 
   it("paused 상태 offer만 가진 상대는 CAPACITY_PAUSED로 차단된다", () => {
     const input = baseInput();

@@ -8,11 +8,11 @@ import collabRelationsSeed from "@/data/collab_relations.json";
 import membersPublicSeed from "@/data/members.json";
 import organizationsSeed from "@/data/organizations.json";
 import engineNeedsSeed from "@/data/people/derived/engine-needs.json";
+// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
+import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
 import impactIntentsSeed from "@/data/people/impact_intents.json";
 import offersSeed from "@/data/people/offers.json";
 import matchScoresSeed from "@/data/private/match_scores.json";
-// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
-import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
 import tagsSeed from "@/data/tags.json";
 import { getConsentFlags } from "@/lib/consent";
 import { ForbiddenError } from "@/lib/dal/errors";
@@ -87,7 +87,11 @@ function buildDeclines(): DeclineRecord[] {
   const out: DeclineRecord[] = [];
   for (const rec of recommendations) {
     if (rec.rec_kind === "모듬" || !rec.to_member_id) continue;
-    const merged = overrides[rec.id] ? { ...rec, ...overrides[rec.id] } : rec;
+    // 시드 status는 과거 목업 상태일 뿐 현재 세션의 노출 억제 receipt가 아니다.
+    // 이번 세션에서 실제 override가 생긴 거절만 즉시 엔진 재실행에 반영한다.
+    const override = overrides[rec.id];
+    if (!override) continue;
+    const merged = { ...rec, ...override };
     if (merged.status === "declined" && merged.decline_reason) {
       out.push({
         fromId: rec.to_member_id,

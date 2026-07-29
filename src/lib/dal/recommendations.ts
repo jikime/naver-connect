@@ -42,7 +42,22 @@ function isRecommendationParty(
   return (
     vc.role === "운영자" ||
     vc.personaId === rec.to_member_id ||
-    vc.personaId === rec.from_member_id
+    vc.personaId === rec.from_member_id ||
+    (rec.rec_kind === "모듬" && meetupMemberIds(rec).includes(vc.personaId))
+  );
+}
+
+/** 일반 뷰어에게 그래프 pair를 공개할 수 있는지: 본인 관련 + 양쪽 매칭 동의. */
+function canViewGraphPair(
+  vc: ViewerContext,
+  from: string,
+  to: string,
+): boolean {
+  if (vc.role === "운영자") return true;
+  return (
+    (vc.personaId === from || vc.personaId === to) &&
+    getConsentFlags(from).matching &&
+    getConsentFlags(to).matching
   );
 }
 
@@ -186,11 +201,11 @@ export interface RecommendationGraphEdge {
  * min_exposure_note·matching_rationale·is_hot_lead 등 비공개/민감 필드는 절대 투영하지 않고
  * from/to/match_type/rec_kind/status만 남긴다. recommendations.json을 읽는 유일한 지점이
  * 이 파일이어야 하므로(ADR-03) 그래프 조립 DAL도 시드를 직접 import하지 않고 이 함수를 경유한다.
- * 뷰어별 필터(FR-RC-08 공공중간지원 분기 등)는 "추천 생성" 단계의 규칙이며, 여기서는
- * 네트워크 전경(overview)의 구조 엣지를 반환한다.
+ * 운영자는 전체 구조 엣지를 보고, 일반 회원은 본인이 endpoint이며 양쪽 매칭 동의가
+ * 유효한 pair만 본다. 원문 없는 구조라도 타인 관계망을 전역 열거할 수 없게 한다.
  */
 export async function getRecommendationGraphEdges(
-  _vc: ViewerContext,
+  vc: ViewerContext,
 ): Promise<RecommendationGraphEdge[]> {
   const edges: RecommendationGraphEdge[] = [];
   for (const rec of seed) {
@@ -198,6 +213,7 @@ export async function getRecommendationGraphEdges(
       const organizer = rec.from_member_id;
       for (const memberId of meetupMemberIds(rec)) {
         if (memberId === organizer) continue;
+        if (!canViewGraphPair(vc, organizer, memberId)) continue;
         edges.push({
           id: `${rec.id}:${memberId}`,
           from: organizer,
@@ -208,6 +224,7 @@ export async function getRecommendationGraphEdges(
         });
       }
     } else if (rec.to_member_id) {
+      if (!canViewGraphPair(vc, rec.from_member_id, rec.to_member_id)) continue;
       edges.push({
         id: rec.id,
         from: rec.from_member_id,
@@ -227,12 +244,22 @@ export async function getRecommendation(
   id: string,
 ): Promise<Recommendation> {
   const engineRef = parseEngineRecId(id);
+  // 엔진 ID의 recipient/other를 바꿔 대입하며 타인 추천 존재 여부를 열거하지 못하게
+  // 실제 엔진 실행 전에 동일한 당사자/운영자 게이트를 적용한다.
+  if (
+    engineRef &&
+    vc.role !== "운영자" &&
+    vc.personaId !== engineRef.recipient &&
+    vc.personaId !== engineRef.other
+  ) {
+    throw new Error(`Recommendation not found: ${id}`);
+  }
   const rec = engineRef
     ? buildEngineRecommendationsFor(engineRef.recipient).find(
         (r) => r.id === id,
       )
     : seed.find((r) => r.id === id);
-  if (!rec || !isMatchingAllowedPair(rec)) {
+  if (!rec || !isMatchingAllowedPair(rec) || !isRecommendationParty(rec, vc)) {
     throw new Error(`Recommendation not found: ${id}`);
   }
   return withSessionAndMask(rec, vc);
