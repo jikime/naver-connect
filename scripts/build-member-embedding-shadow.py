@@ -97,9 +97,11 @@ def normalized_projection(vectors: np.ndarray) -> tuple[np.ndarray, list[float]]
     for axis in range(2):
         if coords[0, axis] < 0:
             coords[:, axis] *= -1
-        scale = float(np.max(np.abs(coords[:, axis])))
-        if scale > 0:
-            coords[:, axis] /= scale
+    # One scale for both axes preserves the projected geometry. Per-axis
+    # normalization would visually stretch one principal component.
+    scale = float(np.max(np.abs(coords)))
+    if scale > 0:
+        coords /= scale
 
     variance = singular_values**2
     explained = variance[:2] / variance.sum()

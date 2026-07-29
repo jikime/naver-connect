@@ -29,17 +29,20 @@ interface MapNode {
   score?: number;
 }
 
-const WIDTH = 960;
+const WIDTH = 800;
 const HEIGHT = 470;
-const X_PADDING = 105;
-const Y_PADDING = 78;
+const PADDING = 65;
+const CENTER_X = WIDTH / 2;
+const CENTER_Y = HEIGHT / 2;
+const PROJECTION_SCALE =
+  Math.min(WIDTH - PADDING * 2, HEIGHT - PADDING * 2) / 2;
 
 function svgX(value: number): number {
-  return X_PADDING + ((value + 1) / 2) * (WIDTH - X_PADDING * 2);
+  return CENTER_X + value * PROJECTION_SCALE;
 }
 
 function svgY(value: number): number {
-  return Y_PADDING + ((1 - value) / 2) * (HEIGHT - Y_PADDING * 2);
+  return CENTER_Y - value * PROJECTION_SCALE;
 }
 
 function otherMemberId(
