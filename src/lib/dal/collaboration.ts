@@ -9,6 +9,7 @@ import collabRelationsSeed from "@/data/collab_relations.json";
 import organizationsSeed from "@/data/organizations.json";
 import projectProposalsSeed from "@/data/project_proposals.json";
 import subgroupMapSeed from "@/data/subgroup_map.json";
+import { resolveDisplayLabel } from "@/lib/vocabulary";
 import { useBusinessRelationSessionStore } from "@/stores/business-relation-session";
 import type {
   CollabCase,
@@ -50,12 +51,12 @@ export const SUBGROUP_KIND_COLOR: Record<SubgroupKindOrLetter, string> = {
 
 /** 층(kind)별 한글 라벨. */
 export const SUBGROUP_KIND_LABEL: Record<SubgroupKindOrLetter, string> = {
-  "non-social": "비사회적기업",
-  supporter: "지원가",
-  activist: "활동가",
-  C: "비사회적기업",
-  B: "지원가",
-  A: "활동가",
+  "non-social": resolveDisplayLabel("nvc.role.ally"),
+  supporter: resolveDisplayLabel("nvc.role.supporter"),
+  activist: resolveDisplayLabel("nvc.role.activist"),
+  C: resolveDisplayLabel("nvc.role.ally"),
+  B: resolveDisplayLabel("nvc.role.supporter"),
+  A: resolveDisplayLabel("nvc.role.activist"),
 };
 
 // ──────────────────────────────────────────────

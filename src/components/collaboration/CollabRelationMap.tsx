@@ -13,9 +13,15 @@
 import { useMemo, useState } from "react";
 import organizationsSeedFallback from "@/data/organizations.json";
 import subgroupMapSeed from "@/data/subgroup_map.json";
+import { resolveDisplayLabel } from "@/lib/vocabulary";
 import type { CollabRelation, Organization, SubgroupMapEntry } from "@/types";
 
 const subgroupMap = subgroupMapSeed as SubgroupMapEntry[];
+const LAYER_LABEL = {
+  A: resolveDisplayLabel("nvc.role.activist"),
+  B: resolveDisplayLabel("nvc.role.supporter"),
+  C: resolveDisplayLabel("nvc.role.ally"),
+} as const;
 
 // ── 레이아웃 상수 ─────────────────────────────────────────
 
@@ -489,9 +495,21 @@ export function CollabRelationMap({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-guud-hairline bg-card px-4 py-2.5 text-xs">
         {/* 레이어 토글 */}
         {[
-          { key: "showA" as const, layer: "A" as const, label: "A 활동가" },
-          { key: "showB" as const, layer: "B" as const, label: "B 지원가" },
-          { key: "showC" as const, layer: "C" as const, label: "C 비사회적" },
+          {
+            key: "showA" as const,
+            layer: "A" as const,
+            label: `A ${LAYER_LABEL.A}`,
+          },
+          {
+            key: "showB" as const,
+            layer: "B" as const,
+            label: `B ${LAYER_LABEL.B}`,
+          },
+          {
+            key: "showC" as const,
+            layer: "C" as const,
+            label: `C ${LAYER_LABEL.C}`,
+          },
         ].map(({ key, layer, label }) => (
           <label key={key} className="flex cursor-pointer items-center gap-1.5">
             <input
@@ -646,11 +664,7 @@ export function CollabRelationMap({
                     fill={LAYER[l].text}
                     letterSpacing="0.1em"
                   >
-                    {l === "A"
-                      ? "A  활동가 레이어"
-                      : l === "B"
-                        ? "B  지원가 레이어"
-                        : "C  비사회적 레이어"}
+                    {`${l}  ${LAYER_LABEL[l]} 레이어`}
                   </text>
                 </g>
               );
@@ -972,11 +986,7 @@ export function CollabRelationMap({
               className="inline-block h-3 w-3 rounded-sm"
               style={{ background: LAYER[l].border }}
             />
-            {l === "A"
-              ? "활동가 (A)"
-              : l === "B"
-                ? "지원가 (B)"
-                : "비사회적 (C)"}
+            {`${LAYER_LABEL[l]} (${l})`}
           </span>
         ))}
         <span className="flex items-center gap-1.5">

@@ -32,7 +32,7 @@
     "subgroup_code": "C2",
     "subgroup_label": "전문서비스파트너형",
     "kind": "non-social",
-    "rationale": "영리 회계법인으로 사회적경제 조직에 전문 서비스 제공. 지원가를 거치지 않고 활동가와 직접 협업."
+    "rationale": "영리 회계법인으로 사회적경제 조직에 전문 서비스 제공. 사회혁신지원가를 거치지 않고 사회혁신활동가와 직접 협업."
   },
   {
     "org_id": "ORG-006",
@@ -46,7 +46,7 @@
     "subgroup_code": "B1",
     "subgroup_label": "자금공급형",
     "kind": "supporter",
-    "rationale": "임팩트 투자사. 보조금·펀드 형태로 사회적경제 활동가에게 자금 공급."
+    "rationale": "임팩트 투자사. 보조금·펀드 형태로 사회혁신활동가에게 자금 공급."
   },
   {
     "org_id": "ORG-008",
@@ -88,7 +88,7 @@
     "subgroup_code": "C2",
     "subgroup_label": "전문서비스파트너형",
     "kind": "non-social",
-    "rationale": "돌봄 중개 영리 플랫폼. 기술 역량으로 활동가와 직접 협업하는 전문서비스 형태."
+    "rationale": "돌봄 중개 영리 플랫폼. 기술 역량으로 사회혁신활동가와 직접 협업하는 전문서비스 형태."
   },
   {
     "org_id": "ORG-014",
@@ -298,7 +298,7 @@
     "subgroup_code": "A2",
     "subgroup_label": "리사이클·자원순환형",
     "kind": "activist",
-    "rationale": "아름다운가게. 물품 재사용·기부 순환 구조로 자원 재순환 활동가."
+    "rationale": "아름다운가게. 물품 재사용·기부 순환 구조로 자원 재순환을 실천하는 사회혁신활동가."
   },
   {
     "org_id": "ORG-044",
