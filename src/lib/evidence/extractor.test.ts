@@ -82,7 +82,13 @@ describe("buildLinkCandidates — 자동 병합 불가", () => {
     const links = buildLinkCandidates(r.mentions, {
       organizations: dict.organizations,
       members: [
-        { id: "M-001", name: "김서연", orgName: "달빛나눔협동조합", sido: "전북", keywords: [] },
+        {
+          id: "M-001",
+          name: "김서연",
+          orgName: "달빛나눔협동조합",
+          sido: "전북",
+          keywords: [],
+        },
       ],
     });
     const memberLink = links.find((l) => l.candidate.kind === "member");
@@ -97,7 +103,13 @@ describe("buildLinkCandidates — 자동 병합 불가", () => {
     const links = buildLinkCandidates(r.mentions, {
       organizations: [],
       members: [
-        { id: "M-001", name: "김서연", orgName: "달빛나눔협동조합", sido: "전북", keywords: [] },
+        {
+          id: "M-001",
+          name: "김서연",
+          orgName: "달빛나눔협동조합",
+          sido: "전북",
+          keywords: [],
+        },
       ],
     });
     expect(links.filter((l) => l.candidate.kind === "member")).toHaveLength(0);
@@ -111,7 +123,13 @@ describe("buildLinkCandidates — 자동 병합 불가", () => {
     const links = buildLinkCandidates(r.mentions, {
       organizations: dict.organizations,
       members: [
-        { id: "M-001", name: "김서연", orgName: "달빛나눔협동조합", sido: "전북", keywords: [] },
+        {
+          id: "M-001",
+          name: "김서연",
+          orgName: "달빛나눔협동조합",
+          sido: "전북",
+          keywords: [],
+        },
       ],
     });
     const md = renderReviewTable(links);

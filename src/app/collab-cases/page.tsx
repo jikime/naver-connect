@@ -4,12 +4,12 @@
 // 세션 내 write(inputCollabCase)는 기존 방식(Zustand) 유지.
 
 import type { Metadata } from "next";
+import { CollabCasesView } from "@/components/collaboration/CollabCasesView";
 import {
   getCollabCasesFromDB,
   getCollabRelationsFromDB,
   getOrganizationsFromDB,
 } from "@/lib/dal/collaboration-server";
-import { CollabCasesView } from "@/components/collaboration/CollabCasesView";
 
 export const metadata: Metadata = {
   title: "협업사례 | 사회혁신기업가네트워크 AX 플랫폼 (목업)",
@@ -34,7 +34,8 @@ export default async function CollabCasesPage() {
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
             진행됐거나 진행 중인 협력 사례를 확인하고, 우리 조직 기준으로 가능한
-            협업 조합을 시뮬레이션해보세요. 새로운 사례도 직접 입력할 수 있습니다.
+            협업 조합을 시뮬레이션해보세요. 새로운 사례도 직접 입력할 수
+            있습니다.
           </p>
         </div>
       </header>

@@ -175,5 +175,10 @@ export function extractPost(
     }
   }
 
-  return { post_id: post.post_id, mentions, claims, pii_violations: violations };
+  return {
+    post_id: post.post_id,
+    mentions,
+    claims,
+    pii_violations: violations,
+  };
 }

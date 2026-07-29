@@ -11,9 +11,20 @@ process.env.NEXT_PUBLIC_APP_MODE ??= "demo";
 import membersSeed from "../src/data/members.json";
 import needsSeed from "../src/data/private/people/needs.json";
 import {
-  buildEngineRecommendationsFor,
+  computeMatchingBundle,
+  type MatchingSessionState,
   runMatchingEngine,
-} from "../src/lib/dal/matching";
+} from "../src/lib/server/matching-service";
+
+const EMPTY_SESSION: MatchingSessionState = {
+  onboardingResults: {},
+  recommendationOverrides: {},
+  ruleWeightOverrides: null,
+};
+const engineRecsFor = (personaId: string) =>
+  computeMatchingBundle({ personaId, role: "기업가", session: EMPTY_SESSION })
+    .engineRecommendations;
+
 import { COMMON_WEIGHT, RECIPROCAL_WEIGHT } from "../src/lib/matching/engine";
 
 type CombineKey = "min" | "geometric" | "harmonic";
@@ -52,7 +63,7 @@ function topKByCombine(
 async function run(): Promise<void> {
   const members = membersSeed as { id: string; name: string }[];
   const needs = needsSeed as { detail_quote: string }[];
-  const { output } = runMatchingEngine();
+  const { output } = runMatchingEngine(EMPTY_SESSION);
 
   console.log("▶ 매칭 baseline 평가 리포트 (n=8 — smoke 전용, 품질 gold 아님)");
   console.log(
@@ -88,14 +99,12 @@ async function run(): Promise<void> {
 
   // 커버리지 + 안전 요약(정본 검증은 harness.test.ts)
   console.log("\n▶ 커버리지·안전 요약");
-  const uncovered = members.filter(
-    (m) => buildEngineRecommendationsFor(m.id).length === 0,
-  );
+  const uncovered = members.filter((m) => engineRecsFor(m.id).length === 0);
   console.log(`  엔진 추천 0건 회원: ${uncovered.length}명`);
   const quotes = needs.map((n) => n.detail_quote).filter((q) => q.length >= 8);
   let leaks = 0;
   for (const m of members) {
-    const payload = JSON.stringify(buildEngineRecommendationsFor(m.id));
+    const payload = JSON.stringify(engineRecsFor(m.id));
     for (const q of quotes) if (payload.includes(q)) leaks += 1;
   }
   console.log(`  비공개 원문 누출: ${leaks}건`);

@@ -78,7 +78,7 @@
     "pair_code": "A6 × A4",
     "relation_type": "서비스결합",
     "domain_tags": [2, 6],
-    "strength": 0.80,
+    "strength": 0.8,
     "basis_case_id": "CC-06",
     "is_actual": true,
     "description": "DRT 스타트업(A6)과 재가돌봄 협동조합(A4)의 병원동행 공동 운영. 교통-돌봄 연계."
@@ -134,7 +134,7 @@
     "pair_code": "B3 × A5",
     "relation_type": "인증지원",
     "domain_tags": [1, 2],
-    "strength": 0.70,
+    "strength": 0.7,
     "basis_case_id": null,
     "is_actual": false,
     "description": "[잠재] 한국사회적기업진흥원(B3)이 의료사협(A5) 사회적기업 인증 심화 지원 및 네트워크 연결."
@@ -162,7 +162,7 @@
     "pair_code": "C2 × A4",
     "relation_type": "전문서비스",
     "domain_tags": [5],
-    "strength": 0.60,
+    "strength": 0.6,
     "basis_case_id": null,
     "is_actual": false,
     "description": "[잠재] 사회적경제 전문 회계법인(C2)이 로컬푸드 협동조합(A4)에 재무·회계 자문 제공."
@@ -372,7 +372,7 @@
     "pair_code": "A4 × A6",
     "relation_type": "서비스결합",
     "domain_tags": [6, 4],
-    "strength": 0.80,
+    "strength": 0.8,
     "basis_case_id": "CC-19",
     "is_actual": true,
     "description": "대전 생태교통 협동조합(A6)과 대전 시민햇빛발전(A4)의 전기차-재생에너지 결합."
@@ -624,7 +624,7 @@
     "pair_code": "A4 × B4",
     "relation_type": "자원공유",
     "domain_tags": [4, 2],
-    "strength": 0.80,
+    "strength": 0.8,
     "basis_case_id": "CC-37",
     "is_actual": true,
     "description": "광주 햇빛발전 협동조합(A4)과 광주사회서비스원(B4)의 돌봄시설 에너지 전환."
@@ -708,7 +708,7 @@
     "pair_code": "A6 × B2",
     "relation_type": "역량강화",
     "domain_tags": [13, 9],
-    "strength": 0.70,
+    "strength": 0.7,
     "basis_case_id": null,
     "is_actual": false,
     "description": "[잠재] 루트임팩트(B2)가 경북청년연대(A6) 창업 성장 멘토링·공간 지원."

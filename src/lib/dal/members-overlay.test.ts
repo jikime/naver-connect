@@ -4,7 +4,8 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 import membersSeed from "@/data/members.json";
-import { runMatchingEngine } from "@/lib/dal/matching";
+import { snapshotSessionState } from "@/lib/dal/matching";
+import { runMatchingEngine } from "@/lib/server/matching-service";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
   MemberPublicSeed,
@@ -164,7 +165,7 @@ describe("runMatchingEngine — 세션 스냅샷이 매칭 컨텍스트에 반�
     const snapshot = snapshotFixture();
     storeSnapshot("M-001", snapshot);
 
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     const ctx = input.personContext["M-001"];
     expect(ctx.region).toEqual(snapshot.region);
     expect(ctx.fieldIds).toEqual(snapshot.field_tags);
@@ -181,7 +182,7 @@ describe("runMatchingEngine — 세션 스냅샷이 매칭 컨텍스트에 반�
     const snapshot = snapshotFixture();
     storeSnapshot("M-001", snapshot);
 
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     const mine = input.impactIntents.filter((i) => i.owner.id === "M-001");
     expect(mine).toHaveLength(1);
     expect(mine[0].id).toBe("impact-session-M-001");

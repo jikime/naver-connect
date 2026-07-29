@@ -5,7 +5,7 @@
 // 데이터 출처: https://seis.or.kr 또는 https://www.data.go.kr/data/3070094/fileData.do
 
 import { readFileSync } from "node:fs";
-import { join, extname } from "node:path";
+import { extname, join } from "node:path";
 import * as dotenv from "dotenv";
 import { Pool } from "pg";
 import * as XLSX from "xlsx";
@@ -28,9 +28,7 @@ function parseRegion(address: string): { sido: string; sigungu: string } {
 }
 
 /** 인증유형 → subgroup_code 추정 */
-function inferSubgroupCode(
-  certType: string,
-): string {
+function inferSubgroupCode(certType: string): string {
   if (!certType) return "A1";
   if (certType.includes("일자리")) return "A1";
   if (certType.includes("사회서비스")) return "A3";
@@ -44,11 +42,14 @@ function inferFieldTags(name: string, address: string): number[] {
   const text = (name + " " + address).toLowerCase();
   const tags: number[] = [];
   if (text.includes("의료") || text.includes("병원")) tags.push(1);
-  if (text.includes("돌봄") || text.includes("복지") || text.includes("요양")) tags.push(2);
+  if (text.includes("돌봄") || text.includes("복지") || text.includes("요양"))
+    tags.push(2);
   if (text.includes("주택") || text.includes("주거")) tags.push(3);
   if (text.includes("에너지") || text.includes("태양광")) tags.push(4);
-  if (text.includes("먹거리") || text.includes("식품") || text.includes("농")) tags.push(5);
-  if (text.includes("교통") || text.includes("이동") || text.includes("운송")) tags.push(6);
+  if (text.includes("먹거리") || text.includes("식품") || text.includes("농"))
+    tags.push(5);
+  if (text.includes("교통") || text.includes("이동") || text.includes("운송"))
+    tags.push(6);
   if (text.includes("환경") || text.includes("생태")) tags.push(4);
   if (text.includes("문화") || text.includes("예술")) tags.push(9);
   if (text.includes("교육") || text.includes("학습")) tags.push(13);
@@ -58,8 +59,12 @@ function inferFieldTags(name: string, address: string): number[] {
 async function run() {
   const filePath = process.argv[2];
   if (!filePath) {
-    console.error("사용법: npx tsx scripts/import-social-enterprise.ts <파일경로>");
-    console.error("예시: npx tsx scripts/import-social-enterprise.ts C:\\Users\\neoar\\Downloads\\사회적기업현황.xlsx");
+    console.error(
+      "사용법: npx tsx scripts/import-social-enterprise.ts <파일경로>",
+    );
+    console.error(
+      "예시: npx tsx scripts/import-social-enterprise.ts C:\\Users\\neoar\\Downloads\\사회적기업현황.xlsx",
+    );
     process.exit(1);
   }
 
@@ -73,7 +78,9 @@ async function run() {
   const workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, { defval: "" });
+  const rows = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, {
+    defval: "",
+  });
   console.log(`  ${rows.length}행 읽음`);
 
   const client = await pool.connect();
@@ -83,16 +90,38 @@ async function run() {
   try {
     for (const row of rows) {
       // 컬럼명은 파일마다 다를 수 있으므로 유연하게 매핑
-      const name =
-        (row["기업명"] || row["법인명"] || row["기관명"] || row["name"] || "").trim();
-      const regNo =
-        (row["사업자등록번호"] || row["사업자번호"] || row["reg_no"] || "").replace(/-/g, "").trim();
-      const address =
-        (row["주소"] || row["사업장주소"] || row["address"] || "").trim();
-      const certType =
-        (row["인증유형"] || row["유형"] || row["cert_type"] || "").trim();
+      const name = (
+        row["기업명"] ||
+        row["법인명"] ||
+        row["기관명"] ||
+        row["name"] ||
+        ""
+      ).trim();
+      const regNo = (
+        row["사업자등록번호"] ||
+        row["사업자번호"] ||
+        row["reg_no"] ||
+        ""
+      )
+        .replace(/-/g, "")
+        .trim();
+      const address = (
+        row["주소"] ||
+        row["사업장주소"] ||
+        row["address"] ||
+        ""
+      ).trim();
+      const certType = (
+        row["인증유형"] ||
+        row["유형"] ||
+        row["cert_type"] ||
+        ""
+      ).trim();
       const empCount = parseInt(
-        (row["근로자수"] || row["종사자수"] || row["employees"] || "0").replace(/[^0-9]/g, ""),
+        (row["근로자수"] || row["종사자수"] || row["employees"] || "0").replace(
+          /[^0-9]/g,
+          "",
+        ),
         10,
       );
 

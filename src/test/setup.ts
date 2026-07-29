@@ -1,0 +1,8 @@
+// vitest 공용 셋업 — node 테스트에는 HTTP 서버가 없으므로 매칭 클라이언트의 transport를
+// 서버 서비스 함수에 직접 연결한다(경계 계약은 동일: MatchingRequest → MatchingBundle).
+// 근거: C3(codex final-rereview-reject #1), src/lib/dal/matching.ts transport 계약
+
+import { setMatchingTransport } from "@/lib/dal/matching";
+import { computeMatchingBundle } from "@/lib/server/matching-service";
+
+setMatchingTransport(async (req) => computeMatchingBundle(req));

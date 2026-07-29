@@ -127,7 +127,8 @@ async function run(): Promise<void> {
         claims_proposed: claims.length,
         link_candidates: links.length,
         pii_violations_masked: piiViolations,
-        contract: "evidence_retrieval_v1 — matching 승격 금지, needs_review only",
+        contract:
+          "evidence_retrieval_v1 — matching 승격 금지, needs_review only",
       },
       null,
       2,

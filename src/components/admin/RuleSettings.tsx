@@ -83,46 +83,48 @@ export function RuleSettings() {
             </p>
           </div>
           <div className="space-y-2">
-          {(isAdmin ? draftWeights : weights).map((w) => (
-            <div key={w.keyword} className="flex items-center gap-3 text-sm">
-              <span className="w-40 shrink-0 text-foreground">{w.keyword}</span>
-              {isAdmin ? (
-                <Slider
-                  min={0}
-                  max={2}
-                  step={0.1}
-                  value={[w.weight]}
-                  onValueChange={([next]) => updateDraft(w.keyword, next)}
-                  className="flex-1"
-                  aria-label={`${w.keyword} 가중치`}
-                />
-              ) : (
-                <div className="h-1.5 flex-1 rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${(w.weight / 2) * 100}%` }}
+            {(isAdmin ? draftWeights : weights).map((w) => (
+              <div key={w.keyword} className="flex items-center gap-3 text-sm">
+                <span className="w-40 shrink-0 text-foreground">
+                  {w.keyword}
+                </span>
+                {isAdmin ? (
+                  <Slider
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={[w.weight]}
+                    onValueChange={([next]) => updateDraft(w.keyword, next)}
+                    className="flex-1"
+                    aria-label={`${w.keyword} 가중치`}
                   />
-                </div>
-              )}
-              <span className="w-10 text-right text-guud-text-muted-2">
-                {w.weight.toFixed(1)}
-              </span>
-            </div>
-          ))}
-        </div>
-        {isAdmin && (
-          <div className="mt-4 flex items-center gap-3">
-            <Button size="sm" onClick={handleSave} disabled={saving}>
-              가중치 저장 · 점수 재산출
-            </Button>
-            {savedNotice && (
-              <span className="text-xs text-guud-text-muted-2">
-                반영됐어요(세션 한정, 새로고침 시 초기화).
-              </span>
-            )}
+                ) : (
+                  <div className="h-1.5 flex-1 rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${(w.weight / 2) * 100}%` }}
+                    />
+                  </div>
+                )}
+                <span className="w-10 text-right text-guud-text-muted-2">
+                  {w.weight.toFixed(1)}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
-      </section>
+          {isAdmin && (
+            <div className="mt-4 flex items-center gap-3">
+              <Button size="sm" onClick={handleSave} disabled={saving}>
+                가중치 저장 · 점수 재산출
+              </Button>
+              {savedNotice && (
+                <span className="text-xs text-guud-text-muted-2">
+                  반영됐어요(세션 한정, 새로고침 시 초기화).
+                </span>
+              )}
+            </div>
+          )}
+        </section>
 
         <section className="space-y-4">
           <div className="space-y-2">

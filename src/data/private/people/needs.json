@@ -5,9 +5,7 @@
       "kind": "person",
       "id": "M-001"
     },
-    "tag_ids": [
-      6
-    ],
+    "tag_ids": [6],
     "detail_quote": "요양보호사 이직률이 30%를 넘어요",
     "safe_match_status": "draft",
     "priority": "primary",
@@ -24,9 +22,7 @@
       "kind": "person",
       "id": "M-001"
     },
-    "tag_ids": [
-      8
-    ],
+    "tag_ids": [8],
     "detail_quote": "이용자가 흩어져있어 이동시간이 수익을 갉아먹어요",
     "safe_match_status": "draft",
     "priority": "normal",
@@ -43,9 +39,7 @@
       "kind": "person",
       "id": "M-002"
     },
-    "tag_ids": [
-      8
-    ],
+    "tag_ids": [8],
     "detail_quote": "매입임대 30호로 케어안심주택 준비중, 재가돌봄 파트너 필요",
     "safe_match_status": "draft",
     "priority": "primary",
@@ -62,9 +56,7 @@
       "kind": "person",
       "id": "M-002"
     },
-    "tag_ids": [
-      9
-    ],
+    "tag_ids": [9],
     "detail_quote": "LH 등 매입임대 연계 네트워크가 필요해요",
     "safe_match_status": "draft",
     "priority": "normal",
@@ -81,9 +73,7 @@
       "kind": "person",
       "id": "M-003"
     },
-    "tag_ids": [
-      3
-    ],
+    "tag_ids": [3],
     "detail_quote": "공공부지 공모일정에 사업이 휘둘려요",
     "safe_match_status": "draft",
     "priority": "primary",
@@ -100,9 +90,7 @@
       "kind": "person",
       "id": "M-003"
     },
-    "tag_ids": [
-      2
-    ],
+    "tag_ids": [2],
     "detail_quote": "조합원 출자확대가 벽에 부딪혔어요",
     "safe_match_status": "draft",
     "priority": "normal",
@@ -119,9 +107,7 @@
       "kind": "person",
       "id": "M-004"
     },
-    "tag_ids": [
-      9
-    ],
+    "tag_ids": [9],
     "detail_quote": "지자체 위탁계약이 사실상 매출전부라 갱신때마다 조마조마해요",
     "safe_match_status": "draft",
     "priority": "primary",
@@ -138,9 +124,7 @@
       "kind": "person",
       "id": "M-004"
     },
-    "tag_ids": [
-      10
-    ],
+    "tag_ids": [10],
     "detail_quote": "먼저 겪은 선배에게 멘토링을 받고 싶어요",
     "safe_match_status": "draft",
     "priority": "normal",
@@ -157,9 +141,7 @@
       "kind": "person",
       "id": "M-005"
     },
-    "tag_ids": [
-      1
-    ],
+    "tag_ids": [1],
     "detail_quote": "사회적경제 조직 자문처를 넓히고 싶어요",
     "safe_match_status": "draft",
     "priority": "primary",
@@ -176,9 +158,7 @@
       "kind": "person",
       "id": "M-005"
     },
-    "tag_ids": [
-      12
-    ],
+    "tag_ids": [12],
     "detail_quote": "강의 기회를 늘리고 싶어요",
     "safe_match_status": "draft",
     "priority": "normal",
@@ -195,9 +175,7 @@
       "kind": "person",
       "id": "M-006"
     },
-    "tag_ids": [
-      11
-    ],
+    "tag_ids": [11],
     "detail_quote": "돌봄통합지원법 시행초기 현장사례가 연구에 꼭필요해요",
     "safe_match_status": "draft",
     "priority": "primary",
@@ -214,9 +192,7 @@
       "kind": "person",
       "id": "M-006"
     },
-    "tag_ids": [
-      12
-    ],
+    "tag_ids": [12],
     "detail_quote": "공동연구 파트너를 찾고 있어요",
     "safe_match_status": "draft",
     "priority": "normal",
@@ -233,9 +209,7 @@
       "kind": "person",
       "id": "M-007"
     },
-    "tag_ids": [
-      2
-    ],
+    "tag_ids": [2],
     "detail_quote": "돌봄·주거·기후 초기팀을 찾고있어요",
     "safe_match_status": "draft",
     "priority": "primary",
@@ -252,9 +226,7 @@
       "kind": "person",
       "id": "M-007"
     },
-    "tag_ids": [
-      11
-    ],
+    "tag_ids": [11],
     "detail_quote": "투자 판단을 위해 현장 이해를 넓히고 싶어요",
     "safe_match_status": "draft",
     "priority": "normal",
@@ -271,9 +243,7 @@
       "kind": "person",
       "id": "M-008"
     },
-    "tag_ids": [
-      4
-    ],
+    "tag_ids": [4],
     "detail_quote": "직매장 디지털전환이 숙제예요",
     "safe_match_status": "draft",
     "priority": "primary",

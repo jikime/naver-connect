@@ -45,6 +45,20 @@ export default tseslint.config(
     },
   },
   {
+    // C3: 서버 매칭 서비스는 private 원본을 읽는 유일한 비-DAL 지점 — route/테스트만 접근한다.
+    files: ["src/lib/server/**/*.ts"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
+  {
+    // route handler는 서버 실행 — 서비스 모듈 import 허용.
+    files: ["src/app/api/**/*.ts"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
+  {
     // P1-1: 클라이언트 도달 존(app/components/stores)과 DAL 배럴은 민감 people 모듈을
     // import할 수 없다 — Client bundle에 needs/consents 원문이 실리는 경로를 빌드 타임 차단.
     files: [
@@ -73,7 +87,12 @@ export default tseslint.config(
                 "**/dal/people-engine",
               ],
               message:
-                "people·people-engine은 민감 원문을 import하는 서버/스크립트 전용 모듈입니다 — 클라이언트 존·DAL 배럴에서 import 금지(P1-1). 파생 DTO(src/data/people/derived/*)나 consent 모듈을 사용하세요.",
+                "people·people-engine은 민감 원문을 import하는 서버/스크립트 전용 모듈입니다 — 클라이언트 존·DAL 배럴에서 import 금지(P1-1). 파생 DTO(src/data/people/derived/*)를 사용하세요.",
+            },
+            {
+              group: ["@/lib/server/*", "**/lib/server/*"],
+              message:
+                "lib/server(매칭 서비스)는 private 원본을 읽는 서버 전용 모듈입니다 — 클라이언트 존에서 import 금지(C3). /api/matching 경유 또는 DAL 클라이언트(getMatchingBundle)를 사용하세요. type-only import는 next 빌드에서 소거되므로 DAL 내부에서만 허용.",
             },
           ],
         },

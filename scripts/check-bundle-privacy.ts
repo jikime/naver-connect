@@ -243,6 +243,28 @@ async function run(): Promise<void> {
         file,
       });
     }
+    // C3: 매칭 입력은 서버 전용 — 아래 시그니처가 클라 청크에 보이면 경계 붕괴.
+    if (
+      hasRecordSignature(body, 'ownerId:"M-', "match_text", 400) ||
+      hasRecordSignature(body, '"ownerId":"M-', '"match_text"', 400)
+    ) {
+      violations.push({ what: "engine-needs 파생(폐기됨) 시그니처", file });
+    }
+    if (
+      hasRecordSignature(body, 'person_id:"M-', "purposes", 300) ||
+      hasRecordSignature(body, '"person_id":"M-', '"purposes"', 300)
+    ) {
+      violations.push({
+        what: "matching-eligibility 파생(폐기됨) 시그니처",
+        file,
+      });
+    }
+    if (body.includes("rule_weights")) {
+      violations.push({
+        what: "match_scores(rule_weights) private 시드",
+        file,
+      });
+    }
   }
 
   console.log(

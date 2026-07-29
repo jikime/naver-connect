@@ -190,25 +190,9 @@ async function run(): Promise<void> {
     })),
   );
 
-  // ── 파생(클라이언트 안전) 산출물 — P1-1 번들 유출 차단 ──────────────────
-  // 엔진 입력 DTO: 원문(detail_quote)·safe_match_text draft를 일절 포함하지 않는다.
-  // match_text는 user_confirmed safe_match_text만 허용 — 시드는 전부 draft라 "".
-  const engineNeeds = needs.map((n) => ({
-    id: n.id,
-    ownerId: n.owner.id,
-    tag_ids: n.tag_ids,
-    match_text: "",
-    priority: n.priority,
-    urgency: n.urgency,
-    constraints: n.constraints,
-    status: n.status,
-  }));
-  // 동의 자격 요약(불리언만) — consent 레코드 자체는 클라이언트에 싣지 않는다.
-  const eligibility = pub.map((m) => ({
-    person_id: m.id,
-    purposes: [...purposes],
-    source: "seed_mock",
-  }));
+  // ── 파생(클라이언트 안전) 산출물 ─────────────────────────────────────────
+  // C3: engine-needs/matching-eligibility 파생은 폐기 — 엔진 입력·동의 판정이 전부
+  // 서버(matching-service)로 이동해 클라이언트 파생 자체가 불필요해졌다(final-rereview #1).
 
   // legacy private twin은 공개 식별자만 허용한다. 수요 태그/우선순위, hot lead,
   // availability, 추천 이력은 값만 공백화해도 존재 자체가 상태를 노출하므로 전부 제거한다.
@@ -219,8 +203,6 @@ async function run(): Promise<void> {
   writeJson("src/data/people/impact_intents.json", impactIntents);
   writeJson("src/data/private/people/needs.json", needs);
   writeJson("src/data/private/people/consents.json", consents);
-  writeJson("src/data/people/derived/engine-needs.json", engineNeeds);
-  writeJson("src/data/people/derived/matching-eligibility.json", eligibility);
   writeJson(
     "src/data/people/derived/members-private.redacted.json",
     privateRedacted,
@@ -278,7 +260,7 @@ async function run(): Promise<void> {
   );
 
   console.log(
-    `\n${CHECK_MODE ? "▶ 재생성" : "✅"} 완료 — offers ${offers.length} · impact ${impactIntents.length} · needs ${needs.length} · consents ${consents.length} · engine-needs(redacted) ${engineNeeds.length}`,
+    `\n${CHECK_MODE ? "▶ 재생성" : "✅"} 완료 — offers ${offers.length} · impact ${impactIntents.length} · needs ${needs.length} · consents ${consents.length}`,
   );
 
   if (CHECK_MODE) verifyDeterminism();

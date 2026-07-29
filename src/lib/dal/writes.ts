@@ -5,7 +5,7 @@ import declineReasonsSeed from "@/data/decline_reasons.json";
 // P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
 import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
 import {
-  buildEngineRecommendationsFor,
+  getEngineRecommendationsFor,
   parseEngineRecId,
 } from "@/lib/dal/matching";
 import { meetupsById } from "@/lib/dal/meetups";
@@ -34,18 +34,22 @@ export async function getDeclineReasons(): Promise<DeclineReason[]> {
 }
 
 /** 뷰어가 이 추천의 수신 당사자(또는 운영자)인지 확인, 아니면 reject(타인 추천 조작 방지). */
-function assertIsRecipient(recId: string, vc: ViewerContext): void {
+async function assertIsRecipient(
+  recId: string,
+  vc: ViewerContext,
+): Promise<void> {
   // M1: 엔진 추천은 시드에 없으므로 ID에 인코딩된 수신자로 판정한다.
-  // P1-4: 임의 ID 조작 방지 — 현재 엔진 산출에 실재하는 추천인지도 검증한다.
+  // P1-4: 임의 ID 조작 방지 — 현재 엔진 산출(서버)에 실재하는 추천인지도 검증한다(C3: 서비스 경유).
   const engineRef = parseEngineRecId(recId);
   if (engineRef) {
     if (vc.role !== "운영자" && vc.personaId !== engineRef.recipient) {
       throw new Error("본인에게 온 추천만 반응할 수 있습니다");
     }
-    const exists = buildEngineRecommendationsFor(engineRef.recipient).some(
-      (r) => r.id === recId,
-    );
-    if (!exists) {
+    const recs = await getEngineRecommendationsFor({
+      role: vc.role,
+      personaId: engineRef.recipient,
+    });
+    if (!recs.some((r) => r.id === recId)) {
       throw new Error(`Recommendation not found: ${recId}`);
     }
     return;
@@ -76,7 +80,7 @@ export async function submitDecline(
   code: DeclineReasonCode,
   note?: string,
 ): Promise<DeclineReason> {
-  assertIsRecipient(recId, vc);
+  await assertIsRecipient(recId, vc);
   const reason = declineReasons.find((r) => r.code === code);
   if (!reason) {
     throw new Error(`Unknown decline reason code: ${code}`);
@@ -95,7 +99,7 @@ export async function submitMeetingOutcome(
   recId: string,
   outcome: { met: boolean; will_meet_again: boolean; note: string },
 ): Promise<void> {
-  assertIsRecipient(recId, vc);
+  await assertIsRecipient(recId, vc);
   useSessionInteractionStore.getState().setRecommendationOverride(recId, {
     meeting_outcome: outcome,
   });

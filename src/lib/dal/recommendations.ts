@@ -5,12 +5,8 @@
 
 // P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
 import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
-import { getConsentFlags } from "@/lib/consent";
-import {
-  buildEngineRecommendationsFor,
-  getMatchScores,
-  parseEngineRecId,
-} from "@/lib/dal/matching";
+// C3: 동의 판정·엔진 산출·허용 pair·그래프 엣지는 전부 서버 번들에서 온다(클라 private 입력 0).
+import { getMatchingBundle, parseEngineRecId } from "@/lib/dal/matching";
 import { meetupsById } from "@/lib/dal/meetups";
 import { getExpertSubtype } from "@/lib/dal/members";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
@@ -47,32 +43,6 @@ function isRecommendationParty(
   );
 }
 
-/** 일반 뷰어에게 그래프 pair를 공개할 수 있는지: 본인 관련 + 양쪽 매칭 동의. */
-function canViewGraphPair(
-  vc: ViewerContext,
-  from: string,
-  to: string,
-): boolean {
-  if (vc.role === "운영자") return true;
-  return (
-    (vc.personaId === from || vc.personaId === to) &&
-    getConsentFlags(from).matching &&
-    getConsentFlags(to).matching
-  );
-}
-
-/**
- * P1-2: 1:1 추천이 매칭에 노출 가능한 pair인지 — 양쪽 모두 매칭 동의(B)가 유효해야 한다.
- * B opt-out(철회) 시 시드 추천도 목록·상세에서 제외된다(fail-closed). 모듬은 M1 범위 밖.
- */
-function isMatchingAllowedPair(rec: Recommendation): boolean {
-  if (rec.rec_kind === "모듬" || !rec.to_member_id) return true;
-  return (
-    getConsentFlags(rec.from_member_id).matching &&
-    getConsentFlags(rec.to_member_id).matching
-  );
-}
-
 /** 세션 오버라이드(거절/후기/승인) + 최소노출 마스킹을 반영한 뷰 모델로 합성한다. */
 function withSessionAndMask(
   rec: Recommendation,
@@ -83,16 +53,13 @@ function withSessionAndMask(
   const merged: Recommendation = override ? { ...rec, ...override } : rec;
   const isParty = isRecommendationParty(merged, vc);
   // FR-RC-06/BR-01: 당사자·운영자가 아니면 최소노출 문구만.
-  // P1-2: 원문 주인(from_member)의 인용 동의(C)가 없으면 당사자·운영자에게도 원문 대신
-  // 최소노출 문구를 반환한다 — 단 원문 주인 본인은 항상 자기 원문을 본다.
-  const quoteOwnerConsent = getConsentFlags(merged.from_member_id).quote;
-  const canSeeQuote =
-    vc.personaId === merged.from_member_id || (isParty && quoteOwnerConsent);
+  // C3: 클라이언트 시드는 중립 twin이라 원문 자체가 없다 — 원문 열람 복원은 서버 경계에서
+  // 동의(C) 검증과 함께 M2에 제공한다.
   return {
     ...merged,
     message: {
       ...merged.message,
-      contact_point: canSeeQuote
+      contact_point: isParty
         ? merged.message.contact_point
         : merged.min_exposure_note,
     },
@@ -155,13 +122,16 @@ export async function getRecommendations(
   week?: string,
 ): Promise<{ common: Recommendation[]; different: Recommendation[] }> {
   const targetSubtype = getExpertSubtype(vc.personaId);
-  // M1-7: 수동 시드 + 매칭엔진 산출을 병행 노출(중복 pair는 엔진 쪽에서 제외됨).
-  // P1-2: 매칭 동의(B)가 없는 pair의 1:1 시드 추천은 목록에서 제외(fail-closed).
+  // C3: 서버 번들 1회 호출 — 엔진 추천·허용 pair·점수를 함께 받는다(클라 private 입력 0).
+  const bundle = await getMatchingBundle(vc);
+  const allowedSeedIds = new Set(bundle.allowedSeedRecIds);
+  // M1-7: 수동 시드 + 매칭엔진 산출을 병행 노출(중복 pair는 서버에서 제외됨).
+  // P1-2: 매칭 동의(B)가 없는 pair의 1:1 시드 추천은 목록에서 제외(fail-closed, 서버 판정).
   const addressedToViewer = [
     ...seed.filter(
-      (rec) => isAddressedTo(rec, vc.personaId) && isMatchingAllowedPair(rec),
+      (rec) => isAddressedTo(rec, vc.personaId) && allowedSeedIds.has(rec.id),
     ),
-    ...buildEngineRecommendationsFor(vc.personaId),
+    ...bundle.engineRecommendations,
   ];
   const weekFiltered = week
     ? addressedToViewer.filter((rec) => rec.sent_week === week)
@@ -171,9 +141,8 @@ export async function getRecommendations(
       ? weekFiltered.filter((rec) => rec.rec_kind === "모듬")
       : weekFiltered;
   const masked = branchFiltered.map((rec) => withSessionAndMask(rec, vc));
-  const { scores } = await getMatchScores(vc);
   const scoresByPair = new Map(
-    scores.map((s) => [scoreKey(s.from_member_id, s.to_member_id), s]),
+    bundle.scores.map((s) => [scoreKey(s.from_member_id, s.to_member_id), s]),
   );
   const common = sortCommonGroup(
     masked.filter((rec) => rec.rec_axis === "공통점"),
@@ -207,35 +176,9 @@ export interface RecommendationGraphEdge {
 export async function getRecommendationGraphEdges(
   vc: ViewerContext,
 ): Promise<RecommendationGraphEdge[]> {
-  const edges: RecommendationGraphEdge[] = [];
-  for (const rec of seed) {
-    if (rec.rec_kind === "모듬") {
-      const organizer = rec.from_member_id;
-      for (const memberId of meetupMemberIds(rec)) {
-        if (memberId === organizer) continue;
-        if (!canViewGraphPair(vc, organizer, memberId)) continue;
-        edges.push({
-          id: `${rec.id}:${memberId}`,
-          from: organizer,
-          to: memberId,
-          match_type: rec.match_type,
-          rec_kind: "모듬",
-          status: rec.status,
-        });
-      }
-    } else if (rec.to_member_id) {
-      if (!canViewGraphPair(vc, rec.from_member_id, rec.to_member_id)) continue;
-      edges.push({
-        id: rec.id,
-        from: rec.from_member_id,
-        to: rec.to_member_id,
-        match_type: rec.match_type,
-        rec_kind: "1:1",
-        status: rec.status,
-      });
-    }
-  }
-  return edges;
+  // C3: 뷰어 권한·동의 gate가 반영된 엣지를 서버가 계산한다(모듬 엣지 이관은 C4).
+  const bundle = await getMatchingBundle(vc);
+  return bundle.graphEdges;
 }
 
 /** 추천 상세(FR-RC-03~07). 없으면 reject. */
@@ -245,7 +188,7 @@ export async function getRecommendation(
 ): Promise<Recommendation> {
   const engineRef = parseEngineRecId(id);
   // 엔진 ID의 recipient/other를 바꿔 대입하며 타인 추천 존재 여부를 열거하지 못하게
-  // 실제 엔진 실행 전에 동일한 당사자/운영자 게이트를 적용한다.
+  // 서버 번들 조회 전에 동일한 당사자/운영자 게이트를 적용한다.
   if (
     engineRef &&
     vc.role !== "운영자" &&
@@ -254,12 +197,25 @@ export async function getRecommendation(
   ) {
     throw new Error(`Recommendation not found: ${id}`);
   }
-  const rec = engineRef
-    ? buildEngineRecommendationsFor(engineRef.recipient).find(
-        (r) => r.id === id,
-      )
-    : seed.find((r) => r.id === id);
-  if (!rec || !isMatchingAllowedPair(rec) || !isRecommendationParty(rec, vc)) {
+  if (engineRef) {
+    // 서버 번들은 recipient 관점으로 계산된다 — 운영자/상대가 조회해도 동일 산출.
+    const bundle = await getMatchingBundle({
+      role: vc.role,
+      personaId: engineRef.recipient,
+    });
+    const rec = bundle.engineRecommendations.find((r) => r.id === id);
+    if (!rec) {
+      throw new Error(`Recommendation not found: ${id}`);
+    }
+    return withSessionAndMask(rec, vc);
+  }
+  const bundle = await getMatchingBundle(vc);
+  const rec = seed.find((r) => r.id === id);
+  if (
+    !rec ||
+    !bundle.allowedSeedRecIds.includes(id) ||
+    !isRecommendationParty(rec, vc)
+  ) {
     throw new Error(`Recommendation not found: ${id}`);
   }
   return withSessionAndMask(rec, vc);

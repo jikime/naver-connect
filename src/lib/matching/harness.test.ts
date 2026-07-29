@@ -8,12 +8,13 @@ import membersSeed from "@/data/members.json";
 import needsSeed from "@/data/private/people/needs.json";
 import recommendationsSeed from "@/data/private/recommendations.json";
 import {
-  buildEngineRecommendationsFor,
-  runMatchingEngine,
+  getEngineRecommendationsFor,
+  snapshotSessionState,
 } from "@/lib/dal/matching";
 import { getRecommendation } from "@/lib/dal/recommendations";
 import { submitDecline } from "@/lib/dal/writes";
 import { issueSafeMatchReceipt } from "@/lib/matching/receipt";
+import { runMatchingEngine } from "@/lib/server/matching-service";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
   DeclineReasonCode,
@@ -90,7 +91,7 @@ afterEach(() => {
 
 describe("하니스 — hard filter 불변식", () => {
   it("HardFilterViolationRate = 0 — 순위 목록에 filtered pair·자기 자신이 없다", () => {
-    const { output } = runMatchingEngine();
+    const { output } = runMatchingEngine(snapshotSessionState());
     const filteredKeys = new Set(
       output.filtered.map((f) => `${f.from}~${f.to}`),
     );
@@ -101,7 +102,7 @@ describe("하니스 — hard filter 불변식", () => {
   });
 
   it("모든 pair 점수는 1..100 범위다", () => {
-    const { output } = runMatchingEngine();
+    const { output } = runMatchingEngine(snapshotSessionState());
     for (const p of output.pairs) {
       expect(p.score).toBeGreaterThan(0);
       expect(p.score).toBeLessThanOrEqual(100);
@@ -110,12 +111,14 @@ describe("하니스 — hard filter 불변식", () => {
 });
 
 describe("하니스 — 비공개 원문 누출 0", () => {
-  it("엔진 추천 직렬화 결과에 어떤 회원의 need 원문(detail_quote)도 포함되지 않는다", () => {
+  it("엔진 추천 직렬화 결과에 어떤 회원의 need 원문(detail_quote)도 포함되지 않는다", async () => {
     const quotes = needs
       .map((n) => n.detail_quote)
       .filter((q) => q.length >= 8);
     for (const m of members) {
-      const payload = JSON.stringify(buildEngineRecommendationsFor(m.id));
+      const payload = JSON.stringify(
+        await getEngineRecommendationsFor({ role: "기업가", personaId: m.id }),
+      );
       for (const quote of quotes) {
         expect(payload.includes(quote)).toBe(false);
       }
@@ -124,15 +127,18 @@ describe("하니스 — 비공개 원문 누출 0", () => {
 });
 
 describe("하니스 — 커버리지·재현 smoke", () => {
-  it("8명 전원이 엔진 추천을 1건 이상 받는다 (고립 회원 0 — 최우선 골)", () => {
+  it("8명 전원이 엔진 추천을 1건 이상 받는다 (고립 회원 0 — 최우선 골)", async () => {
     for (const m of members) {
-      const recs = buildEngineRecommendationsFor(m.id);
+      const recs = await getEngineRecommendationsFor({
+        role: "기업가",
+        personaId: m.id,
+      });
       expect(recs.length).toBeGreaterThan(0);
     }
   });
 
   it("수동 시드 1:1 추천 pair는 엔진에서도 hard filter를 통과한다 (smoke — 방향 재현율 100%)", () => {
-    const { output } = runMatchingEngine();
+    const { output } = runMatchingEngine(snapshotSessionState());
     const pairKeys = new Set(output.pairs.map((p) => `${p.from}~${p.to}`));
     const oneToOne = seedRecs.filter(
       (r) => r.rec_kind === "1:1" && r.to_member_id,
@@ -146,7 +152,7 @@ describe("하니스 — 커버리지·재현 smoke", () => {
   });
 
   it("결합식 3종이 pair마다 모두 산출된다 (min ≤ harmonic ≤ geometric)", () => {
-    const { output } = runMatchingEngine();
+    const { output } = runMatchingEngine(snapshotSessionState());
     for (const p of output.pairs) {
       if (p.reciprocal.min > 0) {
         expect(p.reciprocal.min).toBeLessThanOrEqual(
@@ -167,7 +173,7 @@ describe("하니스 — 온보딩 적립 → 엔진 즉시 반영", () => {
       "M-001",
       onboardingResultWith("AI 도입을 도와줄 파트너가 필요해요"),
     );
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     const mine = input.needs.filter((n) => n.ownerId === "M-001");
     expect(mine).toHaveLength(1);
     const saved =
@@ -183,7 +189,7 @@ describe("하니스 — 온보딩 적립 → 엔진 즉시 반영", () => {
       needs: [],
       consents: { publish: true, matching: false, quote: false },
     });
-    const { output } = runMatchingEngine();
+    const { output } = runMatchingEngine(snapshotSessionState());
     expect(
       output.pairs.some((p) => p.from === "M-002" || p.to === "M-002"),
     ).toBe(false);
@@ -194,19 +200,19 @@ describe("하니스 — safe-text-only 불변식 (EOF blocker)", () => {
   it("raw detail_quote를 바꿔도(미승인 상태) 엔진 출력이 완전히 동일하다", () => {
     const store = useSessionInteractionStore.getState();
     store.storeOnboardingResult("M-001", onboardingResultWith("원문 버전 A"));
-    const a = JSON.stringify(runMatchingEngine().output);
+    const a = JSON.stringify(runMatchingEngine(snapshotSessionState()).output);
     store.storeOnboardingResult(
       "M-001",
       onboardingResultWith(
         "완전히 다른 원문 버전 B — 점수에 쓰였다면 결과가 달라져야 한다",
       ),
     );
-    const b = JSON.stringify(runMatchingEngine().output);
+    const b = JSON.stringify(runMatchingEngine(snapshotSessionState()).output);
     expect(a).toBe(b);
   });
 
   it("엔진 입력 need에는 detail_quote 키 자체가 존재하지 않는다 (타입+런타임 이중 확인)", () => {
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     for (const n of input.needs) {
       expect("detail_quote" in n).toBe(false);
       expect("safe_match_status" in n).toBe(false);
@@ -217,7 +223,7 @@ describe("하니스 — safe-text-only 불변식 (EOF blocker)", () => {
 describe("하니스 — P1-2 동의 gate 통합", () => {
   it("APP_MODE가 demo가 아니면 seed_mock 동의는 무효 — 엔진 pair 0건 (fail-closed)", () => {
     process.env.NEXT_PUBLIC_APP_MODE = "";
-    const { output } = runMatchingEngine();
+    const { output } = runMatchingEngine(snapshotSessionState());
     expect(output.pairs).toHaveLength(0);
     expect(
       output.filtered.every((f) => f.codes.includes("NO_MATCHING_CONSENT")),
@@ -275,7 +281,7 @@ describe("하니스 — 재리뷰 #5 safe-match provenance (영수증 4중 결�
       ...onboardingResultWith("무시"),
       needs: [confirmedNeed()],
     });
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     const mine = input.needs.find((n) => n.ownerId === "M-001");
     expect(mine?.match_text).toBe("승인된 매칭 요약문");
   });
@@ -285,7 +291,7 @@ describe("하니스 — 재리뷰 #5 safe-match provenance (영수증 4중 결�
       ...onboardingResultWith("무시"),
       needs: [confirmedNeed({ safe_match_receipt: undefined })],
     });
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     expect(input.needs.find((n) => n.ownerId === "M-001")?.match_text).toBe("");
   });
 
@@ -295,7 +301,7 @@ describe("하니스 — 재리뷰 #5 safe-match provenance (영수증 4중 결�
       ...onboardingResultWith("무시"),
       needs: [{ ...confirmed, safe_match_text: "승인 뒤 바꿔치기한 문구" }],
     });
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     expect(input.needs.find((n) => n.ownerId === "M-001")?.match_text).toBe("");
   });
 
@@ -305,7 +311,7 @@ describe("하니스 — 재리뷰 #5 safe-match provenance (영수증 4중 결�
       needs: [confirmedNeed()],
       consents: { publish: true, matching: false, quote: false },
     });
-    const { input } = runMatchingEngine();
+    const { input } = runMatchingEngine(snapshotSessionState());
     expect(input.needs.find((n) => n.ownerId === "M-001")?.match_text).toBe("");
   });
 });
@@ -321,14 +327,20 @@ describe("하니스 — P1-4 엔진 거절 반영·ID 검증 통합", () => {
     "%s 거절 후 재실행에서 같은 방향 pair가 재등장하지 않는다",
     async (reason) => {
       const vc = { role: "기업가" as const, personaId: "M-001" };
-      const recs = buildEngineRecommendationsFor("M-001");
+      const recs = await getEngineRecommendationsFor({
+        role: "기업가",
+        personaId: "M-001",
+      });
       expect(recs.length).toBeGreaterThan(0);
       const target = recs[0];
       await submitDecline(vc, target.id, reason);
-      const after = buildEngineRecommendationsFor("M-001");
+      const after = await getEngineRecommendationsFor({
+        role: "기업가",
+        personaId: "M-001",
+      });
       expect(after.some((r) => r.id === target.id)).toBe(false);
       expect(
-        runMatchingEngine().output.pairs.some(
+        runMatchingEngine(snapshotSessionState()).output.pairs.some(
           (p) => p.from === "M-001" && p.to === target.from_member_id,
         ),
       ).toBe(false);
