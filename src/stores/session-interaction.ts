@@ -6,11 +6,20 @@
 
 import { create } from "zustand";
 import type {
+  CapabilityOfferV1,
   DealRoom,
   DeclineReasonCode,
+  NeedIntentV1,
   RecStatus,
   RuleWeight,
 } from "@/types";
+
+/** M1: 온보딩 확정이 적립하는 people 아이템 + 매칭 동의(세션 한정 — JSON-first 단계). */
+export interface OnboardingResult {
+  needs: NeedIntentV1[];
+  offers: CapabilityOfferV1[];
+  matchingConsent: boolean;
+}
 
 /** 추천 1건에 대한 세션 오버라이드. DAL read 함수가 시드 위에 겹쳐 반환한다. */
 export interface RecommendationOverride {
@@ -29,12 +38,15 @@ interface SessionInteractionStore {
   ruleWeightOverrides: RuleWeight[] | null;
   /** v1.1 FR-DS-01: 딜소싱 폼으로 등록된 딜(세션 한정). getDealRooms(FR-DR-05)가 시드에 겹쳐 반환한다. */
   registeredDeals: DealRoom[];
+  /** M1: personaId → 온보딩 확정 산출물(Need/Offer/매칭동의). 매칭엔진이 시드 위에 겹쳐 읽는다. */
+  onboardingResults: Record<string, OnboardingResult>;
 
   setRecommendationOverride: (
     recId: string,
     patch: RecommendationOverride,
   ) => void;
   finalizeOnboardingFor: (personaId: string) => void;
+  storeOnboardingResult: (personaId: string, result: OnboardingResult) => void;
   setRuleWeightOverrides: (weights: RuleWeight[]) => void;
   addRegisteredDeal: (deal: DealRoom) => void;
   reset: () => void;
@@ -46,11 +58,13 @@ const INITIAL_STATE: Pick<
   | "onboardingFinalized"
   | "ruleWeightOverrides"
   | "registeredDeals"
+  | "onboardingResults"
 > = {
   recommendationOverrides: {},
   onboardingFinalized: {},
   ruleWeightOverrides: null,
   registeredDeals: [],
+  onboardingResults: {},
 };
 
 export const useSessionInteractionStore = create<SessionInteractionStore>(
@@ -69,6 +83,10 @@ export const useSessionInteractionStore = create<SessionInteractionStore>(
           ...state.onboardingFinalized,
           [personaId]: true,
         },
+      })),
+    storeOnboardingResult: (personaId, result) =>
+      set((state) => ({
+        onboardingResults: { ...state.onboardingResults, [personaId]: result },
       })),
     setRuleWeightOverrides: (weights) => set({ ruleWeightOverrides: weights }),
     addRegisteredDeal: (deal) =>

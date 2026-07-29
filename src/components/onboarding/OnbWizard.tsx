@@ -365,6 +365,17 @@ export function OnbWizard() {
         preferred_mode: draft.preferredMode,
         participation_scope: draft.participationScope || null,
         hot_lead,
+        // M1 무손실: readiness·trust_connections도 finalize에 전달(소실 수정)
+        readiness: draft.readiness,
+        trust_connections: draft.trustConnections.map(({ type, ref }) => ({
+          type,
+          ref,
+        })),
+        consents: {
+          publish_profile: draft.visibilityConsent,
+          use_private_needs_for_matching: draft.consentMatching,
+          quote_in_intro: draft.consentQuote,
+        },
         visibility_consent: draft.visibilityConsent,
       });
       setResult(finalized);
@@ -788,9 +799,23 @@ export function OnbWizard() {
                     </section>
                   </div>
                   <VisibilityConsent
-                    checked={draft.visibilityConsent}
-                    onChange={(checked) =>
-                      updateDraft({ visibilityConsent: checked })
+                    consents={{
+                      publish: draft.visibilityConsent,
+                      matching: draft.consentMatching,
+                      quote: draft.consentQuote,
+                    }}
+                    onChange={(patch) =>
+                      updateDraft({
+                        ...(patch.publish !== undefined && {
+                          visibilityConsent: patch.publish,
+                        }),
+                        ...(patch.matching !== undefined && {
+                          consentMatching: patch.matching,
+                        }),
+                        ...(patch.quote !== undefined && {
+                          consentQuote: patch.quote,
+                        }),
+                      })
                     }
                   />
                   {finalizeError && (

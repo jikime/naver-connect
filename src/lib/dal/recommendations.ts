@@ -4,7 +4,11 @@
 // 시드: src/data/private/recommendations.json (민감 — contact_point가 비공개 수요 원문 인용)
 
 import recommendationsSeed from "@/data/private/recommendations.json";
-import { getMatchScores } from "@/lib/dal/matching";
+import {
+  buildEngineRecommendationsFor,
+  getMatchScores,
+  parseEngineRecId,
+} from "@/lib/dal/matching";
 import { meetupsById } from "@/lib/dal/meetups";
 import { getExpertSubtype } from "@/lib/dal/members";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
@@ -117,9 +121,11 @@ export async function getRecommendations(
   week?: string,
 ): Promise<{ common: Recommendation[]; different: Recommendation[] }> {
   const targetSubtype = getExpertSubtype(vc.personaId);
-  const addressedToViewer = seed.filter((rec) =>
-    isAddressedTo(rec, vc.personaId),
-  );
+  // M1-7: 수동 시드 + 매칭엔진 산출을 병행 노출(중복 pair는 엔진 쪽에서 제외됨).
+  const addressedToViewer = [
+    ...seed.filter((rec) => isAddressedTo(rec, vc.personaId)),
+    ...buildEngineRecommendationsFor(vc.personaId),
+  ];
   const weekFiltered = week
     ? addressedToViewer.filter((rec) => rec.sent_week === week)
     : addressedToViewer;
@@ -198,7 +204,12 @@ export async function getRecommendation(
   vc: ViewerContext,
   id: string,
 ): Promise<Recommendation> {
-  const rec = seed.find((r) => r.id === id);
+  const engineRef = parseEngineRecId(id);
+  const rec = engineRef
+    ? buildEngineRecommendationsFor(engineRef.recipient).find(
+        (r) => r.id === id,
+      )
+    : seed.find((r) => r.id === id);
   if (!rec) {
     throw new Error(`Recommendation not found: ${id}`);
   }

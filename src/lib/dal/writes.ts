@@ -3,14 +3,17 @@
 
 import declineReasonsSeed from "@/data/decline_reasons.json";
 import recommendationsSeed from "@/data/private/recommendations.json";
+import { parseEngineRecId } from "@/lib/dal/matching";
 import { meetupsById } from "@/lib/dal/meetups";
 import { getMember } from "@/lib/dal/members";
 import { getRecommendations } from "@/lib/dal/recommendations";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
+  CapabilityOfferV1,
   DeclineReason,
   DeclineReasonCode,
   MaskedMember,
+  NeedIntentV1,
   Recommendation,
   ViewerContext,
 } from "@/types";
@@ -25,6 +28,14 @@ export async function getDeclineReasons(): Promise<DeclineReason[]> {
 
 /** 뷰어가 이 추천의 수신 당사자(또는 운영자)인지 확인, 아니면 reject(타인 추천 조작 방지). */
 function assertIsRecipient(recId: string, vc: ViewerContext): void {
+  // M1: 엔진 추천은 시드에 없으므로 ID에 인코딩된 수신자로 판정한다.
+  const engineRef = parseEngineRecId(recId);
+  if (engineRef) {
+    if (vc.role !== "운영자" && vc.personaId !== engineRef.recipient) {
+      throw new Error("본인에게 온 추천만 반응할 수 있습니다");
+    }
+    return;
+  }
   const rec = recommendations.find((r) => r.id === recId);
   if (!rec) {
     throw new Error(`Recommendation not found: ${recId}`);
@@ -76,7 +87,7 @@ export async function submitMeetingOutcome(
   });
 }
 
-/** finalizeOnboarding 입력(목업 — 실제 온보딩 위저드 스텝 산출은 T-009). */
+/** finalizeOnboarding 입력. M1: readiness·trust_connections 소실 수정 + 동의 3분리. */
 export interface OnboardingFinalizeInput {
   demand_tags: { tagId: number; priority: boolean; detail_quote: string }[];
   supply_tags: { tagId: number; detail: string }[];
@@ -89,19 +100,68 @@ export interface OnboardingFinalizeInput {
     needed_partner: string;
     stage: string;
   } | null;
+  /** M1 무손실: 협업 준비도 원값(구현 전엔 hot_lead 플래그로만 압축돼 소실되던 필드) */
+  readiness: string;
+  /** M1 무손실: 위저드에서 수정된 신뢰 연결점 */
+  trust_connections: {
+    type: "소개자" | "아는회원" | "소속모임";
+    ref: string;
+  }[];
+  /** 동의 3분리(A 공개 노출 / B 비공개 수요의 매칭 사용 / C 소개 시 원문 인용) */
+  consents: {
+    publish_profile: boolean;
+    use_private_needs_for_matching: boolean;
+    quote_in_intro: boolean;
+  };
+  /** 하위호환(구 단일 체크박스) — consents.publish_profile와 동일 값 */
   visibility_consent: boolean;
 }
 
 /**
- * 온보딩 확정(FR-ON-09). 목업이므로 새 회원/추천을 실제로 생성하지 않고, 세션에 완료
- * 플래그만 남긴 뒤 프로필 카드(getMember)와 이미 pending_review 상태인 첫 추천을 반환한다.
- * 향후 백엔드 도입 시 POST /onboarding/finalize로 교체된다(automationRegistry FR-ON-09 swap_point).
+ * 온보딩 확정(FR-ON-09). M1: 입력을 무손실로 Need/Offer 아이템으로 변환해 세션에 적립하고,
+ * 매칭엔진이 즉시 반영한다(JSON-first — 영속 저장은 M4 DB 승인 후 POST /onboarding/finalize로 교체,
+ * automationRegistry FR-ON-09 swap_point). 원문 detail_quote는 그대로 보존(BR-02),
+ * safe_match_text는 draft 상태로 두어 사용자 승인 전 임베딩 입력을 차단한다.
  */
 export async function finalizeOnboarding(
   vc: ViewerContext,
-  _profile: OnboardingFinalizeInput,
+  profile: OnboardingFinalizeInput,
 ): Promise<{ member: MaskedMember; firstRecommendations: Recommendation[] }> {
-  useSessionInteractionStore.getState().finalizeOnboardingFor(vc.personaId);
+  const now = new Date().toISOString();
+  const revision = 2; // 시드(revision 1) 위의 세션 개정판
+  const needs: NeedIntentV1[] = profile.demand_tags.map((d, i) => ({
+    id: `need-session-${vc.personaId}-${d.tagId}-${i}`,
+    owner: { kind: "person", id: vc.personaId },
+    tag_ids: [d.tagId],
+    detail_quote: d.detail_quote,
+    safe_match_status: "draft",
+    priority: d.priority ? "primary" : "normal",
+    urgency: profile.hot_lead?.flag ? "time_sensitive" : "active",
+    constraints: [],
+    status: "active",
+    source: "onboarding",
+    profile_revision: revision,
+    created_at: now,
+  }));
+  const offers: CapabilityOfferV1[] = profile.supply_tags.map((s, i) => ({
+    id: `offer-session-${vc.personaId}-${s.tagId}-${i}`,
+    owner: { kind: "person", id: vc.personaId },
+    tag_ids: [s.tagId],
+    detail: s.detail,
+    status: "active",
+    source: "onboarding",
+    profile_revision: revision,
+    created_at: now,
+  }));
+
+  const store = useSessionInteractionStore.getState();
+  store.storeOnboardingResult(vc.personaId, {
+    needs,
+    offers,
+    matchingConsent: profile.consents.use_private_needs_for_matching,
+  });
+  store.finalizeOnboardingFor(vc.personaId);
+
   const member = await getMember(vc, vc.personaId);
   const { common, different } = await getRecommendations(vc);
   const firstRecommendations = [...common, ...different].filter(

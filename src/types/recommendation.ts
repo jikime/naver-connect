@@ -58,6 +58,15 @@ export interface Recommendation {
   decline_note?: string;
   /** FR-FB-04 */
   meeting_outcome?: { met: boolean; will_meet_again: boolean; note: string };
+  // ── M1 엔진 병행 노출(옵셔널 — 시드 하위호환, plans/generic-mixing-seahorse M1-7) ──
+  /** 추천 출처: 수동 시드 vs 매칭엔진. 미지정=seed */
+  source?: "seed" | "engine";
+  /** 엔진 근거 포인터 — 점수에 실제 사용된 item id (LLM 창작 아님 증빙) */
+  reason_pointers?: {
+    your_need?: string;
+    their_offer?: string;
+    their_benefit?: string;
+  };
 }
 
 /** decline_reasons.json (FR-FB-01/02) */

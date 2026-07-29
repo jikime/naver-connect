@@ -58,8 +58,10 @@ export interface OnboardingDraft {
   followupAnswers: FollowupAnswer[];
   followupDone: boolean;
 
-  // 스텝7 — 공개범위 동의(FR-ON-08)
+  // 스텝7 — 동의 3분리(FR-ON-08 확장, M1): A 공개 노출(필수) / B 매칭 사용 / C 원문 인용
   visibilityConsent: boolean;
+  consentMatching: boolean;
+  consentQuote: boolean;
 }
 
 export const HOT_LEAD_READINESS = "구체적 프로젝트 있음";
@@ -126,6 +128,8 @@ export function createEmptyDraft(): OnboardingDraft {
     followupAnswers: [],
     followupDone: false,
     visibilityConsent: false,
+    consentMatching: true,
+    consentQuote: false,
   };
 }
 
