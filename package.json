@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
+    "dev:demo": "NEXT_PUBLIC_APP_MODE=demo next dev -p 3005",
+    "build:demo": "NEXT_PUBLIC_APP_MODE=demo next build",
     "build": "next build",
     "start": "next start",
     "lint": "biome check && eslint --config eslint.config.mjs .",
     "format": "biome format --write",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:migration": "tsx scripts/migrate-members-to-people.ts --check",
+    "check:privacy": "tsx scripts/check-bundle-privacy.ts"
   },
   "dependencies": {
     "@types/pg": "^8.20.0",

@@ -58,8 +58,16 @@ export interface OnboardingDraft {
   followupAnswers: FollowupAnswer[];
   followupDone: boolean;
 
-  // 스텝7 — 공개범위 동의(FR-ON-08)
+  // 스텝7 — 동의 3분리(FR-ON-08 확장, M1): A 공개 노출(필수) / B 매칭 사용 / C 원문 인용
   visibilityConsent: boolean;
+  consentMatching: boolean;
+  consentQuote: boolean;
+
+  /**
+   * 스텝7 — 매칭용 문구 승인(M2 P1-1, tagId 키). 승인 의사와 문구만 담는다 —
+   * 영수증은 서버가 발급한다(Codex 보완 #1).
+   */
+  safeMatchApprovals: Record<number, { approved: boolean; text: string }>;
 }
 
 export const HOT_LEAD_READINESS = "구체적 프로젝트 있음";
@@ -126,6 +134,10 @@ export function createEmptyDraft(): OnboardingDraft {
     followupAnswers: [],
     followupDone: false,
     visibilityConsent: false,
+    // M2 보완 #6: opt-in 원칙 — 매칭 사용 동의(B)도 기본 미선택. 사용자가 직접 켠다.
+    consentMatching: false,
+    consentQuote: false,
+    safeMatchApprovals: {},
   };
 }
 

@@ -15,6 +15,8 @@ export * from "./matching";
 export * from "./meetups";
 export * from "./members";
 export * from "./onboarding";
+// people·people-engine은 민감 시드(needs/consents 원문)를 import하므로 배럴에서 제외한다 —
+// 배럴 경유로 Client bundle에 원문이 실리는 것을 차단(P1-1). 서버/스크립트/테스트만 직접 import.
 export * from "./recommendations";
 export * from "./resources";
 export * from "./review";

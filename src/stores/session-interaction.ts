@@ -6,11 +6,27 @@
 
 import { create } from "zustand";
 import type {
+  CapabilityOfferV1,
   DealRoom,
   DeclineReasonCode,
+  NeedIntentV1,
+  OnboardingFinalizeInput,
   RecStatus,
   RuleWeight,
 } from "@/types";
+
+/**
+ * M1(P1-3 무손실): 온보딩 확정이 적립하는 전체 스냅샷 + people 아이템 + 동의 3분리.
+ * snapshot이 원본 계약(organization·region·field_tags·value_chain_stage·mission_statement·
+ * activities·availability·preferred_mode·participation_scope·hot_lead·readiness·
+ * trust_connections 포함)을 그대로 보존한다 — 시스템이 임의 요약·재구성하지 않는다.
+ */
+export interface OnboardingResult {
+  snapshot: OnboardingFinalizeInput;
+  needs: NeedIntentV1[];
+  offers: CapabilityOfferV1[];
+  consents: { publish: boolean; matching: boolean; quote: boolean };
+}
 
 /** 추천 1건에 대한 세션 오버라이드. DAL read 함수가 시드 위에 겹쳐 반환한다. */
 export interface RecommendationOverride {
@@ -29,12 +45,15 @@ interface SessionInteractionStore {
   ruleWeightOverrides: RuleWeight[] | null;
   /** v1.1 FR-DS-01: 딜소싱 폼으로 등록된 딜(세션 한정). getDealRooms(FR-DR-05)가 시드에 겹쳐 반환한다. */
   registeredDeals: DealRoom[];
+  /** M1: personaId → 온보딩 확정 산출물(Need/Offer/매칭동의). 매칭엔진이 시드 위에 겹쳐 읽는다. */
+  onboardingResults: Record<string, OnboardingResult>;
 
   setRecommendationOverride: (
     recId: string,
     patch: RecommendationOverride,
   ) => void;
   finalizeOnboardingFor: (personaId: string) => void;
+  storeOnboardingResult: (personaId: string, result: OnboardingResult) => void;
   setRuleWeightOverrides: (weights: RuleWeight[]) => void;
   addRegisteredDeal: (deal: DealRoom) => void;
   reset: () => void;
@@ -46,11 +65,13 @@ const INITIAL_STATE: Pick<
   | "onboardingFinalized"
   | "ruleWeightOverrides"
   | "registeredDeals"
+  | "onboardingResults"
 > = {
   recommendationOverrides: {},
   onboardingFinalized: {},
   ruleWeightOverrides: null,
   registeredDeals: [],
+  onboardingResults: {},
 };
 
 export const useSessionInteractionStore = create<SessionInteractionStore>(
@@ -69,6 +90,10 @@ export const useSessionInteractionStore = create<SessionInteractionStore>(
           ...state.onboardingFinalized,
           [personaId]: true,
         },
+      })),
+    storeOnboardingResult: (personaId, result) =>
+      set((state) => ({
+        onboardingResults: { ...state.onboardingResults, [personaId]: result },
       })),
     setRuleWeightOverrides: (weights) => set({ ruleWeightOverrides: weights }),
     addRegisteredDeal: (deal) =>

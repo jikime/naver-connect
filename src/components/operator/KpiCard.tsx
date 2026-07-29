@@ -36,7 +36,9 @@ export function KpiCard({
           <CardTitle
             className={cn(
               "font-mono text-[0.625rem] font-medium tracking-[0.14em] uppercase",
-              highlight ? "text-primary-foreground/80" : "text-guud-text-muted-2",
+              highlight
+                ? "text-primary-foreground/80"
+                : "text-guud-text-muted-2",
             )}
           >
             {kpi.label}
@@ -80,7 +82,10 @@ export function KpiCard({
             highlight ? "text-primary-foreground/80" : "text-guud-text-muted-2",
           )}
         >
-          <span>목표 {kpi.target}{kpi.unit}</span>
+          <span>
+            목표 {kpi.target}
+            {kpi.unit}
+          </span>
           <span>{achieved ? "목표선 도달(가정치)" : "목표선 미도달"}</span>
         </div>
       </CardContent>

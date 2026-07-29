@@ -48,13 +48,16 @@ export default async function GapReportPage() {
               {region.name} <span className="text-primary">사업기회</span> 발굴
             </h1>
             <p className="text-sm text-guud-text-muted-2">
-              지역 주체 유형별 규모, 연결 커버리지·buying power(구매력), 완전 공백
-              축, 과거·진행 중 협업 사례, 그리고 그 공백을 메울 기회 카드를 한
-              화면에서 봅니다.
+              지역 주체 유형별 규모, 연결 커버리지·buying power(구매력), 완전
+              공백 축, 과거·진행 중 협업 사례, 그리고 그 공백을 메울 기회 카드를
+              한 화면에서 봅니다.
             </p>
           </header>
 
-          <section className="space-y-4" aria-labelledby="region-status-heading">
+          <section
+            className="space-y-4"
+            aria-labelledby="region-status-heading"
+          >
             <div className="flex items-center gap-2">
               <h2
                 id="region-status-heading"

@@ -19,8 +19,8 @@ export default function FinancePage() {
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
               프로젝트 분야·단계·지역에 맞는 금융기관/상품을 제안받거나 직접
-              검색·연락합니다. 법률 검토가 끝나지 않은 상품(예: 신협 연계)은 상태
-              뱃지만 표시하며 확정·계약 기능은 제공하지 않습니다.
+              검색·연락합니다. 법률 검토가 끝나지 않은 상품(예: 신협 연계)은
+              상태 뱃지만 표시하며 확정·계약 기능은 제공하지 않습니다.
             </p>
           </div>
           <AutomationLevelBadge frId="FR-FN-01" />

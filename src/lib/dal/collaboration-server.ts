@@ -7,11 +7,7 @@ import "server-only";
 import collabCasesSeed from "@/data/collab_cases.json";
 import collabRelationsSeed from "@/data/collab_relations.json";
 import organizationsSeed from "@/data/organizations.json";
-import type {
-  CollabCase,
-  CollabRelation,
-  Organization,
-} from "@/types";
+import type { CollabCase, CollabRelation, Organization } from "@/types";
 
 /**
  * DB에서 협업사례 조회. DB 연결 실패 시 JSON 시드로 fallback한다.

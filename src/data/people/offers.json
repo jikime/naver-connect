@@ -1,0 +1,171 @@
+[
+  {
+    "id": "offer-M-001-11-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-001"
+    },
+    "tag_ids": [11],
+    "detail": "통합지원회의 참여기관 사례 개방 가능",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-001-10-1",
+    "owner": {
+      "kind": "person",
+      "id": "M-001"
+    },
+    "tag_ids": [10],
+    "detail": "통합돌봄 7년 현장 운영경험",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-002-5-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-002"
+    },
+    "tag_ids": [5],
+    "detail": "커뮤니티 공간 공유 가능",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-002-11-1",
+    "owner": {
+      "kind": "person",
+      "id": "M-002"
+    },
+    "tag_ids": [11],
+    "detail": "입주자 커뮤니티 현장 접점",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-003-10-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-003"
+    },
+    "tag_ids": [10],
+    "detail": "옥상 태양광 20개소 개발·운영",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-004-4-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-004"
+    },
+    "tag_ids": [4],
+    "detail": "고령자 특화 배차 알고리즘",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-004-11-1",
+    "owner": {
+      "kind": "person",
+      "id": "M-004"
+    },
+    "tag_ids": [11],
+    "detail": "농촌 이동수요 현장 데이터",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-005-7-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-005"
+    },
+    "tag_ids": [7],
+    "detail": "비영리회계·공모사업 정산 10년",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-006-8-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-006"
+    },
+    "tag_ids": [8],
+    "detail": "정책분석·제안서 방법론",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-006-3-1",
+    "owner": {
+      "kind": "person",
+      "id": "M-006"
+    },
+    "tag_ids": [3],
+    "detail": "제도·정책 동향 상시 파악",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-007-2-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-007"
+    },
+    "tag_ids": [2],
+    "detail": "IR 코칭, 투자심사 관점 피드백",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-008-10-0",
+    "owner": {
+      "kind": "person",
+      "id": "M-008"
+    },
+    "tag_ids": [10],
+    "detail": "직매장 운영 12년, 지자체 협약 산전수전",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "offer-M-008-1-1",
+    "owner": {
+      "kind": "person",
+      "id": "M-008"
+    },
+    "tag_ids": [1],
+    "detail": "직매장 입점 판로 제공",
+    "status": "active",
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  }
+]

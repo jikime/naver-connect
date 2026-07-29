@@ -2,18 +2,29 @@
 // 근거: ARCHITECTURE.md §5.3 DAL 쓰기 계약, FR-FB-01~04, FR-ON-09
 
 import declineReasonsSeed from "@/data/decline_reasons.json";
-import recommendationsSeed from "@/data/private/recommendations.json";
+// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
+import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
+import {
+  confirmSafeTexts,
+  getEngineRecommendationsFor,
+  parseEngineRecId,
+} from "@/lib/dal/matching";
 import { meetupsById } from "@/lib/dal/meetups";
 import { getMember } from "@/lib/dal/members";
 import { getRecommendations } from "@/lib/dal/recommendations";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
+  CapabilityOfferV1,
   DeclineReason,
   DeclineReasonCode,
   MaskedMember,
+  NeedIntentV1,
+  OnboardingFinalizeInput,
   Recommendation,
   ViewerContext,
 } from "@/types";
+
+export type { OnboardingFinalizeInput } from "@/types";
 
 const declineReasons = declineReasonsSeed as DeclineReason[];
 const recommendations = recommendationsSeed as Recommendation[];
@@ -24,7 +35,26 @@ export async function getDeclineReasons(): Promise<DeclineReason[]> {
 }
 
 /** 뷰어가 이 추천의 수신 당사자(또는 운영자)인지 확인, 아니면 reject(타인 추천 조작 방지). */
-function assertIsRecipient(recId: string, vc: ViewerContext): void {
+async function assertIsRecipient(
+  recId: string,
+  vc: ViewerContext,
+): Promise<void> {
+  // M1: 엔진 추천은 시드에 없으므로 ID에 인코딩된 수신자로 판정한다.
+  // P1-4: 임의 ID 조작 방지 — 현재 엔진 산출(서버)에 실재하는 추천인지도 검증한다(C3: 서비스 경유).
+  const engineRef = parseEngineRecId(recId);
+  if (engineRef) {
+    if (vc.role !== "운영자" && vc.personaId !== engineRef.recipient) {
+      throw new Error("본인에게 온 추천만 반응할 수 있습니다");
+    }
+    const recs = await getEngineRecommendationsFor({
+      role: vc.role,
+      personaId: engineRef.recipient,
+    });
+    if (!recs.some((r) => r.id === recId)) {
+      throw new Error(`Recommendation not found: ${recId}`);
+    }
+    return;
+  }
   const rec = recommendations.find((r) => r.id === recId);
   if (!rec) {
     throw new Error(`Recommendation not found: ${recId}`);
@@ -51,7 +81,7 @@ export async function submitDecline(
   code: DeclineReasonCode,
   note?: string,
 ): Promise<DeclineReason> {
-  assertIsRecipient(recId, vc);
+  await assertIsRecipient(recId, vc);
   const reason = declineReasons.find((r) => r.code === code);
   if (!reason) {
     throw new Error(`Unknown decline reason code: ${code}`);
@@ -70,38 +100,104 @@ export async function submitMeetingOutcome(
   recId: string,
   outcome: { met: boolean; will_meet_again: boolean; note: string },
 ): Promise<void> {
-  assertIsRecipient(recId, vc);
+  await assertIsRecipient(recId, vc);
   useSessionInteractionStore.getState().setRecommendationOverride(recId, {
     meeting_outcome: outcome,
   });
 }
 
-/** finalizeOnboarding 입력(목업 — 실제 온보딩 위저드 스텝 산출은 T-009). */
-export interface OnboardingFinalizeInput {
-  demand_tags: { tagId: number; priority: boolean; detail_quote: string }[];
-  supply_tags: { tagId: number; detail: string }[];
-  activities: string[];
-  preferred_mode: string;
-  participation_scope: "개인 자격으로 참여" | "소속 기관을 대표해 참여" | null;
-  hot_lead: {
-    flag: boolean;
-    project_summary: string;
-    needed_partner: string;
-    stage: string;
-  } | null;
-  visibility_consent: boolean;
-}
+// OnboardingFinalizeInput 타입은 @/types/onboarding.ts로 이동(스토어 스냅샷 보존용 — 순환 방지).
+// 위 re-export로 기존 import 경로 호환을 유지한다.
 
 /**
- * 온보딩 확정(FR-ON-09). 목업이므로 새 회원/추천을 실제로 생성하지 않고, 세션에 완료
- * 플래그만 남긴 뒤 프로필 카드(getMember)와 이미 pending_review 상태인 첫 추천을 반환한다.
- * 향후 백엔드 도입 시 POST /onboarding/finalize로 교체된다(automationRegistry FR-ON-09 swap_point).
+ * 온보딩 확정(FR-ON-09). M1: 입력을 무손실로 Need/Offer 아이템으로 변환해 세션에 적립하고,
+ * 매칭엔진이 즉시 반영한다(JSON-first — 영속 저장은 M4 DB 승인 후 POST /onboarding/finalize로 교체,
+ * automationRegistry FR-ON-09 swap_point). 원문 detail_quote는 그대로 보존(BR-02),
+ * safe_match_text는 draft 상태로 두어 사용자 승인 전 임베딩 입력을 차단한다.
  */
 export async function finalizeOnboarding(
   vc: ViewerContext,
-  _profile: OnboardingFinalizeInput,
+  profile: OnboardingFinalizeInput,
 ): Promise<{ member: MaskedMember; firstRecommendations: Recommendation[] }> {
-  useSessionInteractionStore.getState().finalizeOnboardingFor(vc.personaId);
+  const now = new Date().toISOString();
+  const revision = 2; // 시드(revision 1) 위의 세션 개정판
+  // P1-3: 질문하지 않아 답이 없는 항목은 빈 원문으로 저장 — 시스템 문구를 사용자 quote로 날조하지 않는다.
+  // M2 P1-1: 승인 의사가 있는 항목은 safe_match_text를 담아 두되 status는 draft 유지 —
+  // user_confirmed 승격은 서버 발급 영수증(confirmSafeTexts)을 받은 뒤에만 한다.
+  const needs: NeedIntentV1[] = profile.demand_tags.map((d, i) => ({
+    id: `need-session-${vc.personaId}-${d.tagId}-${i}`,
+    owner: { kind: "person", id: vc.personaId },
+    tag_ids: [d.tagId],
+    detail_quote: d.detail_quote,
+    ...(d.safe_match?.approved && d.safe_match.text.trim().length > 0
+      ? { safe_match_text: d.safe_match.text.trim() }
+      : {}),
+    safe_match_status: "draft",
+    priority: d.priority ? "primary" : "normal",
+    urgency: profile.hot_lead?.flag ? "time_sensitive" : "active",
+    constraints: [],
+    status: "active",
+    source: "onboarding",
+    profile_revision: revision,
+    created_at: now,
+  }));
+  const offers: CapabilityOfferV1[] = profile.supply_tags.map((s, i) => ({
+    id: `offer-session-${vc.personaId}-${s.tagId}-${i}`,
+    owner: { kind: "person", id: vc.personaId },
+    tag_ids: [s.tagId],
+    detail: s.detail,
+    status: "active",
+    source: "onboarding",
+    profile_revision: revision,
+    created_at: now,
+  }));
+
+  const store = useSessionInteractionStore.getState();
+  // P1-3: 전체 스냅샷 보존(무손실) + 동의 3종 receipt를 세션에 그대로 남긴다.
+  store.storeOnboardingResult(vc.personaId, {
+    snapshot: profile,
+    needs,
+    offers,
+    consents: {
+      publish: profile.consents.publish_profile,
+      matching: profile.consents.use_private_needs_for_matching,
+      quote: profile.consents.quote_in_intro,
+    },
+  });
+  store.finalizeOnboardingFor(vc.personaId);
+
+  // M2 P1-1: 매칭 동의(B) + 승인 의사가 있는 need만 서버에 영수증 발급을 요청하고,
+  // 발급분을 user_confirmed로 승격해 재적립한다. 미승인·미동의는 draft 그대로(fail-closed).
+  // silent fallback 금지 — 발급 실패는 그대로 throw되어 화면 오류로 드러난다.
+  const approvals = needs
+    .filter((n) => typeof n.safe_match_text === "string")
+    .map((n) => ({ needId: n.id, text: n.safe_match_text as string }));
+  if (profile.consents.use_private_needs_for_matching && approvals.length > 0) {
+    const confirmed = await confirmSafeTexts(vc.personaId, approvals);
+    const byNeedId = new Map(confirmed.map((c) => [c.needId, c]));
+    const upgradedNeeds: NeedIntentV1[] = needs.map((n) => {
+      const c = byNeedId.get(n.id);
+      return c
+        ? {
+            ...n,
+            safe_match_text: c.text,
+            safe_match_status: "user_confirmed",
+            safe_match_receipt: c.receipt,
+          }
+        : n;
+    });
+    store.storeOnboardingResult(vc.personaId, {
+      snapshot: profile,
+      needs: upgradedNeeds,
+      offers,
+      consents: {
+        publish: profile.consents.publish_profile,
+        matching: profile.consents.use_private_needs_for_matching,
+        quote: profile.consents.quote_in_intro,
+      },
+    });
+  }
+
   const member = await getMember(vc, vc.personaId);
   const { common, different } = await getRecommendations(vc);
   const firstRecommendations = [...common, ...different].filter(

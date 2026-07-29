@@ -21,8 +21,8 @@ export default function DealSourcingPage() {
             <AutomationLevelBadge frId="FR-DS-01" />
           </div>
           <p className="max-w-2xl text-sm text-guud-text-muted-2">
-            협업 프로젝트를 등록하면 딜룸 파이프라인에 씨앗 단계로 반영되고, "내가
-            제안한 딜"로 우선 노출됩니다. 등록은 이번 세션에서만 유지되는
+            협업 프로젝트를 등록하면 딜룸 파이프라인에 씨앗 단계로 반영되고,
+            "내가 제안한 딜"로 우선 노출됩니다. 등록은 이번 세션에서만 유지되는
             시뮬레이션입니다(새로고침 시 초기화).
           </p>
         </div>

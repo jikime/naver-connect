@@ -2,7 +2,7 @@
 
 // OnbWizard — 온보딩 위저드 셸. 7스텝 진행 상태·검증·데이터 패칭을 소유한다.
 // 근거: ARCHITECTURE.md §3(L2 OnbWizard), TASKS.md T-009a/T-009b, FR-ON-01~11
-// 스텝: ①프로필확인 ②수요3+★1 ③공급3 ④협력성향4문항 ⑤민감정보고지 ⑥AI후속질문 ⑦확정.
+// 스텝: ①프로필확인 ②수요1~3+★1 ③공급1~3 ④협력성향4문항 ⑤민감정보고지 ⑥AI후속질문 ⑦확정.
 // 협업준비도='구체적 프로젝트 있음'→hot_lead(스텝6 후속질문 +3 분기 트리거, FR-ON-05).
 
 import {
@@ -82,13 +82,13 @@ const STEP_META = [
   },
   {
     title: "필요한 연결",
-    description: "지금 가장 필요한 세 가지와 우선순위를 알려주세요.",
+    description: "지금 가장 필요한 것을 1~3가지 고르고 우선순위를 알려주세요.",
     time: "약 1분",
     icon: Lock,
   },
   {
     title: "나눌 수 있는 것",
-    description: "다른 회원에게 건넬 수 있는 경험 세 가지를 골라요.",
+    description: "다른 회원에게 건넬 수 있는 경험을 1~3가지 골라요.",
     time: "약 1분",
     icon: Gift,
   },
@@ -135,14 +135,17 @@ function canProceedFromStep(
         draft.valueChainStage.trim().length > 0 &&
         draft.missionStatement.trim().length > 0
       );
+    // Codex 합의(2026-07-29): 수요/공급 최소 1 + 최대 3으로 완화, primary 정확히 1개
     case 2:
       return (
-        draft.demandSelections.length === 3 &&
-        draft.demandSelections.some((s) => s.priority)
+        draft.demandSelections.length >= 1 &&
+        draft.demandSelections.length <= 3 &&
+        draft.demandSelections.filter((s) => s.priority).length === 1
       );
     case 3:
       return (
-        draft.supplySelections.length === 3 &&
+        draft.supplySelections.length >= 1 &&
+        draft.supplySelections.length <= 3 &&
         draft.supplySelections.every((s) => s.detail.trim().length > 0)
       );
     case 4:
@@ -327,13 +330,18 @@ export function OnbWizard() {
         const followup = draft.followupAnswers.find(
           (a) => a.kind === "demand" && a.tagId === sel.tagId,
         );
+        // M2 P1-1: 승인 의사만 동봉 — 영수증은 finalize 내부에서 서버가 발급한다.
+        const approval = draft.safeMatchApprovals[sel.tagId];
+        // P1-3: 질문하지 않은 항목에 시스템 문구를 사용자 원문처럼 넣지 않는다 — 빈 값 유지
         return {
           tagId: sel.tagId,
           priority: sel.priority,
-          detail_quote:
-            followup?.answer && followup.answer.length > 0
-              ? followup.answer
-              : "(온보딩 후속질문에서 다루지 않음)",
+          detail_quote: followup?.answer?.trim() ?? "",
+          ...(draft.consentMatching &&
+          approval?.approved &&
+          approval.text.trim().length > 0
+            ? { safe_match: { approved: true, text: approval.text.trim() } }
+            : {}),
         };
       });
       const supplyFollowup = draft.followupAnswers.find(
@@ -359,12 +367,36 @@ export function OnbWizard() {
         : null;
 
       const finalized = await finalizeOnboarding(vc, {
+        organization: {
+          name: draft.orgName,
+          type: draft.orgType,
+          role: draft.orgRole,
+        },
+        region: {
+          sido: draft.sido,
+          sigungu: draft.sigungu,
+        },
+        field_tags: [...draft.fieldTags],
+        value_chain_stage: draft.valueChainStage,
+        mission_statement: draft.missionStatement,
         demand_tags,
         supply_tags,
         activities: draft.activities,
+        availability: draft.availability,
         preferred_mode: draft.preferredMode,
         participation_scope: draft.participationScope || null,
         hot_lead,
+        // M1 무손실: readiness·trust_connections도 finalize에 전달(소실 수정)
+        readiness: draft.readiness,
+        trust_connections: draft.trustConnections.map(({ type, ref }) => ({
+          type,
+          ref,
+        })),
+        consents: {
+          publish_profile: draft.visibilityConsent,
+          use_private_needs_for_matching: draft.consentMatching,
+          quote_in_intro: draft.consentQuote,
+        },
         visibility_consent: draft.visibilityConsent,
       });
       setResult(finalized);
@@ -788,10 +820,62 @@ export function OnbWizard() {
                     </section>
                   </div>
                   <VisibilityConsent
-                    checked={draft.visibilityConsent}
-                    onChange={(checked) =>
-                      updateDraft({ visibilityConsent: checked })
+                    consents={{
+                      publish: draft.visibilityConsent,
+                      matching: draft.consentMatching,
+                      quote: draft.consentQuote,
+                    }}
+                    onChange={(patch) =>
+                      updateDraft({
+                        ...(patch.publish !== undefined && {
+                          visibilityConsent: patch.publish,
+                        }),
+                        ...(patch.matching !== undefined && {
+                          consentMatching: patch.matching,
+                        }),
+                        ...(patch.quote !== undefined && {
+                          consentQuote: patch.quote,
+                        }),
+                      })
                     }
+                    // M2 P1-1: 원문(후속질문 답)이 있는 수요만 승인 대상 — 빈 문구 승인 금지.
+                    safeMatchItems={draft.demandSelections.flatMap((sel) => {
+                      const quote =
+                        draft.followupAnswers
+                          .find(
+                            (a) => a.kind === "demand" && a.tagId === sel.tagId,
+                          )
+                          ?.answer?.trim() ?? "";
+                      if (!quote) return [];
+                      const approval = draft.safeMatchApprovals[sel.tagId];
+                      return [
+                        {
+                          tagId: sel.tagId,
+                          tagName:
+                            tags.find((t) => t.id === sel.tagId)?.name ??
+                            `수요 ${sel.tagId}`,
+                          quote,
+                          approved: approval?.approved ?? false,
+                          text: approval?.text ?? quote,
+                        },
+                      ];
+                    })}
+                    onSafeMatchChange={(tagId, patch) => {
+                      const quote =
+                        draft.followupAnswers
+                          .find((a) => a.kind === "demand" && a.tagId === tagId)
+                          ?.answer?.trim() ?? "";
+                      const prev = draft.safeMatchApprovals[tagId] ?? {
+                        approved: false,
+                        text: quote,
+                      };
+                      updateDraft({
+                        safeMatchApprovals: {
+                          ...draft.safeMatchApprovals,
+                          [tagId]: { ...prev, ...patch },
+                        },
+                      });
+                    }}
                   />
                   {finalizeError && (
                     <p className="flex items-center gap-2 text-sm text-destructive">

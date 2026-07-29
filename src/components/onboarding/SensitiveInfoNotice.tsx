@@ -76,7 +76,7 @@ export function SensitiveInfoNotice({
         {hasHotLead && (
           <p className="mt-5 rounded-2xl border border-primary/30 bg-secondary/60 p-4 text-sm leading-6 text-foreground">
             구체적인 프로젝트를 선택하셔서 기본 질문 뒤에 프로젝트·필요한
-            파트너·진행 단계에 관해 세 가지만 더 여쭤볼게요.
+            파트너·진행 단계에 관해 몇 가지만 더 여쭤볼게요.
           </p>
         )}
 

@@ -15,7 +15,7 @@ import regionHanbitSeed from "@/data/region_hanbit.json";
 import vcStagesSeed from "@/data/vc_stages.json";
 import { getDealRooms } from "@/lib/dal/deal";
 import { getMembers } from "@/lib/dal/members";
-import { getRecommendationGraphEdges } from "@/lib/dal/recommendations";
+import type { RecommendationGraphEdge } from "@/lib/dal/recommendations";
 import type {
   Field,
   GapCard,
@@ -120,11 +120,15 @@ const REPORT_ID = "DOC-REPORT";
 export async function getKnowledgeGraph(
   vc: ViewerContext,
 ): Promise<KnowledgeGraph> {
-  const [members, dealRooms, recEdges] = await Promise.all([
+  const [members, dealRooms] = await Promise.all([
     getMembers(vc),
     getDealRooms(vc),
-    getRecommendationGraphEdges(vc),
   ]);
+  // C3(final-rereview #1): 사람↔사람 추천 엣지는 공개 정적 전경에서 제외한다.
+  // RSC가 placeholder 뷰어로 프리렌더한 정적 HTML에 특정 개인 스코프의 추천 관계가
+  // 박히는 것을 차단 — 뷰어 스코프 추천 엣지 오버레이는 클라이언트에서 /api/matching
+  // bundle(graphEdges)로 덧입힌다(C4/M2). 추천 관계는 "공개 정보만 표시" 원칙 밖.
+  const recEdges: RecommendationGraphEdge[] = [];
 
   const nodes: KGNode[] = [];
   const edges: KGEdge[] = [];

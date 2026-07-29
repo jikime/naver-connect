@@ -18,8 +18,8 @@ export default function RecommendationsPage() {
               이번 주 <span className="text-primary">추천</span>
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-guud-text-muted-2">
-              공통점이 많은 회원 5명과 차이점이 많은 회원 5명을 구분해 보여줘요 —
-              각 그룹은 더보기로 최대 15명까지 볼 수 있어요.
+              공통점이 많은 회원 5명과 차이점이 많은 회원 5명을 구분해 보여줘요
+              — 각 그룹은 더보기로 최대 15명까지 볼 수 있어요.
             </p>
           </div>
           <AutomationLevelBadge frId="FR-RC-01" />

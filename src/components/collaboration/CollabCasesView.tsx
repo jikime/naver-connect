@@ -464,7 +464,8 @@ export function CollabCasesView({
   const vc = useViewerContext();
   const [activeTab, setActiveTab] = useState<Tab>("graph");
   const [cases, setCases] = useState<CollabCase[]>(initialCases);
-  const [relations, setRelations] = useState<CollabRelation[]>(initialRelations);
+  const [relations, setRelations] =
+    useState<CollabRelation[]>(initialRelations);
   const [showPotential, setShowPotential] = useState(false);
   const [selectedRelation, setSelectedRelation] =
     useState<CollabRelation | null>(null);
@@ -501,106 +502,106 @@ export function CollabCasesView({
       <>
         {/* 관계 그래프 탭 */}
         {activeTab === "graph" && (
-            <div className="space-y-4">
-              {/* 통계 요약 */}
-              <div className="flex flex-wrap gap-4">
-                <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
-                  <p className="text-xs text-guud-text-muted-2">실제 협력</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {actualCount}
-                    <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
-                      건
-                    </span>
-                  </p>
-                </div>
-                <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
-                  <p className="text-xs text-guud-text-muted-2">잠재 협력</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {potentialCount}
-                    <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
-                      건
-                    </span>
-                  </p>
-                </div>
-                <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
-                  <p className="text-xs text-guud-text-muted-2">사례 수</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {cases.length}
-                    <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
-                      건
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              {/* 잠재 협력 토글 */}
-              <div className="flex cursor-pointer items-center gap-2 text-sm text-guud-text-muted-2">
-                <Checkbox
-                  checked={showPotential}
-                  onCheckedChange={(v) => setShowPotential(v === true)}
-                  id="show-potential"
-                />
-                <Label
-                  htmlFor="show-potential"
-                  className="cursor-pointer font-normal"
-                >
-                  잠재 협력 관계도 표시
-                </Label>
-              </div>
-
-              <CollabRelationMap
-                relations={displayedRelations}
-                orgs={initialOrgs}
-                onSelectRelation={setSelectedRelation}
-              />
-
-              {selectedRelation && (
-                <RelationDetailPanel relation={selectedRelation} />
-              )}
-            </div>
-          )}
-
-          {/* 협업 사례 탭 */}
-          {activeTab === "cases" && (
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-              <section>
-                <h2 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground">
-                  협업 사례
-                  <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-                    [ {cases.length} ]
+          <div className="space-y-4">
+            {/* 통계 요약 */}
+            <div className="flex flex-wrap gap-4">
+              <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
+                <p className="text-xs text-guud-text-muted-2">실제 협력</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {actualCount}
+                  <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
+                    건
                   </span>
-                </h2>
-                <ul className="space-y-2">
-                  {cases.map((c) => (
-                    <CaseCard key={c.id} collabCase={c} />
-                  ))}
-                </ul>
-              </section>
-              <InputForm onAdded={(c) => setCases((prev) => [...prev, c])} />
+                </p>
+              </div>
+              <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
+                <p className="text-xs text-guud-text-muted-2">잠재 협력</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {potentialCount}
+                  <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
+                    건
+                  </span>
+                </p>
+              </div>
+              <div className="rounded-xl border border-guud-hairline bg-card px-4 py-2.5">
+                <p className="text-xs text-guud-text-muted-2">사례 수</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {cases.length}
+                  <span className="ml-1 text-sm font-normal text-guud-text-muted-2">
+                    건
+                  </span>
+                </p>
+              </div>
             </div>
-          )}
 
-          {/* 패턴 분석 탭 */}
-          {activeTab === "patterns" && (
-            <div className="space-y-4">
-              <p className="text-sm text-guud-text-muted-2">
-                실제 협력 관계 기준으로 하위그룹 쌍(예: A5 × A4)이 얼마나 자주
-                협업하는지, 어떤 관계 유형이 많은지 분석합니다.
-              </p>
-              <div className="rounded-2xl border border-guud-hairline bg-card p-4">
-                <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-                  실제 협력 패턴
-                </h3>
-                <CollabPatternPanel onlyActual={true} />
-              </div>
-              <div className="rounded-2xl border border-guud-hairline bg-card p-4">
-                <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
-                  전체 패턴 (잠재 포함)
-                </h3>
-                <CollabPatternPanel onlyActual={false} />
-              </div>
+            {/* 잠재 협력 토글 */}
+            <div className="flex cursor-pointer items-center gap-2 text-sm text-guud-text-muted-2">
+              <Checkbox
+                checked={showPotential}
+                onCheckedChange={(v) => setShowPotential(v === true)}
+                id="show-potential"
+              />
+              <Label
+                htmlFor="show-potential"
+                className="cursor-pointer font-normal"
+              >
+                잠재 협력 관계도 표시
+              </Label>
             </div>
-          )}
+
+            <CollabRelationMap
+              relations={displayedRelations}
+              orgs={initialOrgs}
+              onSelectRelation={setSelectedRelation}
+            />
+
+            {selectedRelation && (
+              <RelationDetailPanel relation={selectedRelation} />
+            )}
+          </div>
+        )}
+
+        {/* 협업 사례 탭 */}
+        {activeTab === "cases" && (
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <section>
+              <h2 className="mb-3 flex flex-wrap items-baseline gap-x-2 font-heading text-xl font-light tracking-tight text-foreground">
+                협업 사례
+                <span className="font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+                  [ {cases.length} ]
+                </span>
+              </h2>
+              <ul className="space-y-2">
+                {cases.map((c) => (
+                  <CaseCard key={c.id} collabCase={c} />
+                ))}
+              </ul>
+            </section>
+            <InputForm onAdded={(c) => setCases((prev) => [...prev, c])} />
+          </div>
+        )}
+
+        {/* 패턴 분석 탭 */}
+        {activeTab === "patterns" && (
+          <div className="space-y-4">
+            <p className="text-sm text-guud-text-muted-2">
+              실제 협력 관계 기준으로 하위그룹 쌍(예: A5 × A4)이 얼마나 자주
+              협업하는지, 어떤 관계 유형이 많은지 분석합니다.
+            </p>
+            <div className="rounded-2xl border border-guud-hairline bg-card p-4">
+              <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+                실제 협력 패턴
+              </h3>
+              <CollabPatternPanel onlyActual={true} />
+            </div>
+            <div className="rounded-2xl border border-guud-hairline bg-card p-4">
+              <h3 className="mb-3 font-mono text-[0.625rem] font-medium tracking-[0.16em] text-guud-text-muted-2 uppercase">
+                전체 패턴 (잠재 포함)
+              </h3>
+              <CollabPatternPanel onlyActual={false} />
+            </div>
+          </div>
+        )}
 
         {/* 시뮬레이션 탭 */}
         {activeTab === "simulate" && (
