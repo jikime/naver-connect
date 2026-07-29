@@ -25,6 +25,7 @@ import type {
 } from "@/lib/matching/engine";
 import { runEngine } from "@/lib/matching/engine";
 import { buildExplanation } from "@/lib/matching/explain";
+import { toEngineNeed } from "@/lib/matching/receipt";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
   CapabilityOfferV1,
@@ -32,7 +33,6 @@ import type {
   MatchScore,
   MatchScoresSeed,
   MemberPublicSeed,
-  NeedIntentV1,
   Recommendation,
   RuleWeight,
   Tag,
@@ -117,29 +117,6 @@ function buildDeclines(): DeclineRecord[] {
   return out;
 }
 
-/**
- * 세션 NeedIntent → 엔진 DTO. 재리뷰 #5: match_text는 status 문자열만이 아니라
- * ①user_confirmed ②승인 provenance(safe_match_confirmed_at) ③owner의 매칭 동의(B)
- * 세 조건을 mapper에서 모두 확인해야 사용한다 — 하나라도 없으면 "".
- */
-export function toEngineNeed(n: NeedIntentV1): EngineNeed {
-  const textAllowed =
-    n.safe_match_status === "user_confirmed" &&
-    typeof n.safe_match_confirmed_at === "string" &&
-    n.safe_match_confirmed_at.length > 0 &&
-    getConsentFlags(n.owner.id).matching;
-  return {
-    id: n.id,
-    ownerId: n.owner.id,
-    tag_ids: n.tag_ids,
-    match_text: textAllowed ? (n.safe_match_text ?? "") : "",
-    priority: n.priority,
-    urgency: n.urgency,
-    constraints: n.constraints,
-    status: n.status,
-  };
-}
-
 function toEngineOffer(o: CapabilityOfferV1): EngineOffer {
   return {
     id: o.id,
@@ -162,7 +139,9 @@ function mergeWithSession(): {
     ...seedEngineNeeds.filter(
       (n) => n.status === "active" && !refreshed.has(n.ownerId),
     ),
-    ...Object.values(results).flatMap((r) => r.needs.map(toEngineNeed)),
+    ...Object.values(results).flatMap((r) =>
+      r.needs.map((n) => toEngineNeed(n, (id) => getConsentFlags(id).matching)),
+    ),
   ];
   const offers = [
     ...seedOffers.filter((o) => !refreshed.has(o.owner.id)).map(toEngineOffer),
@@ -178,27 +157,63 @@ function activeWeights(): RuleWeight[] {
   );
 }
 
+/**
+ * C2(재리뷰 REJECT #5): 온보딩 스냅샷이 있는 인물의 ImpactIntent를 세션 버전으로 대체한다.
+ * 미션/분야/지역을 온보딩에서 고쳤는데 공통점(common) 점수만 옛 시드 미션으로 계산되던 문제.
+ */
+function mergeImpactIntents(): ImpactIntentV1[] {
+  const results = useSessionInteractionStore.getState().onboardingResults;
+  const refreshed = new Set(Object.keys(results));
+  const sessionIntents: ImpactIntentV1[] = Object.entries(results).map(
+    ([personaId, r]) => ({
+      id: `impact-session-${personaId}`,
+      owner: { kind: "person", id: personaId },
+      change_statement: r.snapshot.mission_statement,
+      field_ids: r.snapshot.field_tags,
+      geography: r.snapshot.region,
+      source: "onboarding",
+      profile_revision: 2,
+      // 스냅샷에 저장 시각이 없어 같은 온보딩에서 적립된 아이템의 시각을 재사용한다.
+      created_at:
+        r.needs[0]?.created_at ??
+        r.offers[0]?.created_at ??
+        new Date().toISOString(),
+    }),
+  );
+  return [
+    ...seedImpacts.filter((i) => !refreshed.has(i.owner.id)),
+    ...sessionIntents,
+  ];
+}
+
 /** 엔진 실행(전수 pair, n=8). 설명 조립에 입력이 필요해 input도 함께 반환한다. */
 export function runMatchingEngine(): {
   input: EngineInput;
   output: EngineOutput;
 } {
   const { needs, offers } = mergeWithSession();
+  // C2: 온보딩 스냅샷이 있으면 그 인물의 프로필 컨텍스트도 세션 값으로 읽는다(키워드는 시드 유지).
+  const snapshots = useSessionInteractionStore.getState().onboardingResults;
   const input: EngineInput = {
     personIds: members.map((m) => m.id),
     needs,
     offers,
-    impactIntents: seedImpacts,
+    impactIntents: mergeImpactIntents(),
     personContext: Object.fromEntries(
-      members.map((m) => [
-        m.id,
-        {
-          region: { sido: m.region.sido, sigungu: m.region.sigungu },
-          fieldIds: m.field_tags,
-          keywords: m.keyword_set,
-          hotLead: m.hot_lead,
-        },
-      ]),
+      members.map((m) => {
+        const snap = snapshots[m.id]?.snapshot;
+        return [
+          m.id,
+          {
+            region: snap
+              ? { sido: snap.region.sido, sigungu: snap.region.sigungu }
+              : { sido: m.region.sido, sigungu: m.region.sigungu },
+            fieldIds: snap ? snap.field_tags : m.field_tags,
+            keywords: m.keyword_set,
+            hotLead: snap ? (snap.hot_lead?.flag ?? false) : m.hot_lead,
+          },
+        ];
+      }),
     ),
     orgEdges: buildOrgEdges(),
     declines: buildDeclines(),
