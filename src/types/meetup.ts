@@ -38,3 +38,13 @@ export interface MeetupAvailability {
   member_id: string;
   slots: MeetupAvailabilitySlot[];
 }
+
+/** 모둠 참여자끼리 나눈 임시 세션 채팅 메시지. */
+export interface MeetupChatMessage {
+  id: string;
+  meetup_id: string;
+  sender_id: string;
+  sender_name: string;
+  body: string;
+  sent_at: string;
+}

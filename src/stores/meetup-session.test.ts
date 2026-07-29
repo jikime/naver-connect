@@ -60,4 +60,31 @@ describe("meetup session store", () => {
       useMeetupSessionStore.getState().availabilityByMeetup[meetup.id]["M-002"],
     ).toBeUndefined();
   });
+
+  it("keeps chat messages separated by meetup", () => {
+    const store = useMeetupSessionStore.getState();
+    store.sendChatMessage({
+      id: "CHAT-1",
+      meetup_id: meetup.id,
+      sender_id: "M-001",
+      sender_name: "김서연",
+      body: "첫 인사입니다.",
+      sent_at: "2026-07-29T08:00:00.000Z",
+    });
+    store.sendChatMessage({
+      id: "CHAT-2",
+      meetup_id: "USER-MU-2",
+      sender_id: "M-002",
+      sender_name: "박준호",
+      body: "다른 모둠 메시지입니다.",
+      sent_at: "2026-07-29T08:01:00.000Z",
+    });
+
+    const state = useMeetupSessionStore.getState();
+    expect(state.chatMessagesByMeetup[meetup.id]).toHaveLength(1);
+    expect(state.chatMessagesByMeetup[meetup.id][0].body).toBe(
+      "첫 인사입니다.",
+    );
+    expect(state.chatMessagesByMeetup["USER-MU-2"]).toHaveLength(1);
+  });
 });

@@ -2,26 +2,32 @@
 // 백엔드 연결 전 프로토타입용이며 새로고침하면 초기화된다.
 
 import { create } from "zustand";
-import type { Meetup, MeetupAvailability } from "@/types";
+import type { Meetup, MeetupAvailability, MeetupChatMessage } from "@/types";
 
 interface MeetupSessionStore {
   createdMeetups: Meetup[];
   joinedMemberIdsByMeetup: Record<string, string[]>;
   availabilityByMeetup: Record<string, Record<string, MeetupAvailability>>;
+  chatMessagesByMeetup: Record<string, MeetupChatMessage[]>;
   addMeetup: (meetup: Meetup) => void;
   joinMeetup: (meetupId: string, memberId: string) => void;
   leaveMeetup: (meetupId: string, memberId: string) => void;
   shareAvailability: (availability: MeetupAvailability) => void;
+  sendChatMessage: (message: MeetupChatMessage) => void;
   reset: () => void;
 }
 
 const INITIAL_STATE: Pick<
   MeetupSessionStore,
-  "createdMeetups" | "joinedMemberIdsByMeetup" | "availabilityByMeetup"
+  | "createdMeetups"
+  | "joinedMemberIdsByMeetup"
+  | "availabilityByMeetup"
+  | "chatMessagesByMeetup"
 > = {
   createdMeetups: [],
   joinedMemberIdsByMeetup: {},
   availabilityByMeetup: {},
+  chatMessagesByMeetup: {},
 };
 
 export const useMeetupSessionStore = create<MeetupSessionStore>((set) => ({
@@ -68,6 +74,16 @@ export const useMeetupSessionStore = create<MeetupSessionStore>((set) => ({
           ...(state.availabilityByMeetup[availability.meetup_id] ?? {}),
           [availability.member_id]: availability,
         },
+      },
+    })),
+  sendChatMessage: (message) =>
+    set((state) => ({
+      chatMessagesByMeetup: {
+        ...state.chatMessagesByMeetup,
+        [message.meetup_id]: [
+          ...(state.chatMessagesByMeetup[message.meetup_id] ?? []),
+          message,
+        ],
       },
     })),
   reset: () => set(INITIAL_STATE),
