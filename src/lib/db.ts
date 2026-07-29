@@ -21,9 +21,13 @@ function createPool(): Pool {
   const isLocal = /(?:localhost|127\.0\.0\.1|host\.docker\.internal)/.test(
     connectionString,
   );
+  // Vercel 함수는 인스턴스가 수평 확장되므로 각 인스턴스가 여러 연결을 오래
+  // 보유하면 Supavisor 한도를 빠르게 소진한다. 운영은 Transaction pooler(6543)와
+  // 프로세스당 연결 1개를 조합하고, 로컬의 장기 실행 서버만 작은 풀을 사용한다.
+  const maxConnections = process.env.VERCEL === "1" ? 1 : 5;
   return new Pool({
     connectionString,
-    max: 5,
+    max: maxConnections,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 10_000,
     ssl: isLocal ? false : { rejectUnauthorized: false },

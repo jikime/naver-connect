@@ -23,15 +23,19 @@
 - `NEXT_PUBLIC_SUPABASE_URL`: 프로젝트 API URL
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: 브라우저 공개 키
 - `SUPABASE_SECRET_KEY`: 서버 전용 Secret key
-- `SUPABASE_DATABASE_URL`: `Connect > Session pooler > URI`의 포트 5432 연결 문자열
+- `SUPABASE_DATABASE_URL`: 로컬 관리 작업은 Session pooler(5432), Vercel 운영은
+  Transaction pooler(6543) 연결 문자열
 - `AUTH_SECRET`: Auth.js JWT·쿠키 암호화 키
 - `AUTH_URL`: 로컬에서는 `http://localhost:3005`
 - `AUTH_TRUST_HOST`: 신뢰하는 리버스 프록시 뒤에서만 `true`
 - `SHOW_REVIEW_ACCOUNTS`: 로그인 화면에 심사용 계정 안내를 표시할지 여부
 - `ENABLE_REVIEW_DATA`: 심사용 계정에 시드 추천·매칭 데이터를 연결할지 여부
 
-Direct connection 주소(`db.<project-ref>.supabase.co`)는 IPv6 전용일 수 있다. 로컬 또는
-배포 환경에서 `ENOTFOUND`나 `ENETUNREACH`가 발생하면 Session pooler 문자열을 사용한다.
+Direct connection 주소(`db.<project-ref>.supabase.co`)는 IPv6 전용일 수 있다. 로컬에서
+`ENOTFOUND`나 `ENETUNREACH`가 발생하면 Session pooler(5432)를 사용한다. Vercel처럼
+함수가 수평 확장되는 서버리스 환경에서는 연결을 공유할 수 있는 Transaction
+pooler(6543)를 사용하고, 애플리케이션 프로세스당 풀 크기를 1로 제한한다. Transaction
+pooler에서는 named prepared statement를 사용하지 않는다.
 
 ## 적용 순서
 
