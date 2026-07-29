@@ -3,7 +3,7 @@ schema_version: shuzzi-md/v1
 doc_kind: narrative_note
 project_slug: hackathon-naverconnect
 created_at: 2026-07-29T11:53:49+09:00
-updated_at: 2026-07-29T11:53:49+09:00
+updated_at: 2026-07-29T13:56:48+09:00
 timezone: Asia/Seoul
 status: reference_index
 ---
@@ -16,6 +16,7 @@ Read this after
 ## Attached decision and research snapshots
 
 - `docs/decisions/2026-07-29-embedding-decision-register.md`
+- `docs/decisions/2026-07-29-local-evidence-schema-reference.md`
 - `docs/research/2026-07-29-people-match-retrieval-plan.md`
 - `docs/research/2026-07-29-research-synthesis.md`
 - `docs/research/2026-07-29-research-raw.md`
@@ -23,6 +24,11 @@ Read this after
 The append-only cross-agent work log remains local at
 `~/.claude/projects/-Users-shuzzi/memory/inbox/naver-connect/20260729.md`.
 It is not required to understand or continue the checked-in decisions.
+
+The local-evidence schema reference records the authorized 522-post validation,
+the Supabase read-only counts, the local KURE-v1 parsing/embedding results, and
+the boundary between evidence retrieval and user-confirmed people matching.
+No raw corpus, vector, secret, or SQLite database is committed.
 
 ## Retrieval and reciprocal recommendation
 

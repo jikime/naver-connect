@@ -3,7 +3,7 @@ schema_version: shuzzi-md/v1
 doc_kind: narrative_note
 project_slug: hackathon-naverconnect
 created_at: 2026-07-29T11:53:49+09:00
-updated_at: 2026-07-29T11:53:49+09:00
+updated_at: 2026-07-29T13:56:48+09:00
 timezone: Asia/Seoul
 status: read_first
 ---
@@ -146,13 +146,15 @@ not a new canonical person vector and must not be stored as identity truth.
 
 ## 6. External blog boundary
 
-The supplied Naver blog has potentially useful people and organization
-profiles, but automated AI/RAG crawling was stopped after checking the site's
-robots policy. No corpus or DB rows were created.
+The user directly authorized local collection of the supplied Naver blog's
+`사혁넷 사람들` category on 2026-07-29. A local-only validation corpus and
+evidence embeddings were created; no Supabase rows were written and no corpus,
+vector, secret, or SQLite artifact is committed to this repository. See
+`docs/decisions/2026-07-29-local-evidence-schema-reference.md` for counts,
+schema lineage, and the exact model revision.
 
-Accept only an owner-provided PDF/CSV/JSON/HTML export or an explicitly
-authorized API/source. Record permitted uses, retention, deletion, source
-artifact hash, parser version, redaction version, and provenance.
+For every authorized source, record permitted uses, retention, deletion,
+source artifact hash, parser version, redaction version, and provenance.
 
 ```text
 source document
