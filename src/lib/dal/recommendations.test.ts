@@ -45,15 +45,13 @@ describe("getRecommendations — v1.1 공통점/차이점 그룹핑(FR-RC-01/02)
     expect(different.every((r) => r.rec_axis === "차이점")).toBe(true);
   });
 
-  it("핫리드(M-001)는 차이점 그룹에서 퍼즐형이 1순위로 정렬된다", async () => {
+  it("client seed는 hot-lead 상태를 중립화한다", async () => {
     const { different } = await getRecommendations({
       role: "기업가",
       personaId: "M-001",
     });
     expect(different.length).toBeGreaterThan(0);
-    expect(
-      different[0].is_hot_lead && different[0].match_type === "퍼즐형",
-    ).toBe(true);
+    expect(different.every((rec) => rec.is_hot_lead === false)).toBe(true);
   });
 });
 

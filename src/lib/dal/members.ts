@@ -12,15 +12,14 @@ import type {
   ExpertSubtype,
   MaskedMember,
   Member,
-  MemberPrivateSeed,
   MemberPublicSeed,
   ViewerContext,
 } from "@/types";
 
 const publicSeed = membersPublicSeed as MemberPublicSeed[];
-const privateSeed = membersPrivateSeed as MemberPrivateSeed[];
+const privateSeed = membersPrivateSeed as { member_id: string }[];
 
-const privateByMemberId = new Map<string, MemberPrivateSeed>(
+const privateByMemberId = new Map<string, { member_id: string }>(
   privateSeed.map((entry) => [entry.member_id, entry]),
 );
 
@@ -33,12 +32,18 @@ function reassemble(pub: MemberPublicSeed): Member {
       `members-private.json에 member_id="${pub.id}"의 비공개층이 없습니다.`,
     );
   }
-  const { member_id: _memberId, ...privateLayer } = priv;
   return {
     ...pub,
     visibility: {
       public: pub.visibility.public,
-      private: privateLayer,
+      // 클라이언트 시드에는 private 파생값이 없다. 보호 저장소/server DAL이 도입되기
+      // 전까지 본인/운영자 화면도 빈 중립 레이어로 fail-closed 한다.
+      private: {
+        demand_tags: [],
+        hot_lead: null,
+        availability: "",
+        recommendation_history: [],
+      },
     },
   };
 }

@@ -126,39 +126,9 @@ async function run(): Promise<void> {
     source: "seed_mock",
   }));
 
-  // legacy members-private의 redacted twin — 클라이언트(members.ts)는 이것만 import한다.
-  // 원문 서술 필드(detail_quote·hot_lead 3필드)는 전부 공백화, 구조·태그·범주값은 보존.
-  // (Codex 추가 기준: legacy raw quote도 번들 0건 — baseline debt 불허)
-  const privateRedacted = priv.map((p) => {
-    const full = p as MemberPrivateSeedRaw & {
-      hot_lead: {
-        flag: boolean;
-        project_summary: string;
-        needed_partner: string;
-        stage: string;
-      } | null;
-      availability: string;
-      recommendation_history: string[];
-    };
-    return {
-      member_id: full.member_id,
-      demand_tags: full.demand_tags.map((d) => ({
-        tagId: d.tagId,
-        priority: d.priority,
-        detail_quote: "",
-      })),
-      hot_lead: full.hot_lead
-        ? {
-            flag: full.hot_lead.flag,
-            project_summary: "",
-            needed_partner: "",
-            stage: "",
-          }
-        : null,
-      availability: full.availability,
-      recommendation_history: full.recommendation_history,
-    };
-  });
+  // legacy private twin은 공개 식별자만 허용한다. 수요 태그/우선순위, hot lead,
+  // availability, 추천 이력은 값만 공백화해도 존재 자체가 상태를 노출하므로 전부 제거한다.
+  const privateRedacted = priv.map((p) => ({ member_id: p.member_id }));
 
   console.log("▶ 산출물 쓰기");
   writeJson("src/data/people/offers.json", offers);
@@ -172,48 +142,52 @@ async function run(): Promise<void> {
     privateRedacted,
   );
 
-  // recommendations.json redacted twin — contact_point 등 수요 원문 인용 필드를 최소노출
-  // 문구로 치환하고, 잔여 원문 문자열은 전 필드 스캔으로 소거한다(raw quote 번들 0건 기준).
-  const rawQuoteSet = [
-    ...needs.map((n) => n.detail_quote),
-    ...pub.flatMap((m) => {
-      const p = privById.get(m.id) as unknown as {
-        hot_lead: { project_summary: string; needed_partner: string } | null;
-      };
-      return p.hot_lead
-        ? [p.hot_lead.project_summary, p.hot_lead.needed_partner]
-        : [];
-    }),
-  ].filter((q) => q && q.length >= 6);
+  // recommendations 공개 twin — 원본을 scrub하는 방식은 새 민감 필드가 생기면 누출될 수 있다.
+  // 필요한 구조 필드만 allowlist로 새 객체에 복사하고 모든 서술/상태는 중립 목업값으로 합성한다.
   const recsRaw = readJson<
-    ({ min_exposure_note: string; message: { contact_point: string } } & Record<
-      string,
-      unknown
-    >)[]
+    ({
+      id: string;
+      rec_kind: "1:1" | "모듬";
+      from_member_id: string;
+      to_member_id: string | null;
+      match_type: string;
+      value_class: string;
+      rec_axis: string;
+      authored_direction: string;
+      meetup_id?: string;
+    } & Record<string, unknown>)[]
   >("src/data/private/recommendations.json");
-  const scrub = (value: string, fallback: string): string => {
-    let out = value;
-    for (const q of rawQuoteSet) {
-      if (out.includes(q)) out = fallback;
-    }
-    return out;
-  };
-  const recsRedacted = recsRaw.map((rec) => {
-    const fallback = rec.min_exposure_note;
-    const scrubDeep = (v: unknown): unknown => {
-      if (typeof v === "string") return scrub(v, fallback);
-      if (Array.isArray(v)) return v.map(scrubDeep);
-      if (v && typeof v === "object") {
-        return Object.fromEntries(
-          Object.entries(v).map(([k, val]) => [k, scrubDeep(val)]),
-        );
-      }
-      return v;
-    };
-    const cleaned = scrubDeep(rec) as typeof rec;
-    cleaned.message.contact_point = rec.min_exposure_note; // 원문 인용 필드는 무조건 치환
-    return cleaned;
-  });
+  const SAFE_COPY = {
+    matching_rationale: "공개된 구조 신호만으로 생성된 목업 추천입니다.",
+    intro: "새로운 사회혁신 파트너 후보를 확인해 보세요.",
+    contact_point: "공개 프로필 기반의 연결 후보",
+    your_benefit: "서로의 공개 활동 정보를 확인할 수 있어요.",
+    their_benefit: "연결 전 양쪽이 공개 범위를 확인할 수 있어요.",
+    first_action: "공개 프로필을 살펴본 뒤 연결 여부를 선택해 보세요.",
+  } as const;
+  const recsRedacted = recsRaw.map((rec) => ({
+    id: rec.id,
+    rec_kind: rec.rec_kind,
+    from_member_id: rec.from_member_id,
+    to_member_id: rec.to_member_id,
+    match_type: rec.match_type,
+    value_class: rec.value_class,
+    rec_axis: rec.rec_axis,
+    matching_rationale: SAFE_COPY.matching_rationale,
+    message: {
+      intro: SAFE_COPY.intro,
+      contact_point: SAFE_COPY.contact_point,
+      your_benefit: SAFE_COPY.your_benefit,
+      their_benefit: SAFE_COPY.their_benefit,
+      first_action: SAFE_COPY.first_action,
+    },
+    is_hot_lead: false,
+    min_exposure_note: SAFE_COPY.contact_point,
+    authored_direction: rec.authored_direction,
+    ...(rec.meetup_id ? { meetup_id: rec.meetup_id } : {}),
+    sent_week: "demo",
+    status: "pending_review",
+  }));
   writeJson(
     "src/data/people/derived/recommendations.redacted.json",
     recsRedacted,

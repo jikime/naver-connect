@@ -1,176 +1,26 @@
 [
   {
-    "member_id": "M-001",
-    "demand_tags": [
-      {
-        "tagId": 6,
-        "priority": true,
-        "detail_quote": ""
-      },
-      {
-        "tagId": 8,
-        "priority": false,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": null,
-    "availability": "월 2~3회",
-    "recommendation_history": [
-      "REC-03",
-      "REC-04",
-      "REC-05",
-      "REC-06",
-      "REC-07"
-    ]
+    "member_id": "M-001"
   },
   {
-    "member_id": "M-002",
-    "demand_tags": [
-      {
-        "tagId": 8,
-        "priority": true,
-        "detail_quote": ""
-      },
-      {
-        "tagId": 9,
-        "priority": false,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": {
-      "flag": true,
-      "project_summary": "",
-      "needed_partner": "",
-      "stage": ""
-    },
-    "availability": "주 1회 이상",
-    "recommendation_history": [
-      "REC-03",
-      "REC-04"
-    ]
+    "member_id": "M-002"
   },
   {
-    "member_id": "M-003",
-    "demand_tags": [
-      {
-        "tagId": 3,
-        "priority": true,
-        "detail_quote": ""
-      },
-      {
-        "tagId": 2,
-        "priority": false,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": null,
-    "availability": "월 2회(등산 모임 포함)",
-    "recommendation_history": [
-      "REC-01",
-      "REC-02",
-      "REC-10",
-      "REC-11"
-    ]
+    "member_id": "M-003"
   },
   {
-    "member_id": "M-004",
-    "demand_tags": [
-      {
-        "tagId": 9,
-        "priority": true,
-        "detail_quote": ""
-      },
-      {
-        "tagId": 10,
-        "priority": false,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": null,
-    "availability": "월 2~3회",
-    "recommendation_history": [
-      "REC-01",
-      "REC-02",
-      "REC-06",
-      "REC-07"
-    ]
+    "member_id": "M-004"
   },
   {
-    "member_id": "M-005",
-    "demand_tags": [
-      {
-        "tagId": 1,
-        "priority": true,
-        "detail_quote": ""
-      },
-      {
-        "tagId": 12,
-        "priority": false,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": null,
-    "availability": "월 1회 이하 + 프로보노 월 4시간",
-    "recommendation_history": [
-      "REC-08",
-      "REC-09"
-    ]
+    "member_id": "M-005"
   },
   {
-    "member_id": "M-006",
-    "demand_tags": [
-      {
-        "tagId": 11,
-        "priority": true,
-        "detail_quote": ""
-      },
-      {
-        "tagId": 12,
-        "priority": false,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": null,
-    "availability": "월 2~3회",
-    "recommendation_history": [
-      "REC-05"
-    ]
+    "member_id": "M-006"
   },
   {
-    "member_id": "M-007",
-    "demand_tags": [
-      {
-        "tagId": 2,
-        "priority": true,
-        "detail_quote": ""
-      },
-      {
-        "tagId": 11,
-        "priority": false,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": null,
-    "availability": "주말 위주",
-    "recommendation_history": [
-      "REC-08",
-      "REC-09"
-    ]
+    "member_id": "M-007"
   },
   {
-    "member_id": "M-008",
-    "demand_tags": [
-      {
-        "tagId": 4,
-        "priority": true,
-        "detail_quote": ""
-      }
-    ],
-    "hot_lead": null,
-    "availability": "월 2~3회",
-    "recommendation_history": [
-      "REC-10",
-      "REC-11"
-    ]
+    "member_id": "M-008"
   }
 ]

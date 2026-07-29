@@ -1,12 +1,9 @@
 #!/usr/bin/env tsx
-// 빌드 산출물 프라이버시 게이트 — .next/static/chunks에 M0 신규 민감 파일(needs/consents)이
-// 실렸는지 검사한다. 원문 문자열은 legacy members-private.json과 중복이라 문자열 매칭으로는
-// 출처를 못 가리므로, 파일 구조 시그니처로 판별한다:
-//   needs.json   = id:"need-M-…" 인접(300자 내)에 detail_quote 존재 (파생 engine-needs엔 quote 없음)
-//   consents.json = id:"consent-M-…" (파생 eligibility엔 id 없음)
+// 빌드 산출물 프라이버시 게이트.
+// 1) derived JSON 자체를 allowlist 계약으로 검사하고,
+// 2) private 원본의 알려진 서술 문구 및 private 레코드 시그니처가 client chunk에
+//    포함되지 않았는지 검사한다.
 // 사용: npm run build && npx tsx scripts/check-bundle-privacy.ts   (위반 시 exit 1)
-// baseline 부채(별도 판정 대기): members-private.json은 base 3c9d275부터 members.ts 경유로
-// 번들되어 온 구조 — 이 게이트는 리포트만 하고 실패 조건에서 제외한다(Codex 판정 요청 중).
 // 근거: codex-m0m1-review-changes-requested P1-1
 
 import { readdirSync, readFileSync } from "node:fs";
@@ -14,6 +11,53 @@ import { join } from "node:path";
 
 const ROOT = process.cwd();
 const CHUNKS = join(ROOT, ".next", "static", "chunks");
+const DERIVED_RECOMMENDATIONS = join(
+  ROOT,
+  "src/data/people/derived/recommendations.redacted.json",
+);
+const DERIVED_MEMBERS_PRIVATE = join(
+  ROOT,
+  "src/data/people/derived/members-private.redacted.json",
+);
+
+const SAFE_RECOMMENDATION_COPY = new Set([
+  "공개된 구조 신호만으로 생성된 목업 추천입니다.",
+  "새로운 사회혁신 파트너 후보를 확인해 보세요.",
+  "공개 프로필 기반의 연결 후보",
+  "서로의 공개 활동 정보를 확인할 수 있어요.",
+  "연결 전 양쪽이 공개 범위를 확인할 수 있어요.",
+  "공개 프로필을 살펴본 뒤 연결 여부를 선택해 보세요.",
+]);
+const RECOMMENDATION_KEYS = new Set([
+  "id",
+  "rec_kind",
+  "from_member_id",
+  "to_member_id",
+  "match_type",
+  "value_class",
+  "rec_axis",
+  "matching_rationale",
+  "message",
+  "is_hot_lead",
+  "min_exposure_note",
+  "authored_direction",
+  "meetup_id",
+  "sent_week",
+  "status",
+]);
+const MESSAGE_KEYS = new Set([
+  "intro",
+  "contact_point",
+  "your_benefit",
+  "their_benefit",
+  "first_action",
+]);
+const DISALLOWED_RECOMMENDATION_KEYS = [
+  "meeting_outcome",
+  "decline_reason",
+  "decline_note",
+  "reason_pointers",
+];
 
 function chunkFiles(): string[] {
   return readdirSync(CHUNKS, { recursive: true })
@@ -38,13 +82,84 @@ function hasRecordSignature(
   return false;
 }
 
+function unexpectedKeys(
+  value: Record<string, unknown>,
+  allowed: Set<string>,
+): string[] {
+  return Object.keys(value).filter((key) => !allowed.has(key));
+}
+
+function validateDerivedArtifacts(
+  violations: { what: string; file: string }[],
+): void {
+  const recommendations = JSON.parse(
+    readFileSync(DERIVED_RECOMMENDATIONS, "utf8"),
+  ) as Record<string, unknown>[];
+  for (const rec of recommendations) {
+    const extra = unexpectedKeys(rec, RECOMMENDATION_KEYS);
+    if (extra.length > 0) {
+      violations.push({
+        what: `recommendation allowlist 밖 key: ${extra.join(",")}`,
+        file: DERIVED_RECOMMENDATIONS,
+      });
+    }
+    const message = rec.message as Record<string, unknown> | undefined;
+    if (!message || unexpectedKeys(message, MESSAGE_KEYS).length > 0) {
+      violations.push({
+        what: "recommendation message allowlist 위반",
+        file: DERIVED_RECOMMENDATIONS,
+      });
+    }
+    const narratives = [
+      rec.matching_rationale,
+      rec.min_exposure_note,
+      ...Object.values(message ?? {}),
+    ];
+    if (
+      narratives.some(
+        (value) =>
+          typeof value !== "string" || !SAFE_RECOMMENDATION_COPY.has(value),
+      ) ||
+      rec.is_hot_lead !== false ||
+      rec.status !== "pending_review" ||
+      rec.sent_week !== "demo"
+    ) {
+      violations.push({
+        what: `recommendation 중립 DTO 위반: ${String(rec.id)}`,
+        file: DERIVED_RECOMMENDATIONS,
+      });
+    }
+    for (const key of DISALLOWED_RECOMMENDATION_KEYS) {
+      if (key in rec) {
+        violations.push({
+          what: `recommendation 금지 key: ${key}`,
+          file: DERIVED_RECOMMENDATIONS,
+        });
+      }
+    }
+  }
+
+  const members = JSON.parse(
+    readFileSync(DERIVED_MEMBERS_PRIVATE, "utf8"),
+  ) as Record<string, unknown>[];
+  for (const member of members) {
+    const extra = unexpectedKeys(member, new Set(["member_id"]));
+    if (extra.length > 0) {
+      violations.push({
+        what: `member private allowlist 밖 key: ${extra.join(",")}`,
+        file: DERIVED_MEMBERS_PRIVATE,
+      });
+    }
+  }
+}
+
 async function run(): Promise<void> {
   console.log("▶ 번들 프라이버시 검사 (.next/static/chunks)");
   const files = chunkFiles();
   const violations: { what: string; file: string }[] = [];
+  validateDerivedArtifacts(violations);
 
-  // raw quote 전수(신규 needs + legacy members-private + hot_lead 서술) — 전부 위반 조건.
-  // 클라이언트는 redacted twin(원문 "")만 실으므로 원문 문자열이 보이면 즉시 실패(Codex 추가 기준).
+  // private 사람 원문과 recommendation 서술 전문은 길이 6자 이상 문구를 probe한다.
   const needs = JSON.parse(
     readFileSync(join(ROOT, "src/data/private/people/needs.json"), "utf8"),
   ) as { detail_quote: string }[];
@@ -52,17 +167,42 @@ async function run(): Promise<void> {
     readFileSync(join(ROOT, "src/data/private/members-private.json"), "utf8"),
   ) as {
     demand_tags: { detail_quote: string }[];
-    hot_lead: { project_summary: string; needed_partner: string } | null;
+    hot_lead: {
+      project_summary: string;
+      needed_partner: string;
+      stage: string;
+    } | null;
+    availability: string;
   }[];
-  // needed_partner는 시드 설계상 min_exposure_note(승인된 최소노출 문구)에 공식 재사용되는
-  // 축약 표현이라 raw quote로 취급하지 않는다. 서술 원문(detail_quote·project_summary)만 검사.
+  const rawRecommendations = JSON.parse(
+    readFileSync(join(ROOT, "src/data/private/recommendations.json"), "utf8"),
+  ) as {
+    matching_rationale: string;
+    min_exposure_note: string;
+    message: Record<string, string>;
+    decline_note?: string;
+    meeting_outcome?: { note?: string };
+  }[];
   const rawQuotes = new Set(
     [
       ...needs.map((n) => n.detail_quote),
       ...legacy.flatMap((m) => m.demand_tags.map((d) => d.detail_quote)),
       ...legacy.flatMap((m) =>
-        m.hot_lead ? [m.hot_lead.project_summary] : [],
+        m.hot_lead
+          ? [
+              m.hot_lead.project_summary,
+              m.hot_lead.needed_partner,
+              m.hot_lead.stage,
+            ]
+          : [],
       ),
+      ...rawRecommendations.flatMap((rec) => [
+        rec.matching_rationale,
+        rec.min_exposure_note,
+        ...Object.values(rec.message),
+        rec.decline_note ?? "",
+        rec.meeting_outcome?.note ?? "",
+      ]),
     ].filter((q) => q && q.length >= 6),
   );
 
@@ -82,9 +222,32 @@ async function run(): Promise<void> {
     ) {
       violations.push({ what: "consents.json 레코드", file });
     }
+    for (const key of DISALLOWED_RECOMMENDATION_KEYS) {
+      if (
+        hasRecordSignature(body, 'id:"REC-', key, 2400) ||
+        hasRecordSignature(body, '"id":"REC-', `"${key}"`, 2400)
+      ) {
+        violations.push({
+          what: `recommendation private state key: ${key}`,
+          file,
+        });
+      }
+    }
+    if (
+      (hasRecordSignature(body, 'member_id:"M-', "availability", 700) ||
+        hasRecordSignature(body, '"member_id":"M-', '"availability"', 700)) &&
+      (body.includes("recommendation_history") || body.includes("hot_lead"))
+    ) {
+      violations.push({
+        what: "members-private 파생 레코드 시그니처",
+        file,
+      });
+    }
   }
 
-  console.log(`  검사 파일 ${files.length}개 · raw quote probe ${rawQuotes.size}개`);
+  console.log(
+    `  검사 파일 ${files.length}개 · private phrase probe ${rawQuotes.size}개 · derived allowlist 2종`,
+  );
 
   if (violations.length > 0) {
     console.error(`\n❌ 번들 프라이버시 위반 ${violations.length}건:`);
@@ -94,7 +257,7 @@ async function run(): Promise<void> {
     process.exit(1);
   }
   console.log(
-    "\n✅ 위반 0건 — 신규(needs/consents)·legacy(members-private) raw quote 모두 번들 미포함",
+    "\n✅ 위반 0건 — derived allowlist 준수, private 서술·상태 key client bundle 미포함",
   );
 }
 
