@@ -40,7 +40,9 @@ import type {
   Recommendation,
 } from "@/types";
 import { MeetupCard, type MeetupMemberSummary } from "./MeetupCard";
+import { RecommendationBenefitSummary } from "./RecommendationBenefitSummary";
 import { RecommendationRelationshipMap } from "./RecommendationRelationshipMap";
+import { scoreForRecommendation } from "./recommendation-score";
 
 const INITIAL_VISIBLE = 5;
 const MAX_VISIBLE = 15;
@@ -97,15 +99,14 @@ function RecommendationSummaryCard({
           <CardTitle className="text-base normal-case tracking-normal">
             {rec.message.intro}
           </CardTitle>
-          <CardDescription>{rec.message.first_action}</CardDescription>
+          <CardDescription>{rec.matching_rationale}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          {reasonKeywords.length > 0 && (
-            <p className="text-xs text-guud-text-muted-2">
-              {rec.rec_axis === "공통점" ? "공통 사유" : "차이 사유"}:{" "}
-              {reasonKeywords.join(", ")}
-            </p>
-          )}
+          <RecommendationBenefitSummary
+            recommendation={rec}
+            reasonKeywords={reasonKeywords}
+            compact
+          />
           {linkedMeetup && (
             <div className="flex items-start gap-2 rounded-xl bg-muted/60 p-3">
               <Users className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -158,9 +159,7 @@ function RecommendationCard({
       />
     );
   }
-  const score = scoresByPair.get(
-    scoreKey(rec.from_member_id, rec.to_member_id),
-  );
+  const score = scoreForRecommendation(rec, scoresByPair);
   return (
     <RecommendationSummaryCard
       rec={rec}
