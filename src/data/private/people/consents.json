@@ -1,0 +1,194 @@
+[
+  {
+    "id": "consent-M-001-publish_profile",
+    "person_id": "M-001",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-001-use_private_needs_for_matching",
+    "person_id": "M-001",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-001-facilitate_introduction",
+    "person_id": "M-001",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-002-publish_profile",
+    "person_id": "M-002",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-002-use_private_needs_for_matching",
+    "person_id": "M-002",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-002-facilitate_introduction",
+    "person_id": "M-002",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-003-publish_profile",
+    "person_id": "M-003",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-003-use_private_needs_for_matching",
+    "person_id": "M-003",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-003-facilitate_introduction",
+    "person_id": "M-003",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-004-publish_profile",
+    "person_id": "M-004",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-004-use_private_needs_for_matching",
+    "person_id": "M-004",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-004-facilitate_introduction",
+    "person_id": "M-004",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-005-publish_profile",
+    "person_id": "M-005",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-005-use_private_needs_for_matching",
+    "person_id": "M-005",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-005-facilitate_introduction",
+    "person_id": "M-005",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-006-publish_profile",
+    "person_id": "M-006",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-006-use_private_needs_for_matching",
+    "person_id": "M-006",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-006-facilitate_introduction",
+    "person_id": "M-006",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-007-publish_profile",
+    "person_id": "M-007",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-007-use_private_needs_for_matching",
+    "person_id": "M-007",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-007-facilitate_introduction",
+    "person_id": "M-007",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-008-publish_profile",
+    "person_id": "M-008",
+    "purpose": "publish_profile",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-008-use_private_needs_for_matching",
+    "person_id": "M-008",
+    "purpose": "use_private_needs_for_matching",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  },
+  {
+    "id": "consent-M-008-facilitate_introduction",
+    "person_id": "M-008",
+    "purpose": "facilitate_introduction",
+    "policy_version": "consent/0.1-mock",
+    "consented_at": "2026-07-29T12:00:00+09:00",
+    "source": "seed_mock"
+  }
+]

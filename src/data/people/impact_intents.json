@@ -1,0 +1,149 @@
+[
+  {
+    "id": "impact-M-001",
+    "owner": {
+      "kind": "person",
+      "id": "M-001"
+    },
+    "change_statement": "지역에서 나이 들어도 살던 곳에서 돌봄받는 통합돌봄을 만든다.",
+    "field_ids": [
+      2
+    ],
+    "geography": {
+      "sido": "서울",
+      "sigungu": "은평구"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "impact-M-002",
+    "owner": {
+      "kind": "person",
+      "id": "M-002"
+    },
+    "change_statement": "주거와 돌봄이 결합된 케어안심주택으로 노후 주거 불안을 푼다.",
+    "field_ids": [
+      3
+    ],
+    "geography": {
+      "sido": "경기",
+      "sigungu": "부천시"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "impact-M-003",
+    "owner": {
+      "kind": "person",
+      "id": "M-003"
+    },
+    "change_statement": "시민이 출자해 만드는 옥상 태양광으로 에너지 전환을 앞당긴다.",
+    "field_ids": [
+      4
+    ],
+    "geography": {
+      "sido": "대전",
+      "sigungu": "유성구"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "impact-M-004",
+    "owner": {
+      "kind": "person",
+      "id": "M-004"
+    },
+    "change_statement": "고령자가 병원과 마을을 오갈 수 있는 수요응답형 이동을 만든다.",
+    "field_ids": [
+      6
+    ],
+    "geography": {
+      "sido": "전북",
+      "sigungu": "완주군"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "impact-M-005",
+    "owner": {
+      "kind": "person",
+      "id": "M-005"
+    },
+    "change_statement": "사회적경제 조직이 회계 때문에 좌초하지 않도록 돕는다.",
+    "field_ids": [
+      2,
+      3
+    ],
+    "geography": {
+      "sido": "서울",
+      "sigungu": "중구"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "impact-M-006",
+    "owner": {
+      "kind": "person",
+      "id": "M-006"
+    },
+    "change_statement": "돌봄통합지원 정책이 현장과 맞물리도록 근거를 잇는다.",
+    "field_ids": [
+      2
+    ],
+    "geography": {
+      "sido": "세종",
+      "sigungu": "세종시"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "impact-M-007",
+    "owner": {
+      "kind": "person",
+      "id": "M-007"
+    },
+    "change_statement": "돌봄·주거·기후 초기 팀에 인내자본과 IR 관점을 더한다.",
+    "field_ids": [
+      2,
+      3,
+      4
+    ],
+    "geography": {
+      "sido": "서울",
+      "sigungu": "강남구"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  },
+  {
+    "id": "impact-M-008",
+    "owner": {
+      "kind": "person",
+      "id": "M-008"
+    },
+    "change_statement": "지역 농민의 판로가 되는 직매장으로 먹거리 순환을 만든다.",
+    "field_ids": [
+      5
+    ],
+    "geography": {
+      "sido": "전북",
+      "sigungu": "정읍시"
+    },
+    "source": "migration",
+    "profile_revision": 1,
+    "created_at": "2026-07-29T12:00:00+09:00"
+  }
+]

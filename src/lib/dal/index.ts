@@ -15,6 +15,8 @@ export * from "./matching";
 export * from "./meetups";
 export * from "./members";
 export * from "./onboarding";
+export * from "./people";
+// people-engine은 마스킹 없는 민감 전건 접근자라 배럴에서 제외 (collaboration-server와 동일 선례)
 export * from "./recommendations";
 export * from "./resources";
 export * from "./review";

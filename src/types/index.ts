@@ -13,4 +13,6 @@ export * from "./matching";
 export * from "./meetup";
 export * from "./member";
 export * from "./onboarding";
+export * from "./people";
 export * from "./recommendation";
+export * from "./vocabulary";
