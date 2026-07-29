@@ -571,10 +571,12 @@ export function computeMatchingBundle(req: MatchingRequest): MatchingBundle {
   return {
     scores,
     weights: activeWeights(req.session),
-    engineRecommendations: buildEngineRecommendations(
-      req.personaId,
-      req.session,
-    ),
+    engineRecommendations:
+      req.role === "운영자"
+        ? members.flatMap((member) =>
+            buildEngineRecommendations(member.id, req.session),
+          )
+        : buildEngineRecommendations(req.personaId, req.session),
     allowedSeedRecIds: computeAllowedSeedRecIds(req.session),
     hiddenSeedRecIds: computeHiddenSeedRecIds(req),
     graphEdges: computeGraphEdges(req),

@@ -140,7 +140,7 @@ export async function getMatchScores(
 
 /**
  * 관리자 가중치 편집(FR-RL-02) + 재산출(FR-RL-03). 운영자가 아니면 403 시뮬레이션.
- * 세션 스토어만 갱신(NFR-02) — 새로고침 시 시드 원본으로 리셋(A6).
+ * 브라우저 데모 스토어만 갱신(NFR-02) — 실서비스에서는 서버 세션/RLS로 교체한다.
  */
 export async function setRuleWeights(
   vc: ViewerContext,

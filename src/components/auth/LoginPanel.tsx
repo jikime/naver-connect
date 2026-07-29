@@ -49,7 +49,11 @@ export function LoginPanel() {
   function finishLogin(nextRole: ViewerContext["role"]) {
     const account = getDemoAccount(nextRole);
     signIn(account.user);
-    router.push(account.user.onboardingComplete ? "/home" : "/onboarding");
+    router.push(
+      account.user.role === "운영자" || account.user.onboardingComplete
+        ? "/home"
+        : "/onboarding",
+    );
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {

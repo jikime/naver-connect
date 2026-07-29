@@ -31,7 +31,12 @@ export function AppAccessGate({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (user && !user.onboardingComplete && pathname !== "/onboarding") {
+    if (
+      user &&
+      user.role !== "운영자" &&
+      !user.onboardingComplete &&
+      pathname !== "/onboarding"
+    ) {
       router.replace("/onboarding");
       return;
     }
@@ -67,7 +72,10 @@ export function AppAccessGate({ children }: { children: ReactNode }) {
   const needsRedirect =
     hasHydrated &&
     ((!user && !PUBLIC_ROUTES.has(pathname)) ||
-      (user && !user.onboardingComplete && pathname !== "/onboarding") ||
+      (user &&
+        user.role !== "운영자" &&
+        !user.onboardingComplete &&
+        pathname !== "/onboarding") ||
       (user?.onboardingComplete &&
         (pathname === "/login" || pathname === "/signup")) ||
       (user?.role === "운영자" && pathname === "/profile") ||

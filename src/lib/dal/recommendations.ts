@@ -133,7 +133,7 @@ export async function getRecommendations(
   const addressedToViewer = [
     ...seed.filter(
       (rec) =>
-        isAddressedTo(rec, vc.personaId) &&
+        (vc.role === "운영자" || isAddressedTo(rec, vc.personaId)) &&
         allowedSeedIds.has(rec.id) &&
         !hiddenSeedIds.has(rec.id),
     ),

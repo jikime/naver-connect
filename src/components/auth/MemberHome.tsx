@@ -93,7 +93,7 @@ export function MemberHome() {
               </p>
             </div>
             <span className="rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-secondary-foreground">
-              온보딩 완료
+              {user.role === "운영자" ? "운영 모드" : "온보딩 완료"}
             </span>
           </div>
         </div>
