@@ -3,7 +3,7 @@ schema_version: shuzzi-md/v1
 doc_kind: narrative_note
 project_slug: hackathon-naverconnect
 created_at: 2026-07-29T11:53:49+09:00
-updated_at: 2026-07-29T13:56:48+09:00
+updated_at: 2026-07-29T14:08:00+09:00
 timezone: Asia/Seoul
 status: read_first
 ---
@@ -176,6 +176,13 @@ Preferred UI labels:
 - `social_innovation_activist`: 사회혁신활동가
 - `social_innovation_supporter`: 사회혁신지원가
 - interim inclusive partner label: 사회혁신 협력 파트너
+
+Main commit `08eec42` proposed `일반기업` for the C layer. Keep that label for
+the C1 `일반기업형` context only: the current C layer also contains
+professional-service, public, academic, media, and nonprofit organizations.
+Follow
+`docs/decisions/2026-07-29-main-08eec42-integration-plan.md`
+when integrating the main update.
 
 Stable concept IDs and display labels are separate. Every label proposal,
 activation, deprecation, block, split, and merge is append-only and belongs to
