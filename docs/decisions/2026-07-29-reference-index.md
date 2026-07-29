@@ -3,7 +3,7 @@ schema_version: shuzzi-md/v1
 doc_kind: narrative_note
 project_slug: hackathon-naverconnect
 created_at: 2026-07-29T11:53:49+09:00
-updated_at: 2026-07-29T14:08:00+09:00
+updated_at: 2026-07-29T14:21:08+09:00
 timezone: Asia/Seoul
 status: reference_index
 ---
@@ -16,6 +16,7 @@ Read this after
 ## Attached decision and research snapshots
 
 - `docs/decisions/2026-07-29-embedding-decision-register.md`
+- `docs/decisions/2026-07-29-demo-viewer-integration-plan.md`
 - `docs/decisions/2026-07-29-local-evidence-schema-reference.md`
 - `docs/decisions/2026-07-29-main-08eec42-integration-plan.md`
 - `docs/research/2026-07-29-people-match-retrieval-plan.md`
@@ -35,6 +36,11 @@ The main integration plan audits the `08eec42` label changes against the
 current C-layer data and defines how to preserve them as versioned vocabulary
 history without mislabeling public, academic, media, and nonprofit partners as
 general companies.
+
+The demo-viewer integration plan records why the 522-post standalone HTML must
+remain a local diagnostic and how to carry its people-first editorial
+experience into a server-gated Next.js route with an allowlisted DTO and
+extended privacy checks.
 
 ## Retrieval and reciprocal recommendation
 
