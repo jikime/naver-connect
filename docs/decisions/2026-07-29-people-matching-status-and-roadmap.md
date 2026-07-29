@@ -110,3 +110,24 @@ demo 모드(`npm run dev:demo`, :3005)에서 온보딩을 완료하면 추천이
 > 여기서 깐 승인·동의 계약이 M2 임베딩의 입력 자격을 규정합니다. 온보딩
 > 입력은 아직 세션 영속(DB는 M4 승인 게이트). 검증: vitest 161/161,
 > demo/pilot 빌드 + 번들 프라이버시 스캔 위반 0건, 마이그레이션 결정성 통과.
+
+## 6. 통합 브랜치 마감 결과
+
+`feature/naverconnect-matching-pr`에서 아래 순서로 통합을 마쳤다.
+
+1. `agent/matching-m0m1`의 코드 head `d80b722`까지 저자 이력을 보존해 병합했다.
+2. 최신 `origin/main`의 `08eec42`를 병합했다.
+3. A/B/C 표시 라벨을 하드코딩하지 않고 versioned vocabulary resolver를
+   사용하도록 후속 조치했다. A는 `사회혁신활동가`, B는 `사회혁신지원가`,
+   C 전체는 `사회혁신 협력 파트너`로 표시하고 `일반기업`은 C1 맥락에만 남긴다.
+4. 이 상태에서 vitest 161/161, TypeScript, Biome+ESLint, 기본·demo 빌드,
+   두 빌드의 privacy scan 위반 0건, migration 산출물 6종 byte 일치를 확인했다.
+
+로컬 KURE-v1 벡터·522글 corpus·SQLite·1MiB HTML viewer·Supabase secret은
+이 브랜치에 넣지 않았다. 관계 우선 v5 지도 검증 수치와 통합 경계만
+`2026-07-29-embedding-map-v5-validation.md`에 남겼다.
+
+다음 담당자는 이 문서와 `2026-07-29-people-matching-read-first.md`,
+`2026-07-29-reference-index.md`를 먼저 읽는다. 남은 첫 수동 검증은 실제
+브라우저에서 온보딩 B동의 → safe match 문구 승인 → finalize → 추천 반영
+흐름을 확인하는 것이다. P1-2 이후 기능은 이 PR에서 시작하지 않았다.

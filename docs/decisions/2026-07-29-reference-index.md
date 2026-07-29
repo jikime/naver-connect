@@ -20,6 +20,7 @@ Read this after
 - `docs/decisions/2026-07-29-demo-viewer-integration-plan.md`
 - `docs/decisions/2026-07-29-local-evidence-schema-reference.md`
 - `docs/decisions/2026-07-29-main-08eec42-integration-plan.md`
+- `docs/decisions/2026-07-29-people-matching-status-and-roadmap.md`
 - `docs/research/2026-07-29-people-match-retrieval-plan.md`
 - `docs/research/2026-07-29-research-synthesis.md`
 - `docs/research/2026-07-29-research-raw.md`
