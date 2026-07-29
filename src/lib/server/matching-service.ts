@@ -7,6 +7,7 @@
 // 근거: codex final-rereview-reject #1, people_match_retrieval_plan.md §6, research_synthesis.md §13
 
 import collabRelationsSeed from "@/data/collab_relations.json";
+import meetupsSeed from "@/data/meetups.json";
 import membersPublicSeed from "@/data/members.json";
 import organizationsSeed from "@/data/organizations.json";
 import impactIntentsSeed from "@/data/people/impact_intents.json";
@@ -38,6 +39,7 @@ import type {
   MatchScore,
   MatchScoresSeed,
   MatchType,
+  Meetup,
   MemberPublicSeed,
   NeedIntentV1,
   Recommendation,
@@ -75,6 +77,12 @@ export interface MatchingBundle {
   engineRecommendations: Recommendation[];
   /** 양측 매칭 동의가 유효한 시드 추천 id — 클라이언트 gate는 이 집합만 사용 */
   allowedSeedRecIds: string[];
+  /**
+   * C4(#3): 주간 목록에서 숨길 declined 시드 추천 id(사유 5종 전부, 원본 status·세션
+   * override 불문). 뷰어가 당사자(1:1 endpoint/모듬 참여자)이거나 운영자인 건만 담아
+   * 타인 추천의 거절 상태를 열거하지 못하게 한다. 상세(영수증) 조회는 계속 허용된다.
+   */
+  hiddenSeedRecIds: string[];
   /** 뷰어 권한이 반영된 그래프 엣지(운영자=전체, 일반=본인 pair+양측 동의) */
   graphEdges: MatchingGraphEdge[];
 }
@@ -99,6 +107,8 @@ const seedConsents = consentsSeed as ConsentRecordV1[];
 const seedOffers = offersSeed as CapabilityOfferV1[];
 const seedImpacts = impactIntentsSeed as ImpactIntentV1[];
 const organizations = organizationsSeed as { id: string; member_id?: string }[];
+const meetups = meetupsSeed as Meetup[];
+const meetupsById = new Map(meetups.map((m) => [m.id, m]));
 const collabRelations = collabRelationsSeed as {
   org_a_id: string;
   org_b_id: string;
@@ -337,17 +347,41 @@ function buildEngineRecommendations(
     });
 }
 
-function meetupMemberIdsOf(rec: Recommendation): string[] {
-  // 서버에서는 meetups 시드 재사용 대신 원본 rec의 참여 판정을 클라이언트와 동일하게 유지하기
-  // 위해 meetup_id만 노출한다 — 모듬 동의 gate 정밀화는 C4에서 이 함수 기반으로 확장.
-  return rec.meetup_id ? [] : [];
+/** 모듬 참여자 = meetups 시드 정본 참여자 ∪ 개설자(from_member_id). */
+function meetupParticipantsOf(rec: Recommendation): string[] {
+  if (rec.rec_kind !== "모듬" || !rec.meetup_id) return [];
+  const listed = meetupsById.get(rec.meetup_id)?.member_ids ?? [];
+  if (listed.length === 0) return [];
+  return listed.includes(rec.from_member_id)
+    ? listed
+    : [rec.from_member_id, ...listed];
 }
 
-/** 양측 매칭 동의가 유효한 시드 추천 id(1:1). 모듬 gate는 C4에서 강화. */
+/** 세션 override가 반영된 유효 status — 시드 원본과 세션 거절 어느 쪽이든 최신을 따른다. */
+function mergedStatusOf(
+  rec: Recommendation,
+  session: MatchingSessionState,
+): RecStatus {
+  return session.recommendationOverrides[rec.id]?.status ?? rec.status;
+}
+
+/**
+ * 노출 허용 시드 추천 id — 동의 gate. 주간 목록·상세·그래프 엣지의 공통 전제다.
+ * - C4(#2): 모듬은 demo에서만 유효(seed 모듬은 목업 — non-demo 0건) + 참여자 전원 매칭 동의.
+ *   참여자 목록이 비면 fail-closed로 제외.
+ * - 1:1은 양측 매칭 동의(P1-2), to_member_id 없는 1:1은 fail-closed 제외.
+ * declined 숨김은 hiddenSeedRecIds가 담당한다(상세 영수증 조회는 유지해야 하므로 분리).
+ */
 function computeAllowedSeedRecIds(session: MatchingSessionState): string[] {
   return recommendationsOriginal
     .filter((rec) => {
-      if (rec.rec_kind === "모듬" || !rec.to_member_id) return true;
+      if (rec.rec_kind === "모듬") {
+        if (!isDemoMode()) return false;
+        const participants = meetupParticipantsOf(rec);
+        if (participants.length === 0) return false;
+        return participants.every((id) => matchingConsentOf(id, session));
+      }
+      if (!rec.to_member_id) return false;
       return (
         matchingConsentOf(rec.from_member_id, session) &&
         matchingConsentOf(rec.to_member_id, session)
@@ -356,32 +390,74 @@ function computeAllowedSeedRecIds(session: MatchingSessionState): string[] {
     .map((r) => r.id);
 }
 
-/** 뷰어 권한 반영 그래프 엣지(#1~#3 patch 정책 이관: 운영자=전체, 일반=본인 pair+양측 동의). */
+/** 뷰어가 이 추천의 당사자인지(1:1 endpoint 또는 모듬 참여자). */
+function isPartyOf(rec: Recommendation, personaId: string): boolean {
+  if (rec.rec_kind === "모듬") {
+    return meetupParticipantsOf(rec).includes(personaId);
+  }
+  return personaId === rec.from_member_id || personaId === rec.to_member_id;
+}
+
+/**
+ * C4(#3): 주간 목록에서 숨길 declined 시드 추천 id — 사유 5종 전부, 원본 status·세션
+ * override 불문. 당사자/운영자 스코프로만 담아 타인 거절 상태 열거를 차단한다.
+ */
+function computeHiddenSeedRecIds(req: MatchingRequest): string[] {
+  return recommendationsOriginal
+    .filter(
+      (rec) =>
+        mergedStatusOf(rec, req.session) === "declined" &&
+        (req.role === "운영자" || isPartyOf(rec, req.personaId)),
+    )
+    .map((r) => r.id);
+}
+
+/**
+ * 뷰어 권한 반영 그래프 엣지(#1~#3 patch 정책 + C4 모듬 이관).
+ * allowedSeedRecIds(동의·non-demo 모듬 gate) 통과분에서 declined를 제외하고,
+ * 뷰어 당사자 판정을 얹는다: 운영자=전체, 일반=본인이 endpoint(1:1) 또는 참여자(모듬)인 것만.
+ * 거절된 연결은 그래프에도 광고하지 않는다(C4 #3의 그래프 대응).
+ */
 function computeGraphEdges(req: MatchingRequest): MatchingGraphEdge[] {
-  const canView = (from: string, to: string): boolean => {
-    if (req.role === "운영자") return true;
-    return (
-      (req.personaId === from || req.personaId === to) &&
-      matchingConsentOf(from, req.session) &&
-      matchingConsentOf(to, req.session)
-    );
-  };
+  const allowed = new Set(computeAllowedSeedRecIds(req.session));
   const edges: MatchingGraphEdge[] = [];
   for (const rec of recommendationsOriginal) {
+    if (!allowed.has(rec.id)) continue;
+    const status = mergedStatusOf(rec, req.session);
+    if (status === "declined") continue;
+    if (req.role !== "운영자" && !isPartyOf(rec, req.personaId)) continue;
     if (rec.rec_kind === "모듬") {
-      // 모듬 참여자 목록은 meetups 시드가 정본 — C4에서 참여자 단위 gate와 함께 이관 예정.
-      void meetupMemberIdsOf(rec);
+      const organizer = rec.from_member_id;
+      for (const memberId of meetupParticipantsOf(rec)) {
+        if (memberId === organizer) continue;
+        // 열거 불변식(기존 테스트 계약): 일반 회원 엣지는 항상 본인이 endpoint다.
+        // 같은 모듬이라도 타 참여자 간 엣지는 운영자에게만 내려간다(멤버십 자체는 공개 시드).
+        if (
+          req.role !== "운영자" &&
+          req.personaId !== organizer &&
+          req.personaId !== memberId
+        ) {
+          continue;
+        }
+        edges.push({
+          id: `${rec.id}:${memberId}`,
+          from: organizer,
+          to: memberId,
+          match_type: rec.match_type,
+          rec_kind: "모듬",
+          status,
+        });
+      }
       continue;
     }
     if (!rec.to_member_id) continue;
-    if (!canView(rec.from_member_id, rec.to_member_id)) continue;
     edges.push({
       id: rec.id,
       from: rec.from_member_id,
       to: rec.to_member_id,
       match_type: rec.match_type,
       rec_kind: "1:1",
-      status: rec.status,
+      status,
     });
   }
   return edges;
@@ -406,6 +482,7 @@ export function computeMatchingBundle(req: MatchingRequest): MatchingBundle {
       req.session,
     ),
     allowedSeedRecIds: computeAllowedSeedRecIds(req.session),
+    hiddenSeedRecIds: computeHiddenSeedRecIds(req),
     graphEdges: computeGraphEdges(req),
   };
 }

@@ -113,3 +113,33 @@ describe("getRecommendationGraphEdges — 뷰어 범위와 동의 gate", () => {
     ).rejects.toThrow("Recommendation not found");
   });
 });
+
+describe("getRecommendations — declined 주간 목록 재노출 차단(C4 #3)", () => {
+  it("시드 원본이 declined인 REC-06은 수신자(M-004) 주간 목록에 등장하지 않는다", async () => {
+    const { common, different } = await getRecommendations({
+      role: "기업가",
+      personaId: "M-004",
+    });
+    const ids = [...common, ...different].map((r) => r.id);
+    expect(ids).not.toContain("REC-06");
+  });
+
+  it("세션에서 거절한 추천은 즉시 주간 목록에서 사라진다", async () => {
+    const vc = { role: "기업가" as const, personaId: "M-001" };
+    const before = await getRecommendations(vc);
+    expect([...before.common, ...before.different].map((r) => r.id)).toContain(
+      "REC-07",
+    );
+    useSessionInteractionStore.getState().setRecommendationOverride("REC-07", {
+      status: "declined",
+      decline_reason: "관심없음",
+    });
+    const after = await getRecommendations(vc);
+    expect(
+      [...after.common, ...after.different].map((r) => r.id),
+    ).not.toContain("REC-07");
+    // 상세(영수증) 조회는 유지된다 — 거절 직후 확인 화면 계약(writes.test와 동일).
+    const receipt = await getRecommendation(vc, "REC-07");
+    expect(receipt.status).toBe("declined");
+  });
+});

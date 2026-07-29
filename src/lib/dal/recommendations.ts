@@ -125,11 +125,17 @@ export async function getRecommendations(
   // C3: 서버 번들 1회 호출 — 엔진 추천·허용 pair·점수를 함께 받는다(클라 private 입력 0).
   const bundle = await getMatchingBundle(vc);
   const allowedSeedIds = new Set(bundle.allowedSeedRecIds);
+  // C4(#3): declined(사유 5종 전부)는 주간 목록에 재노출하지 않는다 — 원본 declined는
+  // 클라 twin에서 status가 중립화돼 있어 서버 판정(hiddenSeedRecIds)만이 정본이다.
+  const hiddenSeedIds = new Set(bundle.hiddenSeedRecIds);
   // M1-7: 수동 시드 + 매칭엔진 산출을 병행 노출(중복 pair는 서버에서 제외됨).
   // P1-2: 매칭 동의(B)가 없는 pair의 1:1 시드 추천은 목록에서 제외(fail-closed, 서버 판정).
   const addressedToViewer = [
     ...seed.filter(
-      (rec) => isAddressedTo(rec, vc.personaId) && allowedSeedIds.has(rec.id),
+      (rec) =>
+        isAddressedTo(rec, vc.personaId) &&
+        allowedSeedIds.has(rec.id) &&
+        !hiddenSeedIds.has(rec.id),
     ),
     ...bundle.engineRecommendations,
   ];
@@ -176,7 +182,8 @@ export interface RecommendationGraphEdge {
 export async function getRecommendationGraphEdges(
   vc: ViewerContext,
 ): Promise<RecommendationGraphEdge[]> {
-  // C3: 뷰어 권한·동의 gate가 반영된 엣지를 서버가 계산한다(모듬 엣지 이관은 C4).
+  // C3·C4: 뷰어 권한·동의·declined·모듬(참여자 전원 동의, demo 한정) gate가 전부
+  // 서버(computeGraphEdges)에서 계산된 엣지를 그대로 반환한다.
   const bundle = await getMatchingBundle(vc);
   return bundle.graphEdges;
 }
