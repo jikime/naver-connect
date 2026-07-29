@@ -27,7 +27,11 @@ import type {
 } from "@/lib/matching/engine";
 import { runEngine } from "@/lib/matching/engine";
 import { buildExplanation } from "@/lib/matching/explain";
-import { toEngineNeed } from "@/lib/matching/receipt";
+import {
+  type ConsentReceiptResolver,
+  issueSafeMatchReceipt,
+  toEngineNeed,
+} from "@/lib/matching/receipt";
 import type {
   OnboardingResult,
   RecommendationOverride,
@@ -45,6 +49,7 @@ import type {
   Recommendation,
   RecStatus,
   RuleWeight,
+  SafeMatchReceipt,
   Tag,
 } from "@/types";
 
@@ -135,6 +140,34 @@ function matchingConsentOf(
   );
 }
 
+/** 세션 온보딩 동의의 합성 영수증 id — finalize가 발급받아 need 영수증이 참조한다. */
+function sessionConsentReceiptId(personId: string): string {
+  return `consent-session-${personId}-use_private_needs_for_matching`;
+}
+
+/**
+ * consent_receipt_id 해석기(M2 보완 #1) — 임의 문자열 참조를 차단한다.
+ * 세션 합성 id는 해당 인물의 세션 매칭 동의가 실제 true일 때만,
+ * 시드 id는 demo 모드에서 person·purpose 일치 + 미철회일 때만 유효.
+ */
+function consentReceiptResolverOf(
+  session: MatchingSessionState,
+): ConsentReceiptResolver {
+  return (consentReceiptId, ownerId) => {
+    if (consentReceiptId === sessionConsentReceiptId(ownerId)) {
+      return session.onboardingResults[ownerId]?.consents.matching === true;
+    }
+    if (!isDemoMode()) return false;
+    const record = seedConsents.find((c) => c.id === consentReceiptId);
+    return (
+      record !== undefined &&
+      record.person_id === ownerId &&
+      record.purpose === "use_private_needs_for_matching" &&
+      record.withdrawn_at === undefined
+    );
+  };
+}
+
 // ── 엔진 입력 조립 ─────────────────────────────────────────────────────────
 function buildOrgEdges(): { a: string; b: string }[] {
   const memberByOrg = new Map<string, string>();
@@ -207,12 +240,13 @@ function mergeWithSession(session: MatchingSessionState): {
   const results = session.onboardingResults;
   const refreshed = new Set(Object.keys(results));
   const consentFn = (id: string) => matchingConsentOf(id, session);
+  const resolver = consentReceiptResolverOf(session);
   const needs = [
     ...seedNeeds
       .filter((n) => n.status === "active" && !refreshed.has(n.owner.id))
-      .map((n) => toEngineNeed(n, consentFn)),
+      .map((n) => toEngineNeed(n, consentFn, resolver)),
     ...Object.values(results).flatMap((r) =>
-      r.needs.map((n) => toEngineNeed(n, consentFn)),
+      r.needs.map((n) => toEngineNeed(n, consentFn, resolver)),
     ),
   ];
   const offers = [
@@ -461,6 +495,66 @@ function computeGraphEdges(req: MatchingRequest): MatchingGraphEdge[] {
     });
   }
   return edges;
+}
+
+// ── safe_match_text 승인 영수증 서버 발급(M2 온보딩 P1-1) ─────────────────────
+// Codex 보완 #1: 클라이언트가 issueSafeMatchReceipt를 직접 호출하면 승인자·동의 참조를
+// 스스로 꾸밀 수 있다. 승인 의사(문구)만 받고, 서버가 owner·동의를 확인해 원자 발급한다.
+// mock auth 전제(C3 문서화된 경계): personaId/session은 클라이언트 신고값 — 실인증 결속은 M4.
+
+export interface SafeTextApproval {
+  needId: string;
+  text: string;
+}
+
+export interface SafeTextConfirmRequest {
+  personaId: string;
+  approvals: SafeTextApproval[];
+  session: MatchingSessionState;
+}
+
+export interface SafeTextConfirmResult {
+  needId: string;
+  text: string;
+  receipt: SafeMatchReceipt;
+}
+
+/**
+ * 온보딩 세션 need의 매칭용 문구를 확정하고 영수증을 발급한다.
+ * fail-closed: 온보딩 결과 부재·매칭 동의 없음·타인 need·미존재 need·빈 문구는 전부 reject.
+ */
+export function confirmSafeMatchTexts(
+  req: SafeTextConfirmRequest,
+): SafeTextConfirmResult[] {
+  const result = req.session.onboardingResults[req.personaId];
+  if (!result) {
+    throw new Error("승인할 온보딩 결과가 없습니다");
+  }
+  if (!matchingConsentOf(req.personaId, req.session)) {
+    throw new Error("매칭 사용 동의(B) 없이 매칭 문구를 확정할 수 없습니다");
+  }
+  const consentReceiptId = sessionConsentReceiptId(req.personaId);
+  const confirmedAt = new Date().toISOString();
+  return req.approvals.map((approval) => {
+    const need = result.needs.find((n) => n.id === approval.needId);
+    if (!need) {
+      throw new Error(`승인 대상 need가 없습니다: ${approval.needId}`);
+    }
+    if (need.owner.id !== req.personaId) {
+      throw new Error("본인 need만 승인할 수 있습니다");
+    }
+    const text = approval.text.trim();
+    if (text.length === 0) {
+      throw new Error("빈 매칭 문구는 승인할 수 없습니다");
+    }
+    const receipt = issueSafeMatchReceipt(
+      { ...need, safe_match_text: text },
+      req.personaId,
+      consentReceiptId,
+      confirmedAt,
+    );
+    return { needId: need.id, text, receipt };
+  });
 }
 
 /** 단일 진입점 — route/transport가 호출한다. */

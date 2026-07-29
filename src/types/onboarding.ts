@@ -60,7 +60,16 @@ export interface OnboardingFinalizeInput {
   field_tags: number[];
   value_chain_stage: string;
   mission_statement: string;
-  demand_tags: { tagId: number; priority: boolean; detail_quote: string }[];
+  demand_tags: {
+    tagId: number;
+    priority: boolean;
+    detail_quote: string;
+    /**
+     * M2 P1-1: 사용자가 마지막 확인 화면에서 승인한 매칭용 문구. 승인 의사만 담고,
+     * 영수증은 서버(/api/onboarding/safe-text)가 발급한다 — 미승인이면 need는 draft 유지.
+     */
+    safe_match?: { approved: boolean; text: string };
+  }[];
   supply_tags: { tagId: number; detail: string }[];
   activities: string[];
   /** 스텝4에서 선택한 현재 협업 가능 시간 */

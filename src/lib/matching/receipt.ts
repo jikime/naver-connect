@@ -36,6 +36,16 @@ export function issueSafeMatchReceipt(
   };
 }
 
+/**
+ * consent_receipt_id 해석기 — 참조가 실제 동의 레코드(본인·매칭 목적·미철회)로
+ * 해석되는지 판정한다. 조회처(시드/세션)를 모르는 순수 모듈이라 주입받는다.
+ * (M2 온보딩 보완 #1: "비어있지 않음" 검사만으로는 임의 문자열 위조를 못 막는다)
+ */
+export type ConsentReceiptResolver = (
+  consentReceiptId: string,
+  ownerId: string,
+) => boolean;
+
 /** ISO 8601 파싱 성공 + 1970~2100 범위. "x"·빈 문자열·범위 밖은 전부 무효. */
 function isValidConfirmedAt(value: unknown): boolean {
   if (typeof value !== "string" || value.trim().length === 0) return false;
@@ -47,9 +57,13 @@ function isValidConfirmedAt(value: unknown): boolean {
 /**
  * 영수증 전수 검증 — 하나라도 어긋나면 false(fail-closed).
  * ①status=user_confirmed ②영수증 존재 ③confirmed_at이 유효 ISO ④승인자=owner
- * ⑤source_revision=현재 profile_revision ⑥content_hash=현재 safe_match_text 해시 ⑦동의 영수증 참조 존재
+ * ⑤source_revision=현재 profile_revision ⑥content_hash=현재 safe_match_text 해시
+ * ⑦동의 영수증 참조 존재 + (resolver 주입 시) 실제 동의 레코드로 해석됨.
  */
-export function verifySafeMatchReceipt(need: NeedIntentV1): boolean {
+export function verifySafeMatchReceipt(
+  need: NeedIntentV1,
+  resolveConsentReceipt?: ConsentReceiptResolver,
+): boolean {
   if (need.safe_match_status !== "user_confirmed") return false;
   const receipt = need.safe_match_receipt;
   if (!receipt) return false;
@@ -65,6 +79,12 @@ export function verifySafeMatchReceipt(need: NeedIntentV1): boolean {
   ) {
     return false;
   }
+  if (
+    resolveConsentReceipt &&
+    !resolveConsentReceipt(receipt.consent_receipt_id, need.owner.id)
+  ) {
+    return false;
+  }
   return true;
 }
 
@@ -76,9 +96,11 @@ export function verifySafeMatchReceipt(need: NeedIntentV1): boolean {
 export function toEngineNeed(
   n: NeedIntentV1,
   hasMatchingConsent: (personId: string) => boolean,
+  resolveConsentReceipt?: ConsentReceiptResolver,
 ): EngineNeed {
   const textAllowed =
-    verifySafeMatchReceipt(n) && hasMatchingConsent(n.owner.id);
+    verifySafeMatchReceipt(n, resolveConsentReceipt) &&
+    hasMatchingConsent(n.owner.id);
   return {
     id: n.id,
     ownerId: n.owner.id,

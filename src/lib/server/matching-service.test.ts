@@ -5,11 +5,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import declineReasonsSeed from "@/data/decline_reasons.json";
 import recommendationsOriginalSeed from "@/data/private/recommendations.json";
+import { hashSafeMatchText } from "@/lib/matching/receipt";
 import type {
   MatchingRequest,
   MatchingSessionState,
 } from "@/lib/server/matching-service";
-import { computeMatchingBundle } from "@/lib/server/matching-service";
+import {
+  computeMatchingBundle,
+  confirmSafeMatchTexts,
+  runMatchingEngine,
+} from "@/lib/server/matching-service";
 import type { DeclineReasonCode, Recommendation } from "@/types";
 
 const recsOriginal = recommendationsOriginalSeed as Recommendation[];
@@ -168,5 +173,111 @@ describe("C4 — 모듬 그래프 엣지 서버 이관", () => {
     expect(
       outsider.graphEdges.filter((e) => e.rec_kind === "모듬"),
     ).toHaveLength(0);
+  });
+});
+
+describe("confirmSafeMatchTexts — 서버 발급(M2 온보딩 보완 #1)", () => {
+  const sessionWith = (personaId: string, matching: boolean) => ({
+    ...EMPTY,
+    onboardingResults: {
+      [personaId]: {
+        ...onboardingWithMatchingConsent(matching),
+        needs: [
+          {
+            id: `need-session-${personaId}-4-0`,
+            owner: { kind: "person", id: personaId },
+            tag_ids: [4],
+            detail_quote: "원문입니다",
+            safe_match_status: "draft",
+            priority: "primary",
+            urgency: "active",
+            constraints: [],
+            status: "active",
+            source: "onboarding",
+            profile_revision: 2,
+            created_at: "2026-07-29T15:00:00+09:00",
+          },
+        ],
+      },
+    },
+  });
+
+  it("매칭 동의가 있으면 영수증을 발급하고, 그 영수증은 전수 검증을 통과한다", () => {
+    const session = sessionWith("M-001", true) as MatchingSessionState;
+    const results = confirmSafeMatchTexts({
+      personaId: "M-001",
+      approvals: [{ needId: "need-session-M-001-4-0", text: "승인 요약문" }],
+      session,
+    });
+    expect(results).toHaveLength(1);
+    const { receipt, text } = results[0];
+    expect(text).toBe("승인 요약문");
+    expect(receipt.confirmer_person_id).toBe("M-001");
+    expect(receipt.consent_receipt_id).toContain("consent-session-M-001");
+    // 발급된 영수증으로 need를 확정하면 엔진 입력에 텍스트가 실린다.
+    session.onboardingResults["M-001"].needs[0] = {
+      ...session.onboardingResults["M-001"].needs[0],
+      safe_match_text: text,
+      safe_match_status: "user_confirmed",
+      safe_match_receipt: receipt,
+    };
+    const { input } = runMatchingEngine(session);
+    const need = input.needs.find((n) => n.id === "need-session-M-001-4-0");
+    expect(need?.match_text).toBe("승인 요약문");
+  });
+
+  it("매칭 동의가 없으면 발급을 거부한다", () => {
+    expect(() =>
+      confirmSafeMatchTexts({
+        personaId: "M-001",
+        approvals: [{ needId: "need-session-M-001-4-0", text: "요약" }],
+        session: sessionWith("M-001", false) as MatchingSessionState,
+      }),
+    ).toThrow();
+  });
+
+  it("타인 need·빈 문구·없는 need는 전부 거부한다(fail-closed)", () => {
+    const session = sessionWith("M-001", true) as MatchingSessionState;
+    expect(() =>
+      confirmSafeMatchTexts({
+        personaId: "M-002",
+        approvals: [{ needId: "need-session-M-001-4-0", text: "요약" }],
+        session,
+      }),
+    ).toThrow();
+    expect(() =>
+      confirmSafeMatchTexts({
+        personaId: "M-001",
+        approvals: [{ needId: "need-session-M-001-4-0", text: "   " }],
+        session,
+      }),
+    ).toThrow();
+    expect(() =>
+      confirmSafeMatchTexts({
+        personaId: "M-001",
+        approvals: [{ needId: "need-없음", text: "요약" }],
+        session,
+      }),
+    ).toThrow();
+  });
+
+  it("위조된 consent_receipt_id를 단 세션 need는 엔진에서 텍스트가 빠진다", () => {
+    const session = sessionWith("M-001", true) as MatchingSessionState;
+    const base = session.onboardingResults["M-001"].needs[0];
+    session.onboardingResults["M-001"].needs[0] = {
+      ...base,
+      safe_match_text: "위조 시도",
+      safe_match_status: "user_confirmed",
+      safe_match_receipt: {
+        confirmed_at: "2026-07-29T15:01:00+09:00",
+        confirmer_person_id: "M-001",
+        source_revision: 2,
+        content_hash: hashSafeMatchText("위조 시도"),
+        consent_receipt_id: "consent-위조-임의문자열",
+      },
+    };
+    const { input } = runMatchingEngine(session);
+    const need = input.needs.find((n) => n.id === "need-session-M-001-4-0");
+    expect(need?.match_text).toBe("");
   });
 });

@@ -5,6 +5,7 @@ import declineReasonsSeed from "@/data/decline_reasons.json";
 // P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
 import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
 import {
+  confirmSafeTexts,
   getEngineRecommendationsFor,
   parseEngineRecId,
 } from "@/lib/dal/matching";
@@ -121,11 +122,16 @@ export async function finalizeOnboarding(
   const now = new Date().toISOString();
   const revision = 2; // 시드(revision 1) 위의 세션 개정판
   // P1-3: 질문하지 않아 답이 없는 항목은 빈 원문으로 저장 — 시스템 문구를 사용자 quote로 날조하지 않는다.
+  // M2 P1-1: 승인 의사가 있는 항목은 safe_match_text를 담아 두되 status는 draft 유지 —
+  // user_confirmed 승격은 서버 발급 영수증(confirmSafeTexts)을 받은 뒤에만 한다.
   const needs: NeedIntentV1[] = profile.demand_tags.map((d, i) => ({
     id: `need-session-${vc.personaId}-${d.tagId}-${i}`,
     owner: { kind: "person", id: vc.personaId },
     tag_ids: [d.tagId],
     detail_quote: d.detail_quote,
+    ...(d.safe_match?.approved && d.safe_match.text.trim().length > 0
+      ? { safe_match_text: d.safe_match.text.trim() }
+      : {}),
     safe_match_status: "draft",
     priority: d.priority ? "primary" : "normal",
     urgency: profile.hot_lead?.flag ? "time_sensitive" : "active",
@@ -159,6 +165,38 @@ export async function finalizeOnboarding(
     },
   });
   store.finalizeOnboardingFor(vc.personaId);
+
+  // M2 P1-1: 매칭 동의(B) + 승인 의사가 있는 need만 서버에 영수증 발급을 요청하고,
+  // 발급분을 user_confirmed로 승격해 재적립한다. 미승인·미동의는 draft 그대로(fail-closed).
+  // silent fallback 금지 — 발급 실패는 그대로 throw되어 화면 오류로 드러난다.
+  const approvals = needs
+    .filter((n) => typeof n.safe_match_text === "string")
+    .map((n) => ({ needId: n.id, text: n.safe_match_text as string }));
+  if (profile.consents.use_private_needs_for_matching && approvals.length > 0) {
+    const confirmed = await confirmSafeTexts(vc.personaId, approvals);
+    const byNeedId = new Map(confirmed.map((c) => [c.needId, c]));
+    const upgradedNeeds: NeedIntentV1[] = needs.map((n) => {
+      const c = byNeedId.get(n.id);
+      return c
+        ? {
+            ...n,
+            safe_match_text: c.text,
+            safe_match_status: "user_confirmed",
+            safe_match_receipt: c.receipt,
+          }
+        : n;
+    });
+    store.storeOnboardingResult(vc.personaId, {
+      snapshot: profile,
+      needs: upgradedNeeds,
+      offers,
+      consents: {
+        publish: profile.consents.publish_profile,
+        matching: profile.consents.use_private_needs_for_matching,
+        quote: profile.consents.quote_in_intro,
+      },
+    });
+  }
 
   const member = await getMember(vc, vc.personaId);
   const { common, different } = await getRecommendations(vc);

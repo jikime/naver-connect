@@ -330,11 +330,18 @@ export function OnbWizard() {
         const followup = draft.followupAnswers.find(
           (a) => a.kind === "demand" && a.tagId === sel.tagId,
         );
+        // M2 P1-1: 승인 의사만 동봉 — 영수증은 finalize 내부에서 서버가 발급한다.
+        const approval = draft.safeMatchApprovals[sel.tagId];
         // P1-3: 질문하지 않은 항목에 시스템 문구를 사용자 원문처럼 넣지 않는다 — 빈 값 유지
         return {
           tagId: sel.tagId,
           priority: sel.priority,
           detail_quote: followup?.answer?.trim() ?? "",
+          ...(draft.consentMatching &&
+          approval?.approved &&
+          approval.text.trim().length > 0
+            ? { safe_match: { approved: true, text: approval.text.trim() } }
+            : {}),
         };
       });
       const supplyFollowup = draft.followupAnswers.find(
@@ -831,6 +838,44 @@ export function OnbWizard() {
                         }),
                       })
                     }
+                    // M2 P1-1: 원문(후속질문 답)이 있는 수요만 승인 대상 — 빈 문구 승인 금지.
+                    safeMatchItems={draft.demandSelections.flatMap((sel) => {
+                      const quote =
+                        draft.followupAnswers
+                          .find(
+                            (a) => a.kind === "demand" && a.tagId === sel.tagId,
+                          )
+                          ?.answer?.trim() ?? "";
+                      if (!quote) return [];
+                      const approval = draft.safeMatchApprovals[sel.tagId];
+                      return [
+                        {
+                          tagId: sel.tagId,
+                          tagName:
+                            tags.find((t) => t.id === sel.tagId)?.name ??
+                            `수요 ${sel.tagId}`,
+                          quote,
+                          approved: approval?.approved ?? false,
+                          text: approval?.text ?? quote,
+                        },
+                      ];
+                    })}
+                    onSafeMatchChange={(tagId, patch) => {
+                      const quote =
+                        draft.followupAnswers
+                          .find((a) => a.kind === "demand" && a.tagId === tagId)
+                          ?.answer?.trim() ?? "";
+                      const prev = draft.safeMatchApprovals[tagId] ?? {
+                        approved: false,
+                        text: quote,
+                      };
+                      updateDraft({
+                        safeMatchApprovals: {
+                          ...draft.safeMatchApprovals,
+                          [tagId]: { ...prev, ...patch },
+                        },
+                      });
+                    }}
                   />
                   {finalizeError && (
                     <p className="flex items-center gap-2 text-sm text-destructive">

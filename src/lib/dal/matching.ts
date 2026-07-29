@@ -10,6 +10,9 @@ import type {
   MatchingBundle,
   MatchingRequest,
   MatchingSessionState,
+  SafeTextApproval,
+  SafeTextConfirmRequest,
+  SafeTextConfirmResult,
 } from "@/lib/server/matching-service";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type {
@@ -70,6 +73,43 @@ async function callMatching(vc: ViewerContext): Promise<MatchingBundle> {
     throw new Error(`매칭 서비스 오류 (${res.status})`);
   }
   return (await res.json()) as MatchingBundle;
+}
+
+export type SafeTextTransport = (
+  req: SafeTextConfirmRequest,
+) => Promise<SafeTextConfirmResult[]>;
+
+let safeTextTransport: SafeTextTransport | null = null;
+
+/** 테스트/서버 사이드에서 HTTP 대신 승인 서비스 함수를 직접 연결한다. */
+export function setSafeTextTransport(t: SafeTextTransport | null): void {
+  safeTextTransport = t;
+}
+
+/**
+ * safe_match_text 승인 요청(M2 P1-1) — 영수증은 서버가 발급한다(클라 발급 금지, 보완 #1).
+ * 오류 시 silent fallback 없이 throw(fail-closed).
+ */
+export async function confirmSafeTexts(
+  personaId: string,
+  approvals: SafeTextApproval[],
+): Promise<SafeTextConfirmResult[]> {
+  const req: SafeTextConfirmRequest = {
+    personaId,
+    approvals,
+    session: snapshotSessionState(),
+  };
+  if (safeTextTransport) return safeTextTransport(req);
+  const res = await fetch("/api/onboarding/safe-text", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(req),
+  });
+  if (!res.ok) {
+    throw new Error(`매칭 문구 승인 실패 (${res.status})`);
+  }
+  const payload = (await res.json()) as { results: SafeTextConfirmResult[] };
+  return payload.results;
 }
 
 /** 추천/그래프 DAL이 한 번의 호출로 재사용하는 번들 조회. */

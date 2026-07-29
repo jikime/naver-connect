@@ -155,3 +155,27 @@ describe("safe-match 영수증 — toEngineNeed mapper", () => {
     expect("safe_match_receipt" in dto).toBe(false);
   });
 });
+
+describe("safe-match 영수증 — consent 영수증 해석 검증(M2 온보딩 보완 #1)", () => {
+  // Codex 보완 #1: consent_receipt_id "비어있지 않음"만으로는 부족 — 해석기(resolver)가
+  // 실제 동의 레코드(person·purpose·withdrawn_at)를 확인해야 한다.
+  const resolverAllowing =
+    (validId: string) => (receiptId: string, ownerId: string) =>
+      receiptId === validId && ownerId === "M-001";
+
+  it("resolver가 주어지면 consent_receipt_id가 실제 동의로 해석돼야 통과한다", () => {
+    const need = confirmedNeed();
+    const validId = need.safe_match_receipt?.consent_receipt_id ?? "";
+    expect(verifySafeMatchReceipt(need, resolverAllowing(validId))).toBe(true);
+    expect(
+      verifySafeMatchReceipt(need, resolverAllowing("consent-없는-id")),
+    ).toBe(false);
+  });
+
+  it("resolver 거부는 toEngineNeed에서도 match_text를 비운다", () => {
+    const allow = () => true;
+    expect(toEngineNeed(confirmedNeed(), allow, () => false).match_text).toBe(
+      "",
+    );
+  });
+});

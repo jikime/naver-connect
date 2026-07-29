@@ -267,10 +267,12 @@ describe("하니스 — 재리뷰 #5 safe-match provenance (영수증 4중 결�
     if ("safe_match_receipt" in over) return need;
     return {
       ...need,
+      // M2 보완 #1: consent_receipt_id는 실제 동의 레코드로 해석돼야 한다 —
+      // 세션 온보딩 동의의 정규 합성 id를 사용(임의 문자열은 resolver가 거부).
       safe_match_receipt: issueSafeMatchReceipt(
         need,
         need.owner.id,
-        "CONSENT-M-001-matching",
+        "consent-session-M-001-use_private_needs_for_matching",
         "2026-07-29T13:00:00+09:00",
       ),
     };
