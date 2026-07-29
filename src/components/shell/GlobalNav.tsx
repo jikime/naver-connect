@@ -4,7 +4,7 @@
 // - 플로팅 알약이 아니라 화면 전체 폭 상단 고정 바(sticky top-0, z-100 = {zIndex.sticky}).
 // - 배경 {colors.canvas} 반투명 {opacity.glass}(0.6) + backdrop-blur, 스크롤 시 {opacity.glass-strong}
 //   (0.7)로 진해짐. 바 하단 {colors.hairline} 1px.
-// - 비로그인: 랜딩 앵커 + 로그인/회원가입. 로그인: 기존 전체 대메뉴 + 프로필 메뉴.
+// - 비로그인: 랜딩 앵커 + 로그인. 로그인: 기존 전체 대메뉴 + 프로필 메뉴.
 // - 모바일: 로고 + 햄버거 → Sheet 풀스크린 {colors.menu-overlay} #e8e1d9 오버레이(z-200 = {zIndex.overlay}).
 //
 // 대메뉴 상호작용(v4 계승): 라벨 우측 아래 화살표(열림 시 위로 회전), hover/포커스/클릭으로
@@ -431,12 +431,9 @@ export function GlobalNav() {
           {isAuthenticated ? (
             <UserMenu />
           ) : (
-            <div className="flex items-center gap-2">
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/login">로그인</Link>
-              </Button>
+            <div className="flex items-center">
               <Button asChild size="sm">
-                <Link href="/signup">회원가입</Link>
+                <Link href="/login">로그인</Link>
               </Button>
             </div>
           )}
@@ -526,11 +523,6 @@ export function GlobalNav() {
                   </nav>
                   <SheetClose asChild>
                     <Button asChild>
-                      <Link href="/signup">회원가입</Link>
-                    </Button>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Button asChild variant="outline">
                       <Link href="/login">로그인</Link>
                     </Button>
                   </SheetClose>

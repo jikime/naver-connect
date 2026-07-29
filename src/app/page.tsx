@@ -50,9 +50,9 @@ const SERVICE_LAYERS = [
 
 const ONBOARDING_STEPS = [
   {
-    title: "회원 유형을 선택해 가입",
+    title: "심사용 계정으로 로그인",
     description:
-      "기업가 또는 전문가로 참여합니다. 가입이 끝나면 바로 온보딩으로 이어집니다.",
+      "기업가 또는 전문가 계정으로 로그인하면 역할에 맞는 서비스로 이어집니다.",
   },
   {
     title: "5~7분 프로필 온보딩",
@@ -126,13 +126,10 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Button asChild size="lg">
-                <Link href="/signup">
-                  회원가입하고 시작하기
+                <Link href="/login">
+                  심사용 계정으로 로그인
                   <ArrowRight className="size-4" />
                 </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/login">이미 회원이라면 로그인</Link>
               </Button>
             </div>
             <dl className="grid grid-cols-3 divide-x divide-guud-hairline border-y border-guud-hairline py-4 text-left">
@@ -237,7 +234,7 @@ export default function LandingPage() {
               [ HOW IT WORKS ]
             </p>
             <h2 className="font-heading text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              가입하면 바로
+              로그인하면 바로
               <br />
               <span className="text-primary">온보딩</span>을 시작해요
             </h2>
@@ -248,8 +245,8 @@ export default function LandingPage() {
             <div className="flex items-start gap-3 rounded-2xl border border-guud-hairline bg-background p-4">
               <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" />
               <p className="text-xs leading-5 text-guud-text-muted-2">
-                가입 → 온보딩 → 프로필 확정 → 첫 추천까지 한 흐름으로 체험할 수
-                있습니다.
+                로그인 → 온보딩 → 프로필 확정 → 첫 추천까지 한 흐름으로 체험할
+                수 있습니다.
               </p>
             </div>
           </ScrollReveal>
@@ -388,8 +385,8 @@ export default function LandingPage() {
             </p>
           </div>
           <Button asChild size="lg" className="w-full shrink-0 sm:w-auto">
-            <Link href="/signup">
-              회원가입
+            <Link href="/login">
+              심사용 계정으로 로그인
               <ArrowRight className="size-4" />
             </Link>
           </Button>

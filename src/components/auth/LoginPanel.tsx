@@ -2,7 +2,6 @@
 
 import { Building2, Check, ShieldCheck, Users } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { type FormEvent, useId, useState } from "react";
@@ -89,6 +88,7 @@ export function LoginPanel({ showReviewAccounts = false }: LoginPanelProps) {
             width={1448}
             height={1086}
             sizes="(max-width: 1023px) calc(100vw - 64px), 38vw"
+            loading="eager"
             alt="기존 회원이 협업 동료들의 환영을 받으며 다시 모임으로 돌아오는 모습"
             className="aspect-[16/9] w-full rounded-[calc(var(--radius)*1.2)] object-cover sm:aspect-[4/3]"
           />
@@ -211,13 +211,6 @@ export function LoginPanel({ showReviewAccounts = false }: LoginPanelProps) {
               </div>
             </section>
           )}
-
-          <p className="text-center text-sm text-guud-text-muted-2">
-            아직 계정이 없나요?{" "}
-            <Link href="/signup" className="font-semibold text-primary">
-              회원가입
-            </Link>
-          </p>
         </div>
       </div>
     </div>
