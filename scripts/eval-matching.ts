@@ -5,15 +5,36 @@
 //    (하드 검증은 vitest src/lib/matching/harness.test.ts가 담당 — 이 스크립트는 사람이 읽는 비교표)
 // 근거: people_match_retrieval_plan.md §8, plans/generic-mixing-seahorse.md M1-9
 
+// 데모 리포트 전용 스크립트 — seed_mock 동의를 신뢰하는 demo 모드를 명시 선언(P1-2 게이트와 정합).
+process.env.NEXT_PUBLIC_APP_MODE ??= "demo";
+
 import membersSeed from "../src/data/members.json";
 import needsSeed from "../src/data/private/people/needs.json";
 import {
   buildEngineRecommendationsFor,
   runMatchingEngine,
 } from "../src/lib/dal/matching";
+import { COMMON_WEIGHT, RECIPROCAL_WEIGHT } from "../src/lib/matching/engine";
 
 type CombineKey = "min" | "geometric" | "harmonic";
 const COMBINES: CombineKey[] = ["min", "geometric", "harmonic"];
+
+/** P2-2: variant별로 동일한 최종식(0.75*결합 + 0.25*공통 + 가중치)을 재계산해 비교한다. */
+function variantScore(
+  p: ReturnType<typeof runMatchingEngine>["output"]["pairs"][number],
+  combine: CombineKey,
+): number {
+  const raw = Math.max(
+    0,
+    Math.min(
+      1,
+      RECIPROCAL_WEIGHT * p.reciprocal[combine] +
+        COMMON_WEIGHT * p.common +
+        p.boost,
+    ),
+  );
+  return Math.round(raw * 100);
+}
 
 function topKByCombine(
   pairs: ReturnType<typeof runMatchingEngine>["output"]["pairs"],
@@ -23,9 +44,9 @@ function topKByCombine(
 ): string[] {
   return pairs
     .filter((p) => p.from === persona)
-    .sort((a, b) => b.reciprocal[combine] - a.reciprocal[combine])
+    .sort((a, b) => variantScore(b, combine) - variantScore(a, combine))
     .slice(0, k)
-    .map((p) => `${p.to}(${p.reciprocal[combine].toFixed(2)})`);
+    .map((p) => `${p.to}(${variantScore(p, combine)})`);
 }
 
 async function run(): Promise<void> {

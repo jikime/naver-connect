@@ -43,21 +43,37 @@ export function resolveDisplayLabel(conceptId: string): string {
   return preferred.label;
 }
 
-/**
- * 특정 시점(at) 기준의 라벨 스냅샷을 해석한다 — 과거 이벤트/기록을 당시 화면대로 재현(§6.3 운영규칙 3).
- * 당시 유효(valid_from ≤ at < valid_until)했던 revision 중 가장 최근 valid_from을 선택한다.
- */
-export function resolveLabelAt(conceptId: string, at: string): string {
-  assertKnownConcept(conceptId);
+function revisionsValidAt(conceptId: string, at: string) {
   const t = Date.parse(at);
-  const candidates = revisionsOf(conceptId)
+  return revisionsOf(conceptId)
     .filter(
       (rev) =>
         Date.parse(rev.valid_from) <= t &&
         (rev.valid_until === undefined || t < Date.parse(rev.valid_until)),
     )
     .sort((a, b) => Date.parse(b.valid_from) - Date.parse(a.valid_from));
-  const hit = candidates[0];
+}
+
+/**
+ * 특정 시점(at) 기준의 표시 라벨 스냅샷. P2-4: blocked 라벨은 표시 경로에서 절대 반환하지
+ * 않는다 — 당시 라벨이 blocked뿐이면 현재 preferred로 대체한다. 감사용 원본 라벨은
+ * resolveAuditLabelAt를 사용(감사 API 전용).
+ */
+export function resolveLabelAt(conceptId: string, at: string): string {
+  assertKnownConcept(conceptId);
+  const hit = revisionsValidAt(conceptId, at).find(
+    (rev) => rev.label_kind !== "blocked",
+  );
+  return hit ? hit.label : resolveDisplayLabel(conceptId);
+}
+
+/**
+ * 감사 전용 — 당시 라벨을 blocked 포함 원본 그대로 반환한다.
+ * 화면 표시에 사용 금지(P2-4): 변경 이력·감사 로그 재현에만 쓴다.
+ */
+export function resolveAuditLabelAt(conceptId: string, at: string): string {
+  assertKnownConcept(conceptId);
+  const hit = revisionsValidAt(conceptId, at)[0];
   if (!hit) {
     throw new Error(`No label valid at ${at} for concept: ${conceptId}`);
   }

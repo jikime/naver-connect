@@ -221,8 +221,10 @@ CREATE TABLE IF NOT EXISTS nvc_match_documents (
   content_hash          TEXT NOT NULL
 );
 -- CREATE EXTENSION IF NOT EXISTS vector;  -- ⚠️ 승인 후
+-- P2-3: 여러 space/model shadow 병행을 위해 복합 PK — 문서 하나가 KURE-v1·BGE-M3 등
+-- 다중 임베딩 레코드를 가질 수 있다.
 CREATE TABLE IF NOT EXISTS nvc_embedding_records (
-  document_id      TEXT PRIMARY KEY REFERENCES nvc_match_documents(id),
+  document_id      TEXT NOT NULL REFERENCES nvc_match_documents(id),
   space_id         TEXT NOT NULL,
   model_provider   TEXT NOT NULL,
   model_id         TEXT NOT NULL,
@@ -230,8 +232,9 @@ CREATE TABLE IF NOT EXISTS nvc_embedding_records (
   normalized       BOOLEAN DEFAULT TRUE,
   content_hash     TEXT NOT NULL,
   embedding_status TEXT DEFAULT 'pending' CHECK (embedding_status IN ('pending','ready','failed','invalidated')),
-  generated_at     TIMESTAMPTZ
-  -- , embedding vector(1024)  -- ⚠️ 모델 확정(M2) 후 차원 기입
+  generated_at     TIMESTAMPTZ,
+  -- embedding vector(1024),  -- ⚠️ 모델 확정(M2: KURE-v1 vs BGE-M3 shadow) 후 차원 기입
+  PRIMARY KEY (document_id, space_id, model_id)
 );
 
 -- RLS 초안: nvc_need_intents·nvc_consent_records·nvc_interaction_events는

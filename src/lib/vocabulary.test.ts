@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   findConceptIdByLabel,
   getActiveRelease,
+  resolveAuditLabelAt,
   resolveDisplayLabel,
   resolveLabelAt,
 } from "@/lib/vocabulary";
@@ -64,5 +65,17 @@ describe("resolveLabelAt — 시점 스냅샷 재현 (과거 이벤트는 당시
     expect(
       resolveLabelAt("nvc.role.activist", "2026-07-30T00:00:00+09:00"),
     ).toBe("사회혁신활동가");
+  });
+
+  it("blocked 라벨은 표시 경로에서 과거 시점이라도 반환하지 않는다 (P2-4 — 현재 preferred로 대체)", () => {
+    const label = resolveLabelAt("nvc.role.ally", "2026-01-15T00:00:00+09:00");
+    expect(label).toBe("사회혁신 협력 파트너");
+    expect(label).not.toContain("비사회적");
+  });
+
+  it("감사 전용 resolveAuditLabelAt만 blocked 원본을 반환한다", () => {
+    expect(
+      resolveAuditLabelAt("nvc.role.ally", "2026-01-15T00:00:00+09:00"),
+    ).toBe("비사회적기업");
   });
 });
