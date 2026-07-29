@@ -224,6 +224,59 @@ describe("하니스 — P1-2 동의 gate 통합", () => {
   });
 });
 
+describe("하니스 — 재리뷰 #5 safe-match provenance (mapper 3중 검증)", () => {
+  const confirmedNeed = (over: Partial<NeedIntentV1>): NeedIntentV1 => ({
+    id: "need-prov-1",
+    owner: { kind: "person", id: "M-001" },
+    tag_ids: [4],
+    detail_quote: "원문",
+    safe_match_text: "승인된 매칭 요약문",
+    safe_match_status: "user_confirmed",
+    safe_match_confirmed_at: "2026-07-29T13:00:00+09:00",
+    priority: "primary",
+    urgency: "active",
+    constraints: [],
+    status: "active",
+    source: "onboarding",
+    profile_revision: 2,
+    created_at: "2026-07-29T13:00:00+09:00",
+    ...over,
+  });
+
+  it("status+confirmed_at+매칭동의가 모두 있어야 match_text가 엔진에 들어간다", () => {
+    useSessionInteractionStore.getState().storeOnboardingResult("M-001", {
+      ...onboardingResultWith("무시"),
+      needs: [confirmedNeed({})],
+    });
+    const { input } = runMatchingEngine();
+    const mine = input.needs.find((n) => n.ownerId === "M-001");
+    expect(mine?.match_text).toBe("승인된 매칭 요약문");
+  });
+
+  it("confirmed_at(provenance)이 없으면 status가 user_confirmed여도 match_text는 비운다", () => {
+    useSessionInteractionStore.getState().storeOnboardingResult("M-001", {
+      ...onboardingResultWith("무시"),
+      needs: [confirmedNeed({ safe_match_confirmed_at: undefined })],
+    });
+    const { input } = runMatchingEngine();
+    expect(
+      input.needs.find((n) => n.ownerId === "M-001")?.match_text,
+    ).toBe("");
+  });
+
+  it("매칭 동의(B)가 철회된 owner의 match_text는 mapper 단계에서도 비운다 (hard filter와 이중 방어)", () => {
+    useSessionInteractionStore.getState().storeOnboardingResult("M-001", {
+      ...onboardingResultWith("무시"),
+      needs: [confirmedNeed({})],
+      consents: { publish: true, matching: false, quote: false },
+    });
+    const { input } = runMatchingEngine();
+    expect(
+      input.needs.find((n) => n.ownerId === "M-001")?.match_text,
+    ).toBe("");
+  });
+});
+
 describe("하니스 — P1-4 엔진 거절 반영·ID 검증 통합", () => {
   it("엔진 추천을 거절하면 재실행에서 같은 pair가 재등장하지 않는다", async () => {
     const vc = { role: "기업가" as const, personaId: "M-001" };

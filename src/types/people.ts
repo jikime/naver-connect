@@ -55,6 +55,8 @@ export interface NeedIntentV1 {
   /** PII 제거 + 사용자 승인을 거친 매칭·소개용 요약문. draft 상태면 임베딩 금지 */
   safe_match_text?: string;
   safe_match_status: "draft" | "user_confirmed";
+  /** 승인 provenance — user_confirmed의 필수 동반. 없으면 mapper가 텍스트를 사용하지 않는다(재리뷰 #5) */
+  safe_match_confirmed_at?: string;
   priority: "primary" | "normal";
   urgency: "exploring" | "active" | "time_sensitive";
   constraints: ConstraintV1[];

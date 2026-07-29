@@ -113,14 +113,22 @@ function buildDeclines(): DeclineRecord[] {
   return out;
 }
 
-/** 세션 NeedIntent → 엔진 DTO. match_text는 user-confirmed safe_match_text만(아니면 ""). */
-function toEngineNeed(n: NeedIntentV1): EngineNeed {
+/**
+ * 세션 NeedIntent → 엔진 DTO. 재리뷰 #5: match_text는 status 문자열만이 아니라
+ * ①user_confirmed ②승인 provenance(safe_match_confirmed_at) ③owner의 매칭 동의(B)
+ * 세 조건을 mapper에서 모두 확인해야 사용한다 — 하나라도 없으면 "".
+ */
+export function toEngineNeed(n: NeedIntentV1): EngineNeed {
+  const textAllowed =
+    n.safe_match_status === "user_confirmed" &&
+    typeof n.safe_match_confirmed_at === "string" &&
+    n.safe_match_confirmed_at.length > 0 &&
+    getConsentFlags(n.owner.id).matching;
   return {
     id: n.id,
     ownerId: n.owner.id,
     tag_ids: n.tag_ids,
-    match_text:
-      n.safe_match_status === "user_confirmed" ? (n.safe_match_text ?? "") : "",
+    match_text: textAllowed ? (n.safe_match_text ?? "") : "",
     priority: n.priority,
     urgency: n.urgency,
     constraints: n.constraints,
