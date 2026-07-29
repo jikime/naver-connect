@@ -10,7 +10,9 @@
     "start": "next start",
     "lint": "biome check && eslint --config eslint.config.mjs .",
     "format": "biome format --write",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:migration": "tsx scripts/migrate-members-to-people.ts --check",
+    "check:privacy": "tsx scripts/check-bundle-privacy.ts"
   },
   "dependencies": {
     "@types/pg": "^8.20.0",

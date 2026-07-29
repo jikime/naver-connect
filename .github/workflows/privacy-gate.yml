@@ -1,0 +1,76 @@
+# 프라이버시 게이트 — "demo/pilot client private signature 0건 + migration hash 일치"를 CI로 강제한다.
+#
+# 두 축을 막는다.
+#  1) 결정성(determinism): people 시드·derived 산출물이 스크립트 재실행 결과와 byte 단위로 같은지.
+#     산출물을 손으로 고치거나 스크립트만 고치고 산출물을 재생성하지 않은 PR을 차단한다.
+#  2) 번들 프라이버시: demo/pilot 두 빌드 모두에서 private 서술·레코드 시그니처가
+#     client chunk(.next/static/chunks)에 실리지 않았는지.
+#
+# demo와 pilot을 matrix로 분리하는 이유: seed_mock 동의는 NEXT_PUBLIC_APP_MODE=demo에서만
+# 유효하므로(P1-2 fail-closed) 두 모드는 서로 다른 코드 경로를 태우고, 따라서 서로 다른
+# client chunk를 만든다. 한쪽만 검사하면 나머지 모드의 유출을 놓친다.
+#
+# 근거: codex-m0m1-review-changes-requested P1-1/P1-2, plans/generic-mixing-seahorse.md C5
+
+name: privacy-gate
+
+on:
+  push:
+    branches:
+      - feature/naverconnect_cooperativework
+      - "agent/**"
+  pull_request:
+    branches:
+      - feature/naverconnect_cooperativework
+      - "agent/**"
+
+permissions:
+  contents: read
+
+jobs:
+  privacy-gate:
+    name: privacy-gate (${{ matrix.app_mode }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      # 한 모드가 깨져도 나머지 모드의 결과를 봐야 원인 범위를 좁힐 수 있다.
+      fail-fast: false
+      matrix:
+        app_mode: [demo, pilot]
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: install deps
+        run: npm ci || npm install
+
+      # 게이트 1 — migration hash 일치. 산출물 8종(people 시드 4 + derived 4)을
+      # 재생성해 커밋본과 byte 비교한다. 불일치 시 파일명 나열 후 exit 1.
+      - name: determinism gate (migration hash)
+        run: npx tsx scripts/migrate-members-to-people.ts --check
+
+      - name: unit tests
+        run: npm test
+
+      # demo: seed_mock 동의를 신뢰하는 모드. pilot: APP_MODE 미설정(fail-closed 기본값).
+      - name: build (demo)
+        if: matrix.app_mode == 'demo'
+        run: NEXT_PUBLIC_APP_MODE=demo npx next build
+
+      - name: build (pilot)
+        if: matrix.app_mode == 'pilot'
+        run: npx next build
+
+      # 게이트 2 — client private signature 0건. 빌드 산출물이 있어야 하므로 build 뒤에 온다.
+      - name: bundle privacy gate
+        run: npx tsx scripts/check-bundle-privacy.ts
+
+      - name: typecheck
+        run: npx tsc --noEmit

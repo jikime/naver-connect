@@ -1,12 +1,23 @@
 #!/usr/bin/env tsx
 // 기존 회원 8명 시드를 people 도메인(Need/Offer/ImpactIntent/Consent)으로 무손실 변환한다.
-// 사용: npx tsx scripts/migrate-members-to-people.ts
+// 사용: npx tsx scripts/migrate-members-to-people.ts           (실제 쓰기)
+//       npx tsx scripts/migrate-members-to-people.ts --check   (결정성 게이트 — 쓰기 없음)
 // 원칙: 원문(detail_quote·detail·mission)은 그대로 보존, 시드에 없는 정보는 날조하지 않는다
 //       (resource_types 생략, safe_match_text는 draft 상태로 미생성 — 사용자 승인 후 채움).
 // idempotent: 결정적 ID·고정 created_at → 재실행해도 같은 출력.
+// --check: 산출물 8종(people 시드 4 + derived 4)을 재생성해 커밋본과 byte 비교하고
+//          불일치 파일명을 나열한 뒤 exit 1. CI 프라이버시 게이트의 결정성 축.
 // 근거: plans/generic-mixing-seahorse.md M0-3, people_match_retrieval_plan.md §3
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
 interface MemberPublicSeedRaw {
@@ -25,19 +36,92 @@ interface MemberPrivateSeedRaw {
 const ROOT = process.cwd();
 const CREATED_AT = "2026-07-29T12:00:00+09:00"; // 마이그레이션 기준 시각(결정적)
 const REVISION = 1;
+const CHECK_MODE = process.argv.slice(2).includes("--check");
+
+/** 재생성된 산출물(rel 경로 + 정확한 바이트) — check 모드 비교 대상 */
+const emitted: { rel: string; bytes: Buffer }[] = [];
 
 function readJson<T>(rel: string): T {
   return JSON.parse(readFileSync(join(ROOT, rel), "utf8")) as T;
 }
+function sha256(bytes: Buffer): string {
+  return createHash("sha256").update(bytes).digest("hex");
+}
+/**
+ * 산출물 1건을 생성한다.
+ * 기본 모드: 실제 파일에 쓴다. --check 모드: 쓰지 않고 바이트만 모아 뒀다가 나중에 비교한다.
+ */
 function writeJson(rel: string, data: unknown): void {
-  const abs = join(ROOT, rel);
-  mkdirSync(dirname(abs), { recursive: true });
-  writeFileSync(abs, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+  const bytes = Buffer.from(`${JSON.stringify(data, null, 2)}\n`, "utf8");
+  emitted.push({ rel, bytes });
+  if (!CHECK_MODE) {
+    const abs = join(ROOT, rel);
+    mkdirSync(dirname(abs), { recursive: true });
+    writeFileSync(abs, bytes);
+  }
   console.log(`  ${rel}`);
 }
 
+/**
+ * 재생성 바이트 vs 커밋된 파일 바이트를 비교한다.
+ * 하나라도 다르면 파일명을 나열하고 재생성본을 임시 디렉토리에 떨궈 diff 가능하게 한 뒤 exit 1.
+ */
+function verifyDeterminism(): void {
+  console.log("\n▶ 결정성 검사 — 재생성 바이트 vs 커밋본 (sha256)");
+  const mismatched: string[] = [];
+  for (const { rel, bytes } of emitted) {
+    const abs = join(ROOT, rel);
+    const actual = sha256(bytes);
+    if (!existsSync(abs)) {
+      mismatched.push(rel);
+      console.log(`  ✗ ${rel}  커밋본 없음 · 재생성 ${actual.slice(0, 16)}`);
+      continue;
+    }
+    const committedBytes = readFileSync(abs);
+    const committed = sha256(committedBytes);
+    if (committed === actual && committedBytes.equals(bytes)) {
+      console.log(`  ✓ ${rel}  ${actual.slice(0, 16)}`);
+    } else {
+      mismatched.push(rel);
+      console.log(
+        `  ✗ ${rel}  커밋본 ${committed.slice(0, 16)} ≠ 재생성 ${actual.slice(0, 16)}`,
+      );
+    }
+  }
+
+  const manifest = sha256(
+    Buffer.from(
+      emitted.map((e) => `${e.rel}:${sha256(e.bytes)}`).join("\n"),
+      "utf8",
+    ),
+  );
+  console.log(`  manifest sha256 = ${manifest}`);
+
+  if (mismatched.length > 0) {
+    const out = mkdtempSync(join(tmpdir(), "migrate-check-"));
+    for (const { rel, bytes } of emitted) {
+      const abs = join(out, rel);
+      mkdirSync(dirname(abs), { recursive: true });
+      writeFileSync(abs, bytes);
+    }
+    console.error(`\n❌ 결정성 검사 실패 — 불일치 ${mismatched.length}건:`);
+    for (const rel of mismatched) console.error(`  ${rel}`);
+    console.error(
+      `\n재생성본: ${out}\n복구: npx tsx scripts/migrate-members-to-people.ts 후 diff 확인`,
+    );
+    process.exit(1);
+  }
+  console.log(
+    `\n✅ 결정성 검사 통과 — 산출물 ${emitted.length}종 전부 커밋본과 byte 일치`,
+  );
+}
+
 async function run(): Promise<void> {
-  console.log("▶ members → people 무손실 변환 시작");
+  console.log(
+    CHECK_MODE
+      ? "▶ members → people 변환 재생성(--check: 쓰기 없음)"
+      : "▶ members → people 무손실 변환 시작",
+  );
   const pub = readJson<MemberPublicSeedRaw[]>("src/data/members.json");
   const priv = readJson<MemberPrivateSeedRaw[]>(
     "src/data/private/members-private.json",
@@ -130,7 +214,7 @@ async function run(): Promise<void> {
   // availability, 추천 이력은 값만 공백화해도 존재 자체가 상태를 노출하므로 전부 제거한다.
   const privateRedacted = priv.map((p) => ({ member_id: p.member_id }));
 
-  console.log("▶ 산출물 쓰기");
+  console.log(CHECK_MODE ? "▶ 산출물 재생성" : "▶ 산출물 쓰기");
   writeJson("src/data/people/offers.json", offers);
   writeJson("src/data/people/impact_intents.json", impactIntents);
   writeJson("src/data/private/people/needs.json", needs);
@@ -194,11 +278,13 @@ async function run(): Promise<void> {
   );
 
   console.log(
-    `\n✅ 변환 완료 — offers ${offers.length} · impact ${impactIntents.length} · needs ${needs.length} · consents ${consents.length} · engine-needs(redacted) ${engineNeeds.length}`,
+    `\n${CHECK_MODE ? "▶ 재생성" : "✅"} 완료 — offers ${offers.length} · impact ${impactIntents.length} · needs ${needs.length} · consents ${consents.length} · engine-needs(redacted) ${engineNeeds.length}`,
   );
+
+  if (CHECK_MODE) verifyDeterminism();
 }
 
 run().catch((err) => {
-  console.error("❌ 변환 실패:", err);
+  console.error(CHECK_MODE ? "❌ 검사 실패:" : "❌ 변환 실패:", err);
   process.exit(1);
 });
