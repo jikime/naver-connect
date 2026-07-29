@@ -52,13 +52,6 @@ export default tseslint.config(
     },
   },
   {
-    // route handler는 서버 실행 — 서비스 모듈 import 허용.
-    files: ["src/app/api/**/*.ts"],
-    rules: {
-      "no-restricted-imports": "off",
-    },
-  },
-  {
     // P1-1: 클라이언트 도달 존(app/components/stores)과 DAL 배럴은 민감 people 모듈을
     // import할 수 없다 — Client bundle에 needs/consents 원문이 실리는 경로를 빌드 타임 차단.
     files: [
@@ -95,6 +88,24 @@ export default tseslint.config(
                 "lib/server(매칭 서비스)는 private 원본을 읽는 서버 전용 모듈입니다 — 클라이언트 존에서 import 금지(C3). /api/matching 경유 또는 DAL 클라이언트(getMatchingBundle)를 사용하세요. type-only import는 next 빌드에서 소거되므로 DAL 내부에서만 허용.",
             },
           ],
+        },
+      ],
+    },
+  },
+  {
+    // route handler는 서버 실행 — lib/server import는 허용하되 private 시드 직접 import는
+    // 계속 금지한다(ADR-03: 원본 접근은 DAL·lib/server만). 클라존 블록(src/app/**)이
+    // lib/server 금지를 다시 켜므로, flat config 우선순위상 이 블록이 그 뒤에 와야 한다(C4 수정).
+    files: ["src/app/api/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: PRIVATE_SEED_PATTERNS.map((group) => ({
+            group: [group],
+            message:
+              "민감 시드(src/data/private/*)는 route에서도 직접 import할 수 없습니다(ADR-03). lib/server 서비스 모듈을 경유하세요.",
+          })),
         },
       ],
     },
