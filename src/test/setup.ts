@@ -3,11 +3,17 @@
 // SafeTextConfirmRequest → SafeTextConfirmResult[]).
 // 근거: C3(codex final-rereview-reject #1), M2 P1-1, src/lib/dal/matching.ts transport 계약
 
+import embeddingShadow from "@/data/people/derived/member-embedding-shadow.json";
+import { setPublicEmbeddingTransport } from "@/lib/dal/embedding";
 import { setMatchingTransport, setSafeTextTransport } from "@/lib/dal/matching";
 import {
   computeMatchingBundle,
   confirmSafeMatchTexts,
 } from "@/lib/server/matching-service";
+import type { MemberEmbeddingShadow } from "@/types";
 
 setMatchingTransport(async (req) => computeMatchingBundle(req));
 setSafeTextTransport(async (req) => confirmSafeMatchTexts(req));
+setPublicEmbeddingTransport(
+  async () => embeddingShadow as MemberEmbeddingShadow,
+);

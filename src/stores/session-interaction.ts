@@ -11,6 +11,7 @@ import type {
   CapabilityOfferV1,
   DealRoom,
   DeclineReasonCode,
+  MemberEmbeddingShadow,
   NeedIntentV1,
   OnboardingFinalizeInput,
   RecStatus,
@@ -49,6 +50,8 @@ interface SessionInteractionStore {
   registeredDeals: DealRoom[];
   /** M1: personaId → 온보딩 확정 산출물(Need/Offer/매칭동의). 매칭엔진이 시드 위에 겹쳐 읽는다. */
   onboardingResults: Record<string, OnboardingResult>;
+  /** 공개 온보딩 문서를 KURE로 재임베딩한 회원 공간. persona별 최신 결과만 보존한다. */
+  memberEmbeddingShadows: Record<string, MemberEmbeddingShadow>;
 
   setRecommendationOverride: (
     recId: string,
@@ -56,6 +59,10 @@ interface SessionInteractionStore {
   ) => void;
   finalizeOnboardingFor: (personaId: string) => void;
   storeOnboardingResult: (personaId: string, result: OnboardingResult) => void;
+  setMemberEmbeddingShadow: (
+    personaId: string,
+    shadow: MemberEmbeddingShadow,
+  ) => void;
   setRuleWeightOverrides: (weights: RuleWeight[]) => void;
   addRegisteredDeal: (deal: DealRoom) => void;
   reset: () => void;
@@ -68,12 +75,14 @@ const INITIAL_STATE: Pick<
   | "ruleWeightOverrides"
   | "registeredDeals"
   | "onboardingResults"
+  | "memberEmbeddingShadows"
 > = {
   recommendationOverrides: {},
   onboardingFinalized: {},
   ruleWeightOverrides: null,
   registeredDeals: [],
   onboardingResults: {},
+  memberEmbeddingShadows: {},
 };
 
 export const useSessionInteractionStore = create<SessionInteractionStore>()(
@@ -101,6 +110,13 @@ export const useSessionInteractionStore = create<SessionInteractionStore>()(
             [personaId]: result,
           },
         })),
+      setMemberEmbeddingShadow: (personaId, shadow) =>
+        set((state) => ({
+          memberEmbeddingShadows: {
+            ...state.memberEmbeddingShadows,
+            [personaId]: shadow,
+          },
+        })),
       setRuleWeightOverrides: (weights) =>
         set({ ruleWeightOverrides: weights }),
       addRegisteredDeal: (deal) =>
@@ -116,6 +132,7 @@ export const useSessionInteractionStore = create<SessionInteractionStore>()(
         ruleWeightOverrides: state.ruleWeightOverrides,
         registeredDeals: state.registeredDeals,
         onboardingResults: state.onboardingResults,
+        memberEmbeddingShadows: state.memberEmbeddingShadows,
       }),
     },
   ),

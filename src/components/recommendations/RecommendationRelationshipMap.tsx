@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { MaskedMember, MatchScore, Recommendation } from "@/types";
+import embeddingShadow from "@/data/people/derived/member-embedding-shadow.json";
+import { useSessionInteractionStore } from "@/stores/session-interaction";
+import type {
+  MaskedMember,
+  MatchScore,
+  MemberEmbeddingShadow,
+  Recommendation,
+} from "@/types";
 
 interface Props {
   viewerId: string;
@@ -12,10 +19,48 @@ interface Props {
   scoresByPair: Map<string, MatchScore>;
 }
 
+interface MapNode {
+  memberId: string;
+  name: string;
+  org: string;
+  x: number;
+  y: number;
+  recommendation?: Recommendation;
+  score?: number;
+}
+
 const WIDTH = 960;
-const HEIGHT = 390;
-const CX = WIDTH / 2;
-const CY = HEIGHT / 2;
+const HEIGHT = 470;
+const X_PADDING = 105;
+const Y_PADDING = 78;
+
+function svgX(value: number): number {
+  return X_PADDING + ((value + 1) / 2) * (WIDTH - X_PADDING * 2);
+}
+
+function svgY(value: number): number {
+  return Y_PADDING + ((1 - value) / 2) * (HEIGHT - Y_PADDING * 2);
+}
+
+function otherMemberId(
+  recommendation: Recommendation,
+  viewerId: string,
+): string | null {
+  if (recommendation.rec_kind !== "1:1" || !recommendation.to_member_id) {
+    return null;
+  }
+  if (recommendation.from_member_id === viewerId) {
+    return recommendation.to_member_id;
+  }
+  if (recommendation.to_member_id === viewerId) {
+    return recommendation.from_member_id;
+  }
+  return null;
+}
+
+function pairKey(a: string, b: string): string {
+  return [a, b].sort().join("↔");
+}
 
 export function RecommendationRelationshipMap({
   viewerId,
@@ -23,42 +68,68 @@ export function RecommendationRelationshipMap({
   members,
   scoresByPair,
 }: Props) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const sessionShadow = useSessionInteractionStore(
+    (state) => state.memberEmbeddingShadows[viewerId],
+  );
+  const activeShadow =
+    sessionShadow ?? (embeddingShadow as MemberEmbeddingShadow);
   const memberById = useMemo(
     () => new Map(members.map((member) => [member.id, member])),
     [members],
   );
-  const peers = useMemo(() => {
-    const unique = new Map<string, Recommendation>();
-    for (const rec of recommendations) {
-      const otherId =
-        rec.to_member_id === viewerId
-          ? rec.from_member_id
-          : (rec.to_member_id ?? rec.from_member_id);
-      if (otherId !== viewerId && !unique.has(otherId)) {
-        unique.set(otherId, rec);
+  const recommendationByMember = useMemo(() => {
+    const result = new Map<string, Recommendation>();
+    for (const recommendation of recommendations) {
+      const memberId = otherMemberId(recommendation, viewerId);
+      if (memberId && !result.has(memberId)) {
+        result.set(memberId, recommendation);
       }
     }
-    const entries = [...unique.entries()].slice(0, 10);
-    return entries.map(([id, recommendation], index) => {
-      const angle = -Math.PI / 2 + (index * Math.PI * 2) / entries.length;
-      const member = memberById.get(id);
-      return {
-        id,
-        name: member?.name ?? id,
-        org: member?.org.name ?? "",
-        x: CX + Math.cos(angle) * (entries.length <= 4 ? 270 : 355),
-        y: CY + Math.sin(angle) * (entries.length <= 4 ? 125 : 145),
-        recommendation,
-        score: scoresByPair.get(
-          `${recommendation.from_member_id}→${recommendation.to_member_id ?? ""}`,
-        )?.score,
-      };
-    });
-  }, [memberById, recommendations, scoresByPair, viewerId]);
-  const selected = peers.find((node) => node.id === selectedId) ?? peers[0];
+    return result;
+  }, [recommendations, viewerId]);
+  const cosineByPair = useMemo(
+    () =>
+      new Map(
+        activeShadow.pairs.map((pair) => [
+          pairKey(pair.a, pair.b),
+          pair.cosine,
+        ]),
+      ),
+    [activeShadow],
+  );
+  const nodes = useMemo<MapNode[]>(
+    () =>
+      activeShadow.nodes.map((embedded) => {
+        const member = memberById.get(embedded.member_id);
+        const recommendation = recommendationByMember.get(embedded.member_id);
+        return {
+          memberId: embedded.member_id,
+          name: member?.name ?? embedded.member_id,
+          org: member?.org.name ?? "",
+          x: svgX(embedded.x),
+          y: svgY(embedded.y),
+          recommendation,
+          score: recommendation
+            ? scoresByPair.get(
+                `${recommendation.from_member_id}→${recommendation.to_member_id ?? ""}`,
+              )?.score
+            : undefined,
+        };
+      }),
+    [activeShadow, memberById, recommendationByMember, scoresByPair],
+  );
+  const viewer = nodes.find((node) => node.memberId === viewerId);
+  const recommendedNodes = nodes.filter((node) => node.recommendation);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected =
+    recommendedNodes.find((node) => node.memberId === selectedId) ??
+    recommendedNodes[0];
 
-  if (peers.length === 0) return null;
+  if (!viewer || recommendedNodes.length === 0) return null;
+
+  const selectedCosine = selected
+    ? cosineByPair.get(pairKey(viewerId, selected.memberId))
+    : undefined;
 
   return (
     <section
@@ -71,14 +142,19 @@ export function RecommendationRelationshipMap({
             id="weekly-relationship-map-title"
             className="font-heading text-xl font-light tracking-tight text-foreground"
           >
-            이번 주 추천 관계망
+            이번 주 추천 지도
           </h2>
           <p className="text-sm text-guud-text-muted-2">
-            아래 카드와 같은 추천 결과예요. 선의 길이는 유사도 거리가 아니라
-            읽기 쉬운 배치입니다.
+            점 위치는 공개 자기소개를 KURE-v1로 임베딩한 의미 공간이고, 선은
+            이번 주 실제 추천입니다.
           </p>
+          {sessionShadow && (
+            <p className="text-xs font-semibold text-foreground">
+              온보딩에서 확정한 공개 프로필 위치가 반영됐습니다.
+            </p>
+          )}
         </div>
-        {selected && (
+        {selected?.recommendation && (
           <Button asChild variant="outline" size="sm">
             <Link href={`/recommendations/${selected.recommendation.id}`}>
               {selected.name} 연결 보기
@@ -92,133 +168,155 @@ export function RecommendationRelationshipMap({
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           className="block min-h-80 w-full"
           role="img"
-          aria-label={`나를 중심으로 한 이번 주 추천 ${peers.length}명 관계망`}
+          aria-label={`회원 공개 프로필 임베딩 공간 위에 표시한 이번 주 추천 ${recommendedNodes.length}명`}
         >
-          <title>이번 주 사람 추천 관계망</title>
+          <title>회원 임베딩 공간과 이번 주 추천</title>
           <desc>
-            중앙의 나와 추천된 회원을 공통점 또는 차이점 연결선으로 표시합니다.
+            여덟 회원의 공개 프로필을 KURE-v1로 임베딩한 이차원 위치 위에 현재
+            회원에게 생성된 실제 추천 연결만 표시합니다.
           </desc>
-          {peers.map((node) => {
-            const isDifferent = node.recommendation.rec_axis === "차이점";
-            const active = node.id === selected?.id;
+
+          {recommendedNodes.map((node) => {
+            const recommendation = node.recommendation;
+            if (!recommendation) return null;
+            const active = node.memberId === selected?.memberId;
+            const isDifferent = recommendation.rec_axis === "차이점";
             return (
-              <g key={`edge-${node.id}`}>
-                <line
-                  x1={CX}
-                  y1={CY}
-                  x2={node.x}
-                  y2={node.y}
-                  className={
-                    active
-                      ? "stroke-primary"
-                      : isDifferent
-                        ? "stroke-chart-4/65"
-                        : "stroke-border"
-                  }
-                  strokeWidth={active ? 3 : 2}
-                  strokeDasharray={isDifferent ? "7 6" : undefined}
-                />
-                {node.score !== undefined && (
-                  <g
-                    transform={`translate(${(CX + node.x) / 2} ${(CY + node.y) / 2})`}
-                  >
-                    <rect
-                      x="-19"
-                      y="-12"
-                      width="38"
-                      height="24"
-                      rx="12"
-                      className="fill-background stroke-border"
-                    />
-                    <text
-                      textAnchor="middle"
-                      dominantBaseline="central"
-                      className="fill-foreground text-[12px] font-semibold"
-                    >
-                      {node.score}
-                    </text>
-                  </g>
-                )}
-              </g>
+              <line
+                key={`edge-${node.memberId}`}
+                x1={viewer.x}
+                y1={viewer.y}
+                x2={node.x}
+                y2={node.y}
+                className={
+                  active
+                    ? "stroke-primary"
+                    : isDifferent
+                      ? "stroke-chart-4/45"
+                      : "stroke-border"
+                }
+                strokeWidth={active ? 3 : 1.5}
+                strokeDasharray={isDifferent ? "7 6" : undefined}
+              />
             );
           })}
 
-          <circle
-            cx={CX}
-            cy={CY}
-            r="49"
-            className="fill-foreground stroke-foreground"
-            strokeWidth="2"
-          />
-          <text
-            x={CX}
-            y={CY}
-            textAnchor="middle"
-            dominantBaseline="central"
-            className="fill-primary-foreground text-[15px] font-semibold"
-          >
-            나
-          </text>
-
-          {peers.map((node) => {
-            const active = node.id === selected?.id;
-            return (
-              <g key={node.id} transform={`translate(${node.x} ${node.y})`}>
+          {nodes.map((node) => {
+            const isViewer = node.memberId === viewerId;
+            const isRecommended = Boolean(node.recommendation);
+            const active = node.memberId === selected?.memberId;
+            const nodeContents = (
+              <>
                 <circle
-                  r={active ? 42 : 38}
+                  r={isViewer ? 33 : active ? 28 : isRecommended ? 23 : 17}
                   className={
-                    active
-                      ? "fill-primary stroke-primary"
-                      : "fill-card stroke-border"
+                    isViewer
+                      ? "fill-foreground stroke-foreground"
+                      : active
+                        ? "fill-primary stroke-primary"
+                        : isRecommended
+                          ? "fill-card stroke-foreground"
+                          : "fill-muted stroke-border"
                   }
-                  strokeWidth="2"
+                  strokeWidth={isRecommended || isViewer ? 2 : 1}
                 />
                 <text
+                  y={isViewer ? 5 : isRecommended ? 4 : 3}
                   textAnchor="middle"
-                  dominantBaseline="central"
                   className={
-                    active
-                      ? "fill-primary-foreground text-[14px] font-semibold"
-                      : "fill-foreground text-[14px] font-semibold"
+                    isViewer || active
+                      ? "fill-primary-foreground text-[13px] font-semibold"
+                      : isRecommended
+                        ? "fill-foreground text-[12px] font-semibold"
+                        : "fill-muted-foreground text-[10px]"
                   }
                 >
-                  {node.name}
+                  {isViewer ? "나" : node.name}
                 </text>
-                <text
-                  y="57"
-                  textAnchor="middle"
-                  className="fill-muted-foreground text-[12px]"
-                >
-                  {node.recommendation.rec_axis}
-                </text>
+                {isViewer && (
+                  <text
+                    y="52"
+                    textAnchor="middle"
+                    className="fill-foreground text-[12px] font-semibold"
+                  >
+                    {node.name}
+                  </text>
+                )}
+                {isRecommended && !isViewer && (
+                  <text
+                    y="43"
+                    textAnchor="middle"
+                    className="fill-muted-foreground text-[11px]"
+                  >
+                    {node.recommendation?.rec_axis}
+                  </text>
+                )}
+              </>
+            );
+
+            return (
+              <g
+                key={node.memberId}
+                transform={`translate(${node.x} ${node.y})`}
+                opacity={isViewer || isRecommended ? 1 : 0.38}
+              >
+                {node.recommendation ? (
+                  <a
+                    href={`/recommendations/${node.recommendation.id}`}
+                    aria-label={`${node.name} 추천 상세 보기`}
+                    onMouseEnter={() => setSelectedId(node.memberId)}
+                    onFocus={() => setSelectedId(node.memberId)}
+                  >
+                    {nodeContents}
+                  </a>
+                ) : (
+                  nodeContents
+                )}
               </g>
             );
           })}
         </svg>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {peers.map((node) => (
-          <Button
-            key={node.id}
-            type="button"
-            variant={node.id === selected?.id ? "secondary" : "ghost"}
-            size="xs"
-            aria-pressed={node.id === selected?.id}
-            onClick={() => setSelectedId(node.id)}
-          >
-            {node.name}
-          </Button>
-        ))}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-guud-text-muted-2">
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-px w-6 bg-border" aria-hidden="true" />
+          공통점 추천
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span
+            className="w-6 border-t border-dashed border-chart-4"
+            aria-hidden="true"
+          />
+          차이점 추천
+        </span>
+        <span>옅은 점 · 이번 주 추천에 포함되지 않은 회원</span>
       </div>
 
-      {selected && (
-        <p className="text-sm text-guud-text-muted-2" aria-live="polite">
-          <span className="font-semibold text-foreground">{selected.name}</span>
-          {selected.org ? ` · ${selected.org}` : ""} —{" "}
-          {selected.recommendation.matching_rationale}
-        </p>
+      {selected?.recommendation && (
+        <div className="flex flex-wrap items-start justify-between gap-3 border-t border-guud-hairline pt-4">
+          <p className="max-w-3xl text-sm leading-relaxed text-guud-text-muted-2">
+            <span className="font-semibold text-foreground">
+              {selected.name}
+            </span>
+            {selected.org ? ` · ${selected.org}` : ""}
+            {selectedCosine !== undefined
+              ? ` · KURE 원본 1024차원 cosine ${selectedCosine.toFixed(3)}`
+              : ""}
+            {selected.score !== undefined
+              ? ` · 추천 엔진 점수 ${selected.score}`
+              : ""}
+            <br />
+            {selected.recommendation.matching_rationale}
+          </p>
+        </div>
       )}
+
+      <p className="text-xs leading-relaxed text-guud-text-muted-2">
+        2차원 점 사이 거리는 공개 프로필 표현의 대략적인 배치이며 추천 순위·관계
+        강도와 같지 않습니다. 추천선과 상세 설명은 기존 매칭 엔진 결과를 그대로
+        사용합니다.
+      </p>
     </section>
   );
 }

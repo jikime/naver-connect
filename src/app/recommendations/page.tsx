@@ -2,8 +2,10 @@
 // 근거: ARCHITECTURE.md §3(L1 /recommendations), FR-RC-01/02/08, FR-GL-04
 // v1.1 개편(FR-RC-01): 공통점 5명 + 차이점 5명 구분 제시, 각 그룹 더보기로 최대 15명까지.
 
+import Link from "next/link";
 import { WeeklyRecommendationList } from "@/components/recommendations/WeeklyRecommendationList";
 import { AutomationLevelBadge } from "@/components/shell/AutomationLevelBadge";
+import { Button } from "@/components/ui/button";
 
 export default function RecommendationsPage() {
   return (
@@ -22,7 +24,12 @@ export default function RecommendationsPage() {
               — 각 그룹은 더보기로 최대 15명까지 볼 수 있어요.
             </p>
           </div>
-          <AutomationLevelBadge frId="FR-RC-01" />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/onboarding">추천 기준 업데이트</Link>
+            </Button>
+            <AutomationLevelBadge frId="FR-RC-01" />
+          </div>
         </div>
       </header>
       <WeeklyRecommendationList />
