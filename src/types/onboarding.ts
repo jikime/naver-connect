@@ -41,3 +41,36 @@ export interface InterviewScriptsSeed {
   meta: OnboardingScriptMeta;
   scripts: InterviewScript[];
 }
+
+/**
+ * finalizeOnboarding 입력 — M1: readiness·trust_connections 소실 수정 + 동의 3분리.
+ * (store가 스냅샷으로 보존해야 해서 writes.ts가 아닌 타입 배럴에 둔다 — 순환 방지)
+ */
+export interface OnboardingFinalizeInput {
+  demand_tags: { tagId: number; priority: boolean; detail_quote: string }[];
+  supply_tags: { tagId: number; detail: string }[];
+  activities: string[];
+  preferred_mode: string;
+  participation_scope: "개인 자격으로 참여" | "소속 기관을 대표해 참여" | null;
+  hot_lead: {
+    flag: boolean;
+    project_summary: string;
+    needed_partner: string;
+    stage: string;
+  } | null;
+  /** 무손실: 협업 준비도 원값 */
+  readiness: string;
+  /** 무손실: 위저드에서 수정된 신뢰 연결점 */
+  trust_connections: {
+    type: "소개자" | "아는회원" | "소속모임";
+    ref: string;
+  }[];
+  /** 동의 3분리(A 공개 노출 / B 비공개 수요의 매칭 사용 / C 소개 시 원문 인용) */
+  consents: {
+    publish_profile: boolean;
+    use_private_needs_for_matching: boolean;
+    quote_in_intro: boolean;
+  };
+  /** 하위호환(구 단일 체크박스) — consents.publish_profile와 동일 값 */
+  visibility_consent: boolean;
+}

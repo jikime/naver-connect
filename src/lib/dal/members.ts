@@ -4,7 +4,9 @@
 // 이 파일이 members-private.json을 import하는 유일한 지점이어야 한다(ADR-03, T-005 린트 차단).
 
 import membersPublicSeed from "@/data/members.json";
-import membersPrivateSeed from "@/data/private/members-private.json";
+// P1-1(legacy 포함 0건 기준): 클라이언트 번들에는 원문이 공백화된 redacted twin만 싣는다.
+// 원본(원문 포함) members-private.json은 서버/스크립트 전용 경로로만 사용한다.
+import membersPrivateSeed from "@/data/people/derived/members-private.redacted.json";
 import { visibilityMask } from "@/lib/access/visibility-mask";
 import type {
   ExpertSubtype,

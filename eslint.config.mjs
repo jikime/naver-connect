@@ -37,4 +37,47 @@ export default tseslint.config(
       "no-restricted-imports": "off",
     },
   },
+  {
+    // 테스트 파일은 번들 대상이 아니며, 누출 검사(probe) 목적으로 민감 시드를 직접 읽는다.
+    files: ["src/**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
+  {
+    // P1-1: 클라이언트 도달 존(app/components/stores)과 DAL 배럴은 민감 people 모듈을
+    // import할 수 없다 — Client bundle에 needs/consents 원문이 실리는 경로를 빌드 타임 차단.
+    files: [
+      "src/app/**/*.ts",
+      "src/app/**/*.tsx",
+      "src/components/**/*.ts",
+      "src/components/**/*.tsx",
+      "src/stores/**/*.ts",
+      "src/lib/dal/index.ts",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...PRIVATE_SEED_PATTERNS.map((group) => ({
+              group: [group],
+              message:
+                "민감 시드(src/data/private/*)는 클라이언트 존에서 import할 수 없습니다(ADR-03, NFR-07).",
+            })),
+            {
+              group: [
+                "@/lib/dal/people",
+                "@/lib/dal/people-engine",
+                "**/dal/people",
+                "**/dal/people-engine",
+              ],
+              message:
+                "people·people-engine은 민감 원문을 import하는 서버/스크립트 전용 모듈입니다 — 클라이언트 존·DAL 배럴에서 import 금지(P1-1). 파생 DTO(src/data/people/derived/*)나 consent 모듈을 사용하세요.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

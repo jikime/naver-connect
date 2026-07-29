@@ -120,6 +120,7 @@ export interface ExperienceV1 {
 export type ConsentPurpose =
   | "publish_profile"
   | "use_private_needs_for_matching"
+  | "quote_in_intro"
   | "generate_match_embeddings"
   | "facilitate_introduction"
   | "product_analytics"

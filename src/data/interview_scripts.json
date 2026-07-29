@@ -91,7 +91,7 @@
       "demand_questions": [
         {
           "text": "인력·조직에서 가장 큰 어려움은 무엇인가요?",
-          "example_answer": "요양보호사 이직률이 30%를 넘어요."
+          "example_answer": "요양보호사 이직이 잦아서 팀 유지가 힘들어요."
         }
       ],
       "supply_questions": [

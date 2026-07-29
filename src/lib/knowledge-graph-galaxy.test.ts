@@ -2,7 +2,7 @@
 // connect-ontology galaxy-canvas.test 취지(결정적·공개 데이터)를 우리 어댑터로 이식.
 
 import { describe, expect, it } from "vitest";
-// eslint-disable-next-line no-restricted-imports -- BR-01 비유출 검증 테스트는 "유출되면 안 되는 원문"(민감 시드)을 ground truth로 직접 읽어야 부재를 단언할 수 있다. 테스트 파일 한정 예외(런타임 번들 미포함).
+// BR-01 비유출 검증: 민감 시드를 ground truth로 직접 읽는다 — 테스트 파일은 eslint 전역 예외(번들 미포함).
 import recommendationsSeed from "@/data/private/recommendations.json";
 import { getKnowledgeGraph } from "./dal";
 import {

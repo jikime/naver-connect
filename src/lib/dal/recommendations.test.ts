@@ -53,8 +53,10 @@ describe("getRecommendations — v1.1 공통점/차이점 그룹핑(FR-RC-01/02)
   });
 });
 
-describe("getRecommendations/getRecommendation — 최소노출 마스킹(FR-RC-06)", () => {
-  it("당사자가 아닌 뷰어는 원문 접점 대신 min_exposure_note만 본다", async () => {
+describe("getRecommendations/getRecommendation — 최소노출 마스킹(FR-RC-06 → P1-1 강화)", () => {
+  // P1-1(raw quote 번들 0건): 클라이언트 시드는 redacted twin이라 원문 인용 자체가 없다.
+  // 당사자·운영자의 원문 열람은 M2 서버 경계(route/RSC) + 동의 C 검증과 함께 복원한다.
+  it("당사자가 아닌 뷰어는 min_exposure_note만 본다", async () => {
     // REC-01: from M-003 to M-004. 제3자(M-007)가 조회.
     const rec = await getRecommendation(
       { role: "전문가", personaId: "M-007" },
@@ -63,19 +65,19 @@ describe("getRecommendations/getRecommendation — 최소노출 마스킹(FR-RC-
     expect(rec.message.contact_point).toBe(rec.min_exposure_note);
   });
 
-  it("수신 당사자(to_member_id)는 원문 접점을 그대로 본다", async () => {
+  it("수신 당사자여도 클라이언트에는 원문이 존재하지 않는다 — 최소노출 문구로 통일", async () => {
     const rec = await getRecommendation(
       { role: "기업가", personaId: "M-004" },
       "REC-01",
     );
-    expect(rec.message.contact_point).not.toBe(rec.min_exposure_note);
+    expect(rec.message.contact_point).toBe(rec.min_exposure_note);
   });
 
-  it("운영자는 당사자가 아니어도 원문 접점을 그대로 본다", async () => {
+  it("운영자도 클라이언트 경로에서는 최소노출 문구만 본다 (원문 열람은 서버 경계 도입 후)", async () => {
     const rec = await getRecommendation(
       { role: "운영자", personaId: "M-999" },
       "REC-01",
     );
-    expect(rec.message.contact_point).not.toBe(rec.min_exposure_note);
+    expect(rec.message.contact_point).toBe(rec.min_exposure_note);
   });
 });

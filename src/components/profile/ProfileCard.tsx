@@ -382,7 +382,12 @@ export function ProfileCard() {
                       </div>
                       <blockquote className="mt-4 flex gap-3 text-sm leading-6 text-background/85">
                         <Quote className="mt-0.5 size-4 shrink-0 text-primary" />
-                        <p>“{demand.detail_quote}”</p>
+                        {/* P1-1: 클라이언트 시드는 redacted twin — 원문은 보호 저장소에만 있다 */}
+                        <p>
+                          {demand.detail_quote
+                            ? `“${demand.detail_quote}”`
+                            : "원문은 보호 저장소에 보관 중이에요 — 추천 생성에만 사용됩니다."}
+                        </p>
                       </blockquote>
                     </article>
                   ))}
@@ -395,19 +400,20 @@ export function ProfileCard() {
                         <Sparkles className="size-4" /> 구체적 협업 프로젝트
                       </p>
                       <p className="mt-3 text-sm leading-6 font-semibold text-background">
-                        {privateLayer.hot_lead.project_summary}
+                        {privateLayer.hot_lead.project_summary ||
+                          "프로젝트 상세는 보호 저장소에 보관 중 — 매칭에만 사용돼요."}
                       </p>
                       <dl className="mt-4 grid gap-3 text-xs sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                         <div>
                           <dt className="text-background/50">현재 단계</dt>
                           <dd className="mt-1 font-medium text-background/85">
-                            {privateLayer.hot_lead.stage}
+                            {privateLayer.hot_lead.stage || "비공개"}
                           </dd>
                         </div>
                         <div>
                           <dt className="text-background/50">필요한 파트너</dt>
                           <dd className="mt-1 font-medium text-background/85">
-                            {privateLayer.hot_lead.needed_partner}
+                            {privateLayer.hot_lead.needed_partner || "비공개"}
                           </dd>
                         </div>
                       </dl>

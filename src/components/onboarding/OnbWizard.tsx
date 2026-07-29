@@ -82,13 +82,13 @@ const STEP_META = [
   },
   {
     title: "필요한 연결",
-    description: "지금 가장 필요한 세 가지와 우선순위를 알려주세요.",
+    description: "지금 가장 필요한 것(최대 3가지)과 우선순위를 알려주세요.",
     time: "약 1분",
     icon: Lock,
   },
   {
     title: "나눌 수 있는 것",
-    description: "다른 회원에게 건넬 수 있는 경험 세 가지를 골라요.",
+    description: "다른 회원에게 건넬 수 있는 경험을 1~3가지 골라요.",
     time: "약 1분",
     icon: Gift,
   },
@@ -135,14 +135,17 @@ function canProceedFromStep(
         draft.valueChainStage.trim().length > 0 &&
         draft.missionStatement.trim().length > 0
       );
+    // Codex 합의(2026-07-29): 수요/공급 최소 1 + 최대 3으로 완화, primary 정확히 1개
     case 2:
       return (
-        draft.demandSelections.length === 3 &&
-        draft.demandSelections.some((s) => s.priority)
+        draft.demandSelections.length >= 1 &&
+        draft.demandSelections.length <= 3 &&
+        draft.demandSelections.filter((s) => s.priority).length === 1
       );
     case 3:
       return (
-        draft.supplySelections.length === 3 &&
+        draft.supplySelections.length >= 1 &&
+        draft.supplySelections.length <= 3 &&
         draft.supplySelections.every((s) => s.detail.trim().length > 0)
       );
     case 4:
@@ -327,13 +330,11 @@ export function OnbWizard() {
         const followup = draft.followupAnswers.find(
           (a) => a.kind === "demand" && a.tagId === sel.tagId,
         );
+        // P1-3: 질문하지 않은 항목에 시스템 문구를 사용자 원문처럼 넣지 않는다 — 빈 값 유지
         return {
           tagId: sel.tagId,
           priority: sel.priority,
-          detail_quote:
-            followup?.answer && followup.answer.length > 0
-              ? followup.answer
-              : "(온보딩 후속질문에서 다루지 않음)",
+          detail_quote: followup?.answer?.trim() ?? "",
         };
       });
       const supplyFollowup = draft.followupAnswers.find(

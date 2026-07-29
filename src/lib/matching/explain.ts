@@ -1,7 +1,7 @@
 // evidence-grounded 설명 — LLM 창작 없이 점수에 실제로 쓰인 item 포인터로 4요소를 조립한다.
-// 최소 노출 계약(BR-01): 받는 사람(from) 본인의 need 원문 인용은 허용,
-// 상대(to)의 비공개 need 원문은 절대 인용하지 않고 태그 수준으로만 언급한다.
-// 근거: people_match_retrieval_plan.md §6.3, research_synthesis.md §4.5
+// 텍스트 인용은 승인된 match_text(safe_match_text)와 공개 offer.detail만 —
+// 비공개 원문(detail_quote)은 엔진 입력에 존재하지 않아 구조적으로 인용 불가(safe-text-only).
+// 근거: people_match_retrieval_plan.md §6.3, codex-review-eof-pointer-and-safe-text-blocker
 
 import type { EngineInput, EnginePair } from "@/lib/matching/engine";
 
@@ -33,10 +33,13 @@ export function buildExplanation(
   const fwdOffer = input.offers.find((o) => o.id === pair.best.forwardOfferId);
   const revNeed = input.needs.find((n) => n.id === pair.best.reverseNeedId);
 
+  // 승인된 match_text가 있으면 인용, 없으면(draft) 태그 수준으로만 — 원문 인용 경로 없음
   const your_need: ExplanationPart = fwdNeed
     ? {
         ref: fwdNeed.id,
-        text: `"${fwdNeed.detail_quote}" — 지금 가장 필요한 연결이에요.`,
+        text: fwdNeed.match_text
+          ? `"${fwdNeed.match_text}" — 지금 가장 필요한 연결이에요.`
+          : `지금 '${tagLabel(input, fwdNeed.tag_ids)}' 연결이 가장 필요한 시점이에요.`,
       }
     : {
         text: "공통의 관심사가 커서 대화가 빨리 붙는 조합이에요.",
@@ -51,7 +54,7 @@ export function buildExplanation(
         text: "상대의 공개 프로필이 당신의 활동 반경과 겹칩니다.",
       };
 
-  // 상대 이익: 상대의 비공개 원문 대신 태그 수준으로만 (min exposure)
+  // 상대 이익: 상대의 승인 텍스트가 있어도 태그 수준으로만 (min exposure — 상호 수락 전)
   const their_benefit: ExplanationPart = revNeed
     ? {
         ref: revNeed.id,

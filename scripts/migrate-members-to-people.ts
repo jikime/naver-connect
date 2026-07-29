@@ -88,10 +88,12 @@ async function run(): Promise<void> {
   });
 
   // 시드 회원은 목업이므로 동의도 seed_mock으로 명시 — 실제 동의로 오인 금지.
+  // seed_mock 동의는 APP_MODE=demo에서만 유효하다(P1-2 fail-closed).
   const purposes = [
     "publish_profile",
     "use_private_needs_for_matching",
     "facilitate_introduction",
+    "quote_in_intro",
   ] as const;
   const consents = pub.flatMap((m) =>
     purposes.map((purpose) => ({
@@ -104,14 +106,121 @@ async function run(): Promise<void> {
     })),
   );
 
+  // ── 파생(클라이언트 안전) 산출물 — P1-1 번들 유출 차단 ──────────────────
+  // 엔진 입력 DTO: 원문(detail_quote)·safe_match_text draft를 일절 포함하지 않는다.
+  // match_text는 user_confirmed safe_match_text만 허용 — 시드는 전부 draft라 "".
+  const engineNeeds = needs.map((n) => ({
+    id: n.id,
+    ownerId: n.owner.id,
+    tag_ids: n.tag_ids,
+    match_text: "",
+    priority: n.priority,
+    urgency: n.urgency,
+    constraints: n.constraints,
+    status: n.status,
+  }));
+  // 동의 자격 요약(불리언만) — consent 레코드 자체는 클라이언트에 싣지 않는다.
+  const eligibility = pub.map((m) => ({
+    person_id: m.id,
+    purposes: [...purposes],
+    source: "seed_mock",
+  }));
+
+  // legacy members-private의 redacted twin — 클라이언트(members.ts)는 이것만 import한다.
+  // 원문 서술 필드(detail_quote·hot_lead 3필드)는 전부 공백화, 구조·태그·범주값은 보존.
+  // (Codex 추가 기준: legacy raw quote도 번들 0건 — baseline debt 불허)
+  const privateRedacted = priv.map((p) => {
+    const full = p as MemberPrivateSeedRaw & {
+      hot_lead: {
+        flag: boolean;
+        project_summary: string;
+        needed_partner: string;
+        stage: string;
+      } | null;
+      availability: string;
+      recommendation_history: string[];
+    };
+    return {
+      member_id: full.member_id,
+      demand_tags: full.demand_tags.map((d) => ({
+        tagId: d.tagId,
+        priority: d.priority,
+        detail_quote: "",
+      })),
+      hot_lead: full.hot_lead
+        ? {
+            flag: full.hot_lead.flag,
+            project_summary: "",
+            needed_partner: "",
+            stage: "",
+          }
+        : null,
+      availability: full.availability,
+      recommendation_history: full.recommendation_history,
+    };
+  });
+
   console.log("▶ 산출물 쓰기");
   writeJson("src/data/people/offers.json", offers);
   writeJson("src/data/people/impact_intents.json", impactIntents);
   writeJson("src/data/private/people/needs.json", needs);
   writeJson("src/data/private/people/consents.json", consents);
+  writeJson("src/data/people/derived/engine-needs.json", engineNeeds);
+  writeJson("src/data/people/derived/matching-eligibility.json", eligibility);
+  writeJson(
+    "src/data/people/derived/members-private.redacted.json",
+    privateRedacted,
+  );
+
+  // recommendations.json redacted twin — contact_point 등 수요 원문 인용 필드를 최소노출
+  // 문구로 치환하고, 잔여 원문 문자열은 전 필드 스캔으로 소거한다(raw quote 번들 0건 기준).
+  const rawQuoteSet = [
+    ...needs.map((n) => n.detail_quote),
+    ...pub.flatMap((m) => {
+      const p = privById.get(m.id) as unknown as {
+        hot_lead: { project_summary: string; needed_partner: string } | null;
+      };
+      return p.hot_lead
+        ? [p.hot_lead.project_summary, p.hot_lead.needed_partner]
+        : [];
+    }),
+  ].filter((q) => q && q.length >= 6);
+  const recsRaw = readJson<
+    ({ min_exposure_note: string; message: { contact_point: string } } & Record<
+      string,
+      unknown
+    >)[]
+  >("src/data/private/recommendations.json");
+  const scrub = (value: string, fallback: string): string => {
+    let out = value;
+    for (const q of rawQuoteSet) {
+      if (out.includes(q)) out = fallback;
+    }
+    return out;
+  };
+  const recsRedacted = recsRaw.map((rec) => {
+    const fallback = rec.min_exposure_note;
+    const scrubDeep = (v: unknown): unknown => {
+      if (typeof v === "string") return scrub(v, fallback);
+      if (Array.isArray(v)) return v.map(scrubDeep);
+      if (v && typeof v === "object") {
+        return Object.fromEntries(
+          Object.entries(v).map(([k, val]) => [k, scrubDeep(val)]),
+        );
+      }
+      return v;
+    };
+    const cleaned = scrubDeep(rec) as typeof rec;
+    cleaned.message.contact_point = rec.min_exposure_note; // 원문 인용 필드는 무조건 치환
+    return cleaned;
+  });
+  writeJson(
+    "src/data/people/derived/recommendations.redacted.json",
+    recsRedacted,
+  );
 
   console.log(
-    `\n✅ 변환 완료 — offers ${offers.length} · impact ${impactIntents.length} · needs ${needs.length} · consents ${consents.length}`,
+    `\n✅ 변환 완료 — offers ${offers.length} · impact ${impactIntents.length} · needs ${needs.length} · consents ${consents.length} · engine-needs(redacted) ${engineNeeds.length}`,
   );
 }
 

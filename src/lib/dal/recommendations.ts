@@ -3,7 +3,9 @@
 //       FR-RC-01/02/06/08, BR-01/BR-04, N-5(FR-RC-01↔08 상호참조)
 // 시드: src/data/private/recommendations.json (민감 — contact_point가 비공개 수요 원문 인용)
 
-import recommendationsSeed from "@/data/private/recommendations.json";
+// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
+import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
+import { getConsentFlags } from "@/lib/consent";
 import {
   buildEngineRecommendationsFor,
   getMatchScores,
@@ -44,6 +46,18 @@ function isRecommendationParty(
   );
 }
 
+/**
+ * P1-2: 1:1 추천이 매칭에 노출 가능한 pair인지 — 양쪽 모두 매칭 동의(B)가 유효해야 한다.
+ * B opt-out(철회) 시 시드 추천도 목록·상세에서 제외된다(fail-closed). 모듬은 M1 범위 밖.
+ */
+function isMatchingAllowedPair(rec: Recommendation): boolean {
+  if (rec.rec_kind === "모듬" || !rec.to_member_id) return true;
+  return (
+    getConsentFlags(rec.from_member_id).matching &&
+    getConsentFlags(rec.to_member_id).matching
+  );
+}
+
 /** 세션 오버라이드(거절/후기/승인) + 최소노출 마스킹을 반영한 뷰 모델로 합성한다. */
 function withSessionAndMask(
   rec: Recommendation,
@@ -53,12 +67,17 @@ function withSessionAndMask(
     useSessionInteractionStore.getState().recommendationOverrides[rec.id];
   const merged: Recommendation = override ? { ...rec, ...override } : rec;
   const isParty = isRecommendationParty(merged, vc);
-  // FR-RC-06/BR-01: 당사자(수신자·발신자)·운영자가 아니면 원문 접점 대신 최소노출 문구만 노출.
+  // FR-RC-06/BR-01: 당사자·운영자가 아니면 최소노출 문구만.
+  // P1-2: 원문 주인(from_member)의 인용 동의(C)가 없으면 당사자·운영자에게도 원문 대신
+  // 최소노출 문구를 반환한다 — 단 원문 주인 본인은 항상 자기 원문을 본다.
+  const quoteOwnerConsent = getConsentFlags(merged.from_member_id).quote;
+  const canSeeQuote =
+    vc.personaId === merged.from_member_id || (isParty && quoteOwnerConsent);
   return {
     ...merged,
     message: {
       ...merged.message,
-      contact_point: isParty
+      contact_point: canSeeQuote
         ? merged.message.contact_point
         : merged.min_exposure_note,
     },
@@ -122,8 +141,11 @@ export async function getRecommendations(
 ): Promise<{ common: Recommendation[]; different: Recommendation[] }> {
   const targetSubtype = getExpertSubtype(vc.personaId);
   // M1-7: 수동 시드 + 매칭엔진 산출을 병행 노출(중복 pair는 엔진 쪽에서 제외됨).
+  // P1-2: 매칭 동의(B)가 없는 pair의 1:1 시드 추천은 목록에서 제외(fail-closed).
   const addressedToViewer = [
-    ...seed.filter((rec) => isAddressedTo(rec, vc.personaId)),
+    ...seed.filter(
+      (rec) => isAddressedTo(rec, vc.personaId) && isMatchingAllowedPair(rec),
+    ),
     ...buildEngineRecommendationsFor(vc.personaId),
   ];
   const weekFiltered = week
@@ -210,7 +232,7 @@ export async function getRecommendation(
         (r) => r.id === id,
       )
     : seed.find((r) => r.id === id);
-  if (!rec) {
+  if (!rec || !isMatchingAllowedPair(rec)) {
     throw new Error(`Recommendation not found: ${id}`);
   }
   return withSessionAndMask(rec, vc);

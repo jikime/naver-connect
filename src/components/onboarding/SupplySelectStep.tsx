@@ -58,7 +58,7 @@ export function SupplySelectStep({
           <p className="text-sm leading-6 text-foreground">
             {memberType === "전문가"
               ? "전문 분야를 바탕으로 미리 선택해 두었어요. 맞는지 확인하고 필요한 항목을 추가해주세요."
-              : "다른 회원이 나를 찾아와야 할 이유 세 가지를 골라주세요."}
+              : "다른 회원이 나를 찾아와야 할 이유를 최대 세 가지(한 가지 이상) 골라주세요."}
           </p>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-guud-text-muted-2">
             {hasPrefilledValues ? (
@@ -75,14 +75,10 @@ export function SupplySelectStep({
           aria-live="polite"
           className={cn(
             "flex shrink-0 items-center gap-2 rounded-full bg-background px-3 py-2 text-xs font-semibold",
-            selections.length === REQUIRED_COUNT
-              ? "text-primary"
-              : "text-guud-text-muted-2",
+            selections.length >= 1 ? "text-primary" : "text-guud-text-muted-2",
           )}
         >
-          {selections.length === REQUIRED_COUNT && (
-            <Check className="size-3.5" />
-          )}
+          {selections.length >= 1 && <Check className="size-3.5" />}
           {selections.length}/{REQUIRED_COUNT} 선택
         </div>
       </div>

@@ -2,8 +2,12 @@
 // 근거: ARCHITECTURE.md §5.3 DAL 쓰기 계약, FR-FB-01~04, FR-ON-09
 
 import declineReasonsSeed from "@/data/decline_reasons.json";
-import recommendationsSeed from "@/data/private/recommendations.json";
-import { parseEngineRecId } from "@/lib/dal/matching";
+// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
+import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
+import {
+  buildEngineRecommendationsFor,
+  parseEngineRecId,
+} from "@/lib/dal/matching";
 import { meetupsById } from "@/lib/dal/meetups";
 import { getMember } from "@/lib/dal/members";
 import { getRecommendations } from "@/lib/dal/recommendations";
@@ -14,9 +18,12 @@ import type {
   DeclineReasonCode,
   MaskedMember,
   NeedIntentV1,
+  OnboardingFinalizeInput,
   Recommendation,
   ViewerContext,
 } from "@/types";
+
+export type { OnboardingFinalizeInput } from "@/types";
 
 const declineReasons = declineReasonsSeed as DeclineReason[];
 const recommendations = recommendationsSeed as Recommendation[];
@@ -29,10 +36,17 @@ export async function getDeclineReasons(): Promise<DeclineReason[]> {
 /** 뷰어가 이 추천의 수신 당사자(또는 운영자)인지 확인, 아니면 reject(타인 추천 조작 방지). */
 function assertIsRecipient(recId: string, vc: ViewerContext): void {
   // M1: 엔진 추천은 시드에 없으므로 ID에 인코딩된 수신자로 판정한다.
+  // P1-4: 임의 ID 조작 방지 — 현재 엔진 산출에 실재하는 추천인지도 검증한다.
   const engineRef = parseEngineRecId(recId);
   if (engineRef) {
     if (vc.role !== "운영자" && vc.personaId !== engineRef.recipient) {
       throw new Error("본인에게 온 추천만 반응할 수 있습니다");
+    }
+    const exists = buildEngineRecommendationsFor(engineRef.recipient).some(
+      (r) => r.id === recId,
+    );
+    if (!exists) {
+      throw new Error(`Recommendation not found: ${recId}`);
     }
     return;
   }
@@ -87,35 +101,8 @@ export async function submitMeetingOutcome(
   });
 }
 
-/** finalizeOnboarding 입력. M1: readiness·trust_connections 소실 수정 + 동의 3분리. */
-export interface OnboardingFinalizeInput {
-  demand_tags: { tagId: number; priority: boolean; detail_quote: string }[];
-  supply_tags: { tagId: number; detail: string }[];
-  activities: string[];
-  preferred_mode: string;
-  participation_scope: "개인 자격으로 참여" | "소속 기관을 대표해 참여" | null;
-  hot_lead: {
-    flag: boolean;
-    project_summary: string;
-    needed_partner: string;
-    stage: string;
-  } | null;
-  /** M1 무손실: 협업 준비도 원값(구현 전엔 hot_lead 플래그로만 압축돼 소실되던 필드) */
-  readiness: string;
-  /** M1 무손실: 위저드에서 수정된 신뢰 연결점 */
-  trust_connections: {
-    type: "소개자" | "아는회원" | "소속모임";
-    ref: string;
-  }[];
-  /** 동의 3분리(A 공개 노출 / B 비공개 수요의 매칭 사용 / C 소개 시 원문 인용) */
-  consents: {
-    publish_profile: boolean;
-    use_private_needs_for_matching: boolean;
-    quote_in_intro: boolean;
-  };
-  /** 하위호환(구 단일 체크박스) — consents.publish_profile와 동일 값 */
-  visibility_consent: boolean;
-}
+// OnboardingFinalizeInput 타입은 @/types/onboarding.ts로 이동(스토어 스냅샷 보존용 — 순환 방지).
+// 위 re-export로 기존 import 경로 호환을 유지한다.
 
 /**
  * 온보딩 확정(FR-ON-09). M1: 입력을 무손실로 Need/Offer 아이템으로 변환해 세션에 적립하고,
@@ -129,6 +116,7 @@ export async function finalizeOnboarding(
 ): Promise<{ member: MaskedMember; firstRecommendations: Recommendation[] }> {
   const now = new Date().toISOString();
   const revision = 2; // 시드(revision 1) 위의 세션 개정판
+  // P1-3: 질문하지 않아 답이 없는 항목은 빈 원문으로 저장 — 시스템 문구를 사용자 quote로 날조하지 않는다.
   const needs: NeedIntentV1[] = profile.demand_tags.map((d, i) => ({
     id: `need-session-${vc.personaId}-${d.tagId}-${i}`,
     owner: { kind: "person", id: vc.personaId },
@@ -155,10 +143,16 @@ export async function finalizeOnboarding(
   }));
 
   const store = useSessionInteractionStore.getState();
+  // P1-3: 전체 스냅샷 보존(무손실) + 동의 3종 receipt를 세션에 그대로 남긴다.
   store.storeOnboardingResult(vc.personaId, {
+    snapshot: profile,
     needs,
     offers,
-    matchingConsent: profile.consents.use_private_needs_for_matching,
+    consents: {
+      publish: profile.consents.publish_profile,
+      matching: profile.consents.use_private_needs_for_matching,
+      quote: profile.consents.quote_in_intro,
+    },
   });
   store.finalizeOnboardingFor(vc.personaId);
 

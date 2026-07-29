@@ -12,5 +12,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
+    // 시드 목업 동의(seed_mock)를 신뢰하는 demo 모드로 실행 — fail-closed 검증은
+    // 개별 테스트에서 env를 비워 확인한다 (Codex 리뷰 P1-2).
+    env: { NEXT_PUBLIC_APP_MODE: "demo" },
   },
 });

@@ -10,15 +10,21 @@ import type {
   DealRoom,
   DeclineReasonCode,
   NeedIntentV1,
+  OnboardingFinalizeInput,
   RecStatus,
   RuleWeight,
 } from "@/types";
 
-/** M1: 온보딩 확정이 적립하는 people 아이템 + 매칭 동의(세션 한정 — JSON-first 단계). */
+/**
+ * M1(P1-3 무손실): 온보딩 확정이 적립하는 전체 스냅샷 + people 아이템 + 동의 3분리.
+ * snapshot이 원본 계약(activities·preferred_mode·participation_scope·hot_lead·readiness·
+ * trust_connections 포함)을 그대로 보존한다 — 시스템이 임의 요약·재구성하지 않는다.
+ */
 export interface OnboardingResult {
+  snapshot: OnboardingFinalizeInput;
   needs: NeedIntentV1[];
   offers: CapabilityOfferV1[];
-  matchingConsent: boolean;
+  consents: { publish: boolean; matching: boolean; quote: boolean };
 }
 
 /** 추천 1건에 대한 세션 오버라이드. DAL read 함수가 시드 위에 겹쳐 반환한다. */

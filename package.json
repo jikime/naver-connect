@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
+    "dev:demo": "NEXT_PUBLIC_APP_MODE=demo next dev -p 3005",
+    "build:demo": "NEXT_PUBLIC_APP_MODE=demo next build",
     "build": "next build",
     "start": "next start",
     "lint": "biome check && eslint --config eslint.config.mjs .",

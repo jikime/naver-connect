@@ -1,7 +1,8 @@
 // DAL: 운영자 검수 — 전건 검수 큐 조회 + 승인. 비운영자는 403 시뮬레이션.
 // 근거: ARCHITECTURE.md §5.2/§5.3 접근제어 계약, FR-OP-01/02/03/04, BR-05(전건 검수)
 
-import recommendationsSeed from "@/data/private/recommendations.json";
+// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
+import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
 import { ForbiddenError } from "@/lib/dal/errors";
 import { useSessionInteractionStore } from "@/stores/session-interaction";
 import type { Recommendation, ViewerContext } from "@/types";

@@ -57,13 +57,14 @@ describe("getNeedIntents — 민감층 fail-closed", () => {
 });
 
 describe("consents — 목적별 영수증", () => {
-  it("본인 동의 영수증만 조회되고, 시드 동의는 seed_mock으로 명시돼 있다", async () => {
+  it("본인 동의 영수증만 조회되고, 시드 동의는 seed_mock으로 명시돼 있다 (4목적: quote_in_intro 포함)", async () => {
     const mine = await getConsentRecords({
       role: "기업가",
       personaId: "M-001",
     });
-    expect(mine.length).toBe(3);
+    expect(mine.length).toBe(4);
     expect(mine.every((c) => c.source === "seed_mock")).toBe(true);
+    expect(mine.some((c) => c.purpose === "quote_in_intro")).toBe(true);
   });
 
   it("타인 동의는 비운영자에게 빈 배열이다", async () => {

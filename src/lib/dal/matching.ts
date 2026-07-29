@@ -7,19 +7,20 @@
 import collabRelationsSeed from "@/data/collab_relations.json";
 import membersPublicSeed from "@/data/members.json";
 import organizationsSeed from "@/data/organizations.json";
+import engineNeedsSeed from "@/data/people/derived/engine-needs.json";
 import impactIntentsSeed from "@/data/people/impact_intents.json";
 import offersSeed from "@/data/people/offers.json";
 import matchScoresSeed from "@/data/private/match_scores.json";
-import recommendationsSeed from "@/data/private/recommendations.json";
+// P1-1: 클라이언트 경로에는 원문 인용이 소거된 redacted twin만 싣는다(raw quote 번들 0건 기준).
+import recommendationsSeed from "@/data/people/derived/recommendations.redacted.json";
 import tagsSeed from "@/data/tags.json";
+import { getConsentFlags } from "@/lib/consent";
 import { ForbiddenError } from "@/lib/dal/errors";
-import {
-  hasActiveConsent,
-  listActiveNeedIntentsForEngine,
-} from "@/lib/dal/people-engine";
 import type {
   DeclineRecord,
   EngineInput,
+  EngineNeed,
+  EngineOffer,
   EngineOutput,
 } from "@/lib/matching/engine";
 import { runEngine } from "@/lib/matching/engine";
@@ -31,6 +32,7 @@ import type {
   MatchScore,
   MatchScoresSeed,
   MemberPublicSeed,
+  NeedIntentV1,
   Recommendation,
   RuleWeight,
   Tag,
@@ -41,6 +43,8 @@ const members = membersPublicSeed as MemberPublicSeed[];
 const scoresSeed = matchScoresSeed as MatchScoresSeed;
 const recommendations = recommendationsSeed as Recommendation[];
 const tags = tagsSeed as Tag[];
+// P1-1: 클라이언트 경로에는 원문 없는 파생 DTO만 — private needs/consents는 이 파일에서 import 금지
+const seedEngineNeeds = engineNeedsSeed as EngineNeed[];
 const seedOffers = offersSeed as CapabilityOfferV1[];
 const seedImpacts = impactIntentsSeed as ImpactIntentV1[];
 const organizations = organizationsSeed as { id: string; member_id?: string }[];
@@ -73,7 +77,10 @@ function buildOrgEdges(): { a: string; b: string }[] {
   return edges;
 }
 
-/** 거절 이력: 시드 status + 세션 오버라이드 병합 — 거절자(수신자) 기준 방향 레코드. */
+/**
+ * 거절 이력: 시드 status + 세션 오버라이드 병합 — 거절자(수신자) 기준 방향 레코드.
+ * P1-4: 엔진 추천(REC-ENG:*)에 대한 세션 거절도 DeclineRecord로 투영해 재실행에 반영한다.
+ */
 function buildDeclines(): DeclineRecord[] {
   const overrides =
     useSessionInteractionStore.getState().recommendationOverrides;
@@ -89,33 +96,67 @@ function buildDeclines(): DeclineRecord[] {
       });
     }
   }
+  for (const [recId, override] of Object.entries(overrides)) {
+    const engineRef = parseEngineRecId(recId);
+    if (
+      engineRef &&
+      override.status === "declined" &&
+      override.decline_reason
+    ) {
+      out.push({
+        fromId: engineRef.recipient,
+        toId: engineRef.other,
+        reason: override.decline_reason,
+      });
+    }
+  }
   return out;
+}
+
+/** 세션 NeedIntent → 엔진 DTO. match_text는 user-confirmed safe_match_text만(아니면 ""). */
+function toEngineNeed(n: NeedIntentV1): EngineNeed {
+  return {
+    id: n.id,
+    ownerId: n.owner.id,
+    tag_ids: n.tag_ids,
+    match_text:
+      n.safe_match_status === "user_confirmed" ? (n.safe_match_text ?? "") : "",
+    priority: n.priority,
+    urgency: n.urgency,
+    constraints: n.constraints,
+    status: n.status,
+  };
+}
+
+function toEngineOffer(o: CapabilityOfferV1): EngineOffer {
+  return {
+    id: o.id,
+    ownerId: o.owner.id,
+    tag_ids: o.tag_ids,
+    detail: o.detail,
+    capacity: o.capacity,
+    status: o.status,
+  };
 }
 
 /** 시드 people 아이템 위에 세션 온보딩 적립분을 겹친다(해당 persona의 시드 아이템은 대체). */
 function mergeWithSession(): {
-  needs: EngineInput["needs"];
-  offers: EngineInput["offers"];
-  consentOf: (personId: string) => boolean;
+  needs: EngineNeed[];
+  offers: EngineOffer[];
 } {
   const results = useSessionInteractionStore.getState().onboardingResults;
   const refreshed = new Set(Object.keys(results));
   const needs = [
-    ...listActiveNeedIntentsForEngine().filter(
-      (n) => !refreshed.has(n.owner.id),
+    ...seedEngineNeeds.filter(
+      (n) => n.status === "active" && !refreshed.has(n.ownerId),
     ),
-    ...Object.values(results).flatMap((r) => r.needs),
+    ...Object.values(results).flatMap((r) => r.needs.map(toEngineNeed)),
   ];
   const offers = [
-    ...seedOffers.filter((o) => !refreshed.has(o.owner.id)),
-    ...Object.values(results).flatMap((r) => r.offers),
+    ...seedOffers.filter((o) => !refreshed.has(o.owner.id)).map(toEngineOffer),
+    ...Object.values(results).flatMap((r) => r.offers.map(toEngineOffer)),
   ];
-  const consentOf = (personId: string): boolean => {
-    const session = results[personId];
-    if (session) return session.matchingConsent;
-    return hasActiveConsent(personId, "use_private_needs_for_matching");
-  };
-  return { needs, offers, consentOf };
+  return { needs, offers };
 }
 
 function activeWeights(): RuleWeight[] {
@@ -130,7 +171,7 @@ export function runMatchingEngine(): {
   input: EngineInput;
   output: EngineOutput;
 } {
-  const { needs, offers, consentOf } = mergeWithSession();
+  const { needs, offers } = mergeWithSession();
   const input: EngineInput = {
     personIds: members.map((m) => m.id),
     needs,
@@ -149,7 +190,7 @@ export function runMatchingEngine(): {
     ),
     orgEdges: buildOrgEdges(),
     declines: buildDeclines(),
-    hasMatchingConsent: consentOf,
+    hasMatchingConsent: (personId) => getConsentFlags(personId).matching,
     ruleWeights: activeWeights(),
     tagNames: TAG_NAMES,
   };

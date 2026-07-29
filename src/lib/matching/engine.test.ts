@@ -1,40 +1,40 @@
 // 매칭 엔진 유닛 — reciprocal need↔offer 엔진의 계약 회귀 방지:
-// hard filter 위반 0 / 결합식 부등식 / 비공개 원문 비유출 / 결정성(같은 입력=같은 출력).
-// 근거: people_match_retrieval_plan.md §6, plans/generic-mixing-seahorse.md M1-6
+// hard filter 위반 0 / 결합식 부등식 / safe-text-only(원문 비유출) / 결정성.
+// 입력은 EngineNeed/EngineOffer DTO — detail_quote는 타입 레벨에서 들어올 수 없다.
+// 근거: people_match_retrieval_plan.md §6, codex-m0m1-review-changes-requested P1-1·P2-1
 
 import { describe, expect, it } from "vitest";
-import type { EngineInput } from "@/lib/matching/engine";
+import type {
+  EngineInput,
+  EngineNeed,
+  EngineOffer,
+} from "@/lib/matching/engine";
 import { runEngine } from "@/lib/matching/engine";
 import { buildExplanation } from "@/lib/matching/explain";
 import { evaluateHardFilters } from "@/lib/matching/hard-filters";
 import { combineReciprocal, needOfferScore } from "@/lib/matching/score";
-import type { CapabilityOfferV1, NeedIntentV1 } from "@/types";
 
 function must<T>(v: T | undefined, label = "value"): T {
   if (v === undefined) throw new Error(`expected ${label} to exist`);
   return v;
 }
 
-// ── 픽스처(로컬 리터럴 — visibility-mask.test.ts 선례) ──────────────────
+// ── 픽스처(로컬 리터럴 — visibility-mask.test.ts 선례). match_text = 승인된 매칭 요약문 ──
 const need = (
   id: string,
   ownerId: string,
   tagIds: number[],
-  quote: string,
+  matchText: string,
   priority: "primary" | "normal" = "normal",
-): NeedIntentV1 => ({
+): EngineNeed => ({
   id,
-  owner: { kind: "person", id: ownerId },
+  ownerId,
   tag_ids: tagIds,
-  detail_quote: quote,
-  safe_match_status: "draft",
+  match_text: matchText,
   priority,
   urgency: "active",
   constraints: [],
   status: "active",
-  source: "migration",
-  profile_revision: 1,
-  created_at: "2026-07-29T12:00:00+09:00",
 });
 
 const offer = (
@@ -42,15 +42,12 @@ const offer = (
   ownerId: string,
   tagIds: number[],
   detail: string,
-): CapabilityOfferV1 => ({
+): EngineOffer => ({
   id,
-  owner: { kind: "person", id: ownerId },
+  ownerId,
   tag_ids: tagIds,
   detail,
   status: "active",
-  source: "migration",
-  profile_revision: 1,
-  created_at: "2026-07-29T12:00:00+09:00",
 });
 
 const baseInput = (): EngineInput => ({
@@ -120,13 +117,32 @@ describe("evaluateHardFilters — 위반 0 계약", () => {
   it("paused 상태 offer만 가진 상대는 CAPACITY_PAUSED로 차단된다", () => {
     const input = baseInput();
     input.offers = input.offers.map((o) =>
-      o.owner.id === "B"
-        ? { ...o, capacity: { status: "paused" as const } }
-        : o,
+      o.ownerId === "B" ? { ...o, capacity: { status: "paused" as const } } : o,
     );
     const r = evaluateHardFilters("A", "B", input);
     expect(r.pass).toBe(false);
     expect(r.codes).toContain("CAPACITY_PAUSED");
+  });
+
+  it("엔진이 평가할 수 없는 required 제약은 조용히 통과시키지 않고 차단한다 (P2-1 fail-closed)", () => {
+    const input = baseInput();
+    input.needs = input.needs.map((n) =>
+      n.ownerId === "A"
+        ? {
+            ...n,
+            constraints: [
+              {
+                kind: "mode" as const,
+                strength: "required" as const,
+                values: ["온라인"],
+              },
+            ],
+          }
+        : n,
+    );
+    const r = evaluateHardFilters("A", "B", input);
+    expect(r.pass).toBe(false);
+    expect(r.codes).toContain("REQUIRED_CONSTRAINT_UNSUPPORTED");
   });
 });
 
@@ -154,6 +170,14 @@ describe("needOfferScore — 방향 점수", () => {
       offer("o1", "B", [1], "판로 자문"),
     );
     expect(p).toBeGreaterThan(n);
+  });
+
+  it("match_text가 비어 있어도(미승인) 태그 신호만으로 점수가 나온다 — safe-text-only 계약", () => {
+    const s = needOfferScore(
+      need("n1", "A", [1], ""),
+      offer("o1", "B", [1], "유통망 소개"),
+    );
+    expect(s).toBeGreaterThan(0);
   });
 });
 
@@ -217,16 +241,28 @@ describe("runEngine — 통합", () => {
   });
 });
 
-describe("buildExplanation — 최소 노출 계약 (BR-01)", () => {
-  it("설명에는 상대의 비공개 원문(detail_quote)이 절대 포함되지 않는다", () => {
+describe("buildExplanation — 최소 노출 계약 (BR-01 + safe-text-only)", () => {
+  it("설명에는 상대의 매칭 텍스트가 포함되지 않고 태그 수준으로만 언급된다", () => {
     const input = baseInput();
     const out = runEngine(input);
     const ab = must(out.pairs.find((p) => p.from === "A" && p.to === "B"));
     const text = JSON.stringify(buildExplanation(ab, input));
-    // B의 비공개 원문은 태그 수준으로만 언급되어야 한다
+    // 상대(B)의 텍스트는 태그 수준으로만 — 승인 텍스트라도 상호 수락 전 비인용
     expect(text).not.toContain("웹사이트 만들 사람이 필요해요");
-    // A 본인의 need 원문 인용은 허용(자기 정보)
+    // 본인(A)의 승인된 match_text 인용은 허용(자기 정보)
     expect(text).toContain("판로를 열고 싶어요");
+  });
+
+  it("match_text가 비어 있으면(미승인) 본인 몫도 태그 수준 문장으로 대체된다", () => {
+    const input = baseInput();
+    input.needs = input.needs.map((n) =>
+      n.ownerId === "A" ? { ...n, match_text: "" } : n,
+    );
+    const out = runEngine(input);
+    const ab = must(out.pairs.find((p) => p.from === "A" && p.to === "B"));
+    const ex = buildExplanation(ab, input);
+    expect(ex.your_need.text).not.toContain("판로를 열고 싶어요");
+    expect(ex.your_need.text.length).toBeGreaterThan(0);
   });
 
   it("설명 4요소(내 필요/상대 제공/상대 이익/첫 행동)가 모두 채워진다", () => {

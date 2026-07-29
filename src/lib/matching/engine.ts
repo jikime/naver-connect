@@ -1,7 +1,9 @@
 // 매칭 엔진 코어 — 순수 함수. 시드/스토어를 직접 읽지 않고 전부 주입받는다(테스트 용이·T-005 준수).
-// 사람 1명=1벡터가 아니라 need→offer 방향 점수 2개를 reciprocal로 결합하고,
+// 입력은 EngineNeed/EngineOffer DTO — NeedIntent 원문(detail_quote)은 타입 레벨에서 들어올 수 없고,
+// match_text에는 user-confirmed safe_match_text만 허용된다(Codex 리뷰 blocker: safe-text-only 계약).
 // 결합식 3종(min/geometric/harmonic)을 모두 계산해 평가 하니스가 비교한다. 기본 score는 harmonic.
-// 근거: people_match_retrieval_plan.md §6, research_synthesis.md §9, plans/generic-mixing-seahorse.md M1-6
+// 근거: people_match_retrieval_plan.md §6, codex-m0m1-review-changes-requested P1-1,
+//       codex-review-eof-pointer-and-safe-text-blocker
 
 import { evaluateHardFilters } from "@/lib/matching/hard-filters";
 import {
@@ -11,12 +13,32 @@ import {
   crossMatchedTokens,
   tokenize,
 } from "@/lib/matching/score";
-import type {
-  CapabilityOfferV1,
-  ImpactIntentV1,
-  NeedIntentV1,
-  RuleWeight,
-} from "@/types";
+import type { ConstraintV1, ImpactIntentV1, RuleWeight } from "@/types";
+
+/**
+ * 엔진용 Need DTO — 비공개 원문을 구조적으로 배제한다.
+ * match_text: 사용자가 검토·승인한 safe_match_text만. draft/미승인이면 반드시 "".
+ */
+export interface EngineNeed {
+  id: string;
+  ownerId: string;
+  tag_ids: number[];
+  match_text: string;
+  priority: "primary" | "normal";
+  urgency: "exploring" | "active" | "time_sensitive";
+  constraints: ConstraintV1[];
+  status: "active" | "paused" | "expired";
+}
+
+/** 엔진용 Offer DTO — detail은 공개층 텍스트라 그대로 사용한다. */
+export interface EngineOffer {
+  id: string;
+  ownerId: string;
+  tag_ids: number[];
+  detail: string;
+  capacity?: { status: "open" | "limited" | "paused"; max_active?: number };
+  status: "active" | "paused" | "expired";
+}
 
 export interface PersonContextLite {
   region: { sido: string; sigungu?: string };
@@ -33,8 +55,8 @@ export interface DeclineRecord {
 
 export interface EngineInput {
   personIds: string[];
-  needs: NeedIntentV1[];
-  offers: CapabilityOfferV1[];
+  needs: EngineNeed[];
+  offers: EngineOffer[];
   impactIntents: ImpactIntentV1[];
   personContext: Record<string, PersonContextLite>;
   /** person 단위 연결(소속 조직의 collab_relations에서 파생) */
@@ -56,6 +78,8 @@ export interface EnginePair {
   reciprocal: { min: number; geometric: number; harmonic: number };
   /** 0..100 — harmonic 기본 결합 + 운영자 가중치 반영 */
   score: number;
+  /** 운영자 가중치 가산분(0..1 스케일) — 하니스가 variant별 최종식 재계산에 사용(P2-2) */
+  boost: number;
   axis: "공통점" | "차이점";
   shared_keywords: string[];
   complementary_keywords: string[];
@@ -74,26 +98,23 @@ export interface EngineOutput {
 }
 
 /** 결합식 대비 common 축의 반영 비율 — 평가 하니스에서 함께 실험한다 */
-const RECIPROCAL_WEIGHT = 0.75;
-const COMMON_WEIGHT = 0.25;
+export const RECIPROCAL_WEIGHT = 0.75;
+export const COMMON_WEIGHT = 0.25;
 /** RuleWeight 1단위당 점수(0..1 스케일) — 구 공식 ×12(0..100)와 동일 레버 크기 유지 */
 const RULE_WEIGHT_UNIT = 0.12;
 
-function activeOffers(
-  input: EngineInput,
-  ownerId: string,
-): CapabilityOfferV1[] {
+function activeOffers(input: EngineInput, ownerId: string): EngineOffer[] {
   return input.offers.filter(
     (o) =>
-      o.owner.id === ownerId &&
+      o.ownerId === ownerId &&
       o.status === "active" &&
       o.capacity?.status !== "paused",
   );
 }
 
-function activeNeeds(input: EngineInput, ownerId: string): NeedIntentV1[] {
+function activeNeeds(input: EngineInput, ownerId: string): EngineNeed[] {
   return input.needs.filter(
-    (n) => n.owner.id === ownerId && n.status === "active",
+    (n) => n.ownerId === ownerId && n.status === "active",
   );
 }
 
@@ -154,9 +175,9 @@ export function runEngine(input: EngineInput): EngineOutput {
       );
       const reciprocal = combineReciprocal(fwd.score, rev.score);
 
-      // 키워드: 방향 매칭에서 교차된 토큰(보완) + 컨텍스트 공통 토큰(공통)
+      // 키워드: 승인된 매칭 텍스트(match_text)와 공개 offer.detail의 교차 토큰만 사용
       const complementary = crossMatchedTokens(
-        [fwd.need?.detail_quote ?? "", rev.need?.detail_quote ?? ""].join(" "),
+        [fwd.need?.match_text ?? "", rev.need?.match_text ?? ""].join(" "),
         [fwd.offer?.detail ?? "", rev.offer?.detail ?? ""].join(" "),
       );
       const kwFrom = input.personContext[from]?.keywords ?? [];
@@ -164,9 +185,9 @@ export function runEngine(input: EngineInput): EngineOutput {
       const shared = kwFrom.filter((k) => kwTo.has(k));
 
       const pairTokens = [
-        ...tokenize(fwd.need?.detail_quote ?? ""),
+        ...tokenize(fwd.need?.match_text ?? ""),
         ...tokenize(fwd.offer?.detail ?? ""),
-        ...tokenize(rev.need?.detail_quote ?? ""),
+        ...tokenize(rev.need?.match_text ?? ""),
         ...tokenize(rev.offer?.detail ?? ""),
         ...shared,
         ...complementary,
@@ -192,6 +213,7 @@ export function runEngine(input: EngineInput): EngineOutput {
         common,
         reciprocal,
         score,
+        boost,
         axis: reciprocal.harmonic >= common ? "차이점" : "공통점",
         shared_keywords: shared,
         complementary_keywords: complementary,
