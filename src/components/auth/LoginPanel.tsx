@@ -208,7 +208,7 @@ export function LoginPanel() {
               <div className="min-w-0 flex-1 space-y-3">
                 <div>
                   <p className="text-sm font-semibold text-secondary-foreground">
-                    심사용 빠른 로그인
+                    {activeAccount.user.name} · 심사용 빠른 로그인
                   </p>
                   <p className="mt-1 truncate font-mono text-[0.6875rem] text-guud-text-muted-2">
                     {activeAccount.email} · {activeAccount.password}
@@ -220,7 +220,7 @@ export function LoginPanel() {
                   size="sm"
                   onClick={() => finishLogin(role)}
                 >
-                  {role} 계정으로 바로 입장
+                  {activeAccount.user.name} 계정으로 바로 입장
                 </Button>
               </div>
             </div>
